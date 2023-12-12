@@ -1,6 +1,6 @@
-#include <OpticalFlowSolver.h>
+#include <src/OpticalFlowSolver.h>
 
-#include <gradients.h>
+#include <src/gradients.h>
 
 // Constructors and deconstructors
 OpticalFlowSolver::OpticalFlowSolver(const dim dimin, const float alpha) {

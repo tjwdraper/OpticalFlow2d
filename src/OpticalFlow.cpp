@@ -1,4 +1,4 @@
-#include <OpticalFlow.h>
+#include <src/OpticalFlow.h>
 
 #include <mex.h>
 #include <cstring>

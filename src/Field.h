@@ -1,7 +1,7 @@
 #ifndef _FIELD_H_
 #define _FIELD_H_
 
-#include <coord2d.h>
+#include <src/coord2d.h>
 
 template <class T>
 class Field {
@@ -33,6 +33,6 @@ class Field {
         dim step;
 };
 
-#include <Field.tpp>
+#include <src/Field.tpp>
 
 #endif

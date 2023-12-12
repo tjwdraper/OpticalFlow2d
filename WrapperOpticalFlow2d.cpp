@@ -1,9 +1,9 @@
 #include <mex.h>
 
-#include <coord2d.h>
-#include <Image.h>
-#include <Motion.h>
-#include <OpticalFlow.h>
+#include <src/coord2d.h>
+#include <src/Image.h>
+#include <src/Motion.h>
+#include <src/OpticalFlow.h>
 
 static OpticalFlow *myOpticalFlow = NULL;
 static mwSize *dim_image_mw;

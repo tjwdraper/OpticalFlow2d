@@ -15,8 +15,8 @@ Iref = (Iref - min(Iref(:))) / (max(Iref(:)) - min(Iref(:)));
 Imov = (Imov - min(Imov(:))) / (max(Imov(:)) - min(Imov(:)));
 
 %% Registration paramters
-niter = [100 100 100 100];
-nscales = 3;
+niter = [100 100];
+nscales = 1;
 alpha = 0.50;
 
 %% Load C++ object

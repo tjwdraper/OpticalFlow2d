@@ -1,4 +1,4 @@
-#include <Motion.h>
+#include <src/Motion.h>
 
 // Constructors and deconstructors
 Motion::Motion(const dim dimin) : Field<vector2d>(dimin) {}

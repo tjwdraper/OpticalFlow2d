@@ -1,10 +1,10 @@
 #ifndef _OPTICAL_FLOW_H_
 #define _OPTICAL_FLOW_H_
 
-#include <coord2d.h>
-#include <Image.h>
-#include <Motion.h>
-#include <OpticalFlowSolver.h>
+#include <src/coord2d.h>
+#include <src/Image.h>
+#include <src/Motion.h>
+#include <src/OpticalFlowSolver.h>
 
 class OpticalFlow {
     public:

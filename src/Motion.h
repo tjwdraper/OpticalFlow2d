@@ -1,7 +1,7 @@
 #ifndef _MOTION_H_
 #define _MOTION_H_
 
-#include <Field.h>
+#include <src/Field.h>
 
 class Motion : public Field<vector2d> {
     public:

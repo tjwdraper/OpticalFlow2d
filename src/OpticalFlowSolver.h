@@ -1,9 +1,9 @@
 #ifndef _OPTICAL_FLOW_SOLVER_H_
 #define _OPTICAL_FLOW_SOLVER_H_
 
-#include <coord2d.h>
-#include <Image.h>
-#include <Motion.h>
+#include <src/coord2d.h>
+#include <src/Image.h>
+#include <src/Motion.h>
 
 class OpticalFlowSolver {
     public:
