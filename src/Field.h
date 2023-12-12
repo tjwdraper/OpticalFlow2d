@@ -21,7 +21,11 @@ class Field {
         void downSample(const Field<T>& fieldin);
 
         // Overload operator
-        Field<T>& operator=(const Field& fieldin);
+        virtual Field<T>& operator=(const Field<T>& fieldin) {return *this;};
+        virtual Field<T> operator+(const Field<T>& fieldin) {return *this;};
+        virtual Field<T>& operator+=(const Field<T>& fieldin) {return *this;};
+        virtual Field<T> operator-(const Field<T>& fieldin) {return *this;};
+        virtual Field<T>& operator-=(const Field<T>& fieldin) {return *this;};
 
     protected:
         // Getters and setters

@@ -1,4 +1,5 @@
 #include <src/OpticalFlow.h>
+#include <src/Logger.h>
 
 #include <mex.h>
 #include <cstring>
@@ -14,7 +15,7 @@ void OpticalFlow::display_registration_parameters(const float alpha) const {
     }
     mexPrintf(")\n");
     mexPrintf("nscales:\t\t\t\t%d\n", this->nscales);
-    mexPrintf("alpha:\t\t\t\t%.2f\n", alpha);
+    mexPrintf("alpha:\t\t\t\t\t%.2f\n", alpha);
     mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n");
 }
 
@@ -109,6 +110,10 @@ void OpticalFlow::estimate_motion_at_current_resolution(Motion* motion,
     const int niter,
     const dim dimin, const int sizein) {
     
+    // Create a Logger object
+    Logger log(dimin, niter);
+
+    // Calculating the image gradients only has to be done once
     solver->get_image_gradients(Iref, Imov);
 
     // Iterate over resolution levels
@@ -116,8 +121,8 @@ void OpticalFlow::estimate_motion_at_current_resolution(Motion* motion,
         // Calculate the update step
         solver->get_update(motion);
 
-        // Check for convergence criteria
-        // ..
+        // Calculate the difference between iterations
+        log.update_error(motion);
     }
     
     // Done
