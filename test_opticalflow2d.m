@@ -15,8 +15,8 @@ Iref = (Iref - min(Iref(:))) / (max(Iref(:)) - min(Iref(:)));
 Imov = (Imov - min(Imov(:))) / (max(Imov(:)) - min(Imov(:)));
 
 %% Registration paramters
-niter = [100 100];
-nscales = 1;
+niter = [800 400 200];
+nscales = 2;
 alpha = 0.50;
 
 %% Load C++ object
@@ -65,7 +65,7 @@ normu = sqrt(motion(:,:,1).^2 + motion(:,:,2).^2);
 jac = jacobian(motion);
 
 figure();
-subplot(121); imagesc(normu); colormap jet;
-subplot(122); imagesc(jac); colormap jet;
+subplot(121); imagesc(normu); colormap jet; colorbar;
+subplot(122); imagesc(jac); colormap jet; colorbar;
 
 

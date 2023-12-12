@@ -1,5 +1,6 @@
 #include <src/Image.h>
 
+#include <mex.h>
 #include <math.h>
 
 // Constructors and deconstructors
@@ -157,3 +158,97 @@ void Image::warp2d(const Motion& mo) {
     // Done
     return;
 } 
+
+// Overload operators
+Image& Image::operator=(const Image& im) {
+    if (this->dimin != im.get_dimensions()) {
+        mexErrMsgTxt("Error: in Image::operator=(const Image& )," 
+                      "assignment cannot be done because dimensions of "
+                      "input and output object are not the same.\n");
+    }
+    else {
+        // Copy the contents from the input to object
+        memcpy(this->field, im.get_field(), this->sizein*sizeof(float));
+    }
+
+    // Done
+    return *this;
+}
+
+Image& Image::operator+=(const Image& im) {
+    if (this->dimin != im.get_dimensions()) {
+        mexErrMsgTxt("Error: in Image::operator+=(const Image& )," 
+                      "assignment cannot be done because dimensions of "
+                      "input and output object are not the same.\n");
+    }
+    else {
+        // Get a copy to the pointer to the content of input
+        float *datain = im.get_field();
+
+        // Iterate over voxels, add together
+        for (unsigned int i = 0 ; i < this->sizein; i++) {
+            this->field[i] += datain[i];
+        }
+    }
+
+    // Done
+    return *this;
+}
+
+Image Image::operator+(const Image& im) {
+    if (this->dimin != im.get_dimensions()) {
+        mexErrMsgTxt("Error: in Image::operator+(const Image& )," 
+                      "assignment cannot be done because dimensions of "
+                      "input and output object are not the same.\n");
+        return *this;
+    }
+    else {
+        // Create output field as copy of input
+        Image imout(*this);
+
+        // Add input to it
+        imout += im;
+
+        // Done
+        return imout;
+    }
+}
+
+Image& Image::operator-=(const Image& im) {
+    if (this->dimin != im.get_dimensions()) {
+        mexErrMsgTxt("Error: in Image::operator+=(const Image& )," 
+                      "assignment cannot be done because dimensions of "
+                      "input and output object are not the same.\n");
+    }
+    else {
+        // Get a copy to the pointer to the content of input
+        float *datain = im.get_field();
+
+        // Iterate over voxels, add together
+        for (unsigned int i = 0; i < this->sizein; i++) {
+            this->field[i] -= datain[i];
+        }
+    }
+
+    // Done
+    return *this;
+}
+
+Image Image::operator-(const Image& im) {
+    if (this->dimin != im.get_dimensions()) {
+        mexErrMsgTxt("Error: in Image::operator+(const Image& )," 
+                      "assignment cannot be done because dimensions of "
+                      "input and output object are not the same.\n");
+        return *this;
+    }
+    else {
+        // Create output field as copy of input
+        Image imout(*this);
+
+        // Add input to it
+        imout -= im;
+
+        // Done
+        return imout;
+    }
+}

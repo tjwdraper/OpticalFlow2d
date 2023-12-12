@@ -6,32 +6,39 @@
 
 class Image : public Field<float> {
     public:
-    // Constructors and deconstructors
-    Image(const dim dimin);
-    Image(const Image& im);
-    ~Image();
+        // Constructors and deconstructors
+        Image(const dim dimin);
+        Image(const Image& im);
+        ~Image();
 
-    // Getters and setters
-    void set_image(const double* im);
-    float* get_image() const;
+        // Getters and setters
+        void set_image(const double* im);
+        float* get_image() const;
 
-    // 
-    void copy_image_to_input(double* im) const;
+        // 
+        void copy_image_to_input(double* im) const;
 
-    // Upsample and downsample
-    void upSample(const Image& im);
-    void downSample(const Image& im);
+        // Upsample and downsample
+        void upSample(const Image& im);
+        void downSample(const Image& im);
 
-    // Get some information from the image
-    float sum() const;
-    float max() const;
-    float min() const;
+        // Get some information from the image
+        float sum() const;
+        float max() const;
+        float min() const;
 
-    // Normalize the image
-    void normalize();
+        // Normalize the image
+        void normalize();
 
-    // Warp image with motion field
-    void warp2d(const Motion& mo);
+        // Warp image with motion field
+        void warp2d(const Motion& mo);
+
+        // Overload operators
+        Image& operator=(const Image& im);
+        Image operator+(const Image& im);
+        Image& operator+=(const Image& im);
+        Image operator-(const Image& im);
+        Image& operator-=(const Image& im);
 };
 
 #endif

@@ -173,6 +173,7 @@ void Field<T>::upSample(const Field<T>& fieldin) {
     return;
 }
 
+/*
 // Overload operators
 template <class T>
 Field<T>& Field<T>::operator=(const Field<T>& fieldin) {
@@ -188,4 +189,31 @@ Field<T>& Field<T>::operator=(const Field<T>& fieldin) {
     // Done
     return *this;
 }
+
+template <class T>
+Field<T> Field<T>::operator-(const Field<T>& fieldin) {
+    if (this->dimin != fieldin.get_dimensions()) {
+        std::cout << "Error: in Field<T>::operator=(const Field<T>& )," 
+                      "assignment cannot be done because dimensions of "
+                      "input and output object are not the same." << std::endl;
+        return *this;
+    }
+    else {
+        // Create output
+        Field<T> fieldout(this->dimin);
+
+        // Create copy to contents of the input and output field
+        T *datain = fieldin.get_field();
+        T *dataout = fieldout.get_field();
+
+        // Iterate over voxels
+        for (int i = 0; i < this->sizein; i++) {
+            dataout[i] = this->field[i] - datain[i];
+        }
+
+        // Done
+        return fieldout;
+    }
+}
+*/
 

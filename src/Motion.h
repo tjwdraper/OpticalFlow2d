@@ -16,9 +16,19 @@ class Motion : public Field<vector2d> {
         // Copy to input
         void copy_motion_to_input(double* mo) const;
 
+        // Get some motion field properties
+        float norm() const;
+
         // Upsample and downsample
         void upSample(const Motion& mo);
         void downSample(const Motion& mo);
+
+        // Overload operators
+        Motion& operator=(const Motion& mo);
+        Motion operator+(const Motion& mo);
+        Motion& operator+=(const Motion& mo);
+        Motion operator-(const Motion& mo);
+        Motion& operator-=(const Motion& mo);
 };
 
 #endif
