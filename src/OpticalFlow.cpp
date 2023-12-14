@@ -136,9 +136,11 @@ void OpticalFlow::estimate_motion() {
             s, this->dimin[s].x, this->dimin[s].y, this->sizein[s], this->niter[s]);
 
         // Downsample motion
-        if ((s > 0) && (s < this->nscales)) {
+        mexPrintf("Iteration: %d - Norm of the this->motion[0] before downsampling: %.4f\n", s, this->motion[0]->norm());
+        //if ((s > 0) && (s < this->nscales)) {
             this->motion[s]->downSample(*this->motion[0]);
-        }
+        //}
+        mexPrintf("Iteration: %d - Norm of the this->motion[%d] after downsampling: %.4f\n", s, s, this->motion[s]->norm());
 
         // Estimate motion at current resolution level
         this->estimate_motion_at_current_resolution(this->motion[s],
@@ -148,9 +150,11 @@ void OpticalFlow::estimate_motion() {
                                                     this->dimin[s], this->sizein[s]);
 
         // Upscale to next level in the pyramid
+        mexPrintf("Iteration: %d - Norm of the this->motion[%d] before upsampling: %.4f\n", s, s, this->motion[s]->norm());
         if (s > 0) {
             this->motion[0]->upSample(*this->motion[s]);
         }
+        mexPrintf("Iteration: %d - Norm of the this->motion[0] after upsampling: %.4f\n", s, this->motion[0]->norm());
     }
 
     // Done

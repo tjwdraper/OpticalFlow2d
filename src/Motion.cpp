@@ -50,7 +50,8 @@ void Motion::upSample(const Motion& mo) {
     const dim& dimin     = this->get_dimensions();
     const dim& dimmotion = mo.get_dimensions();
 
-    vector2d ratio(dimin.x / dimmotion.x, dimin.y / dimmotion.y);
+    vector2d ratio((float) dimin.x / (float) dimmotion.x, 
+                   (float) dimin.y / (float) dimmotion.y);
 
     for (int i = 0; i < this->sizein; i++) {
         this->field[i].x *= ratio.x;
@@ -67,7 +68,8 @@ void Motion::downSample(const Motion& mo) {
     const dim& dimin     = this->get_dimensions();
     const dim& dimmotion = mo.get_dimensions();
 
-    vector2d ratio(dimin.x / dimmotion.x, dimin.y / dimmotion.y);
+    vector2d ratio((float) dimin.x / (float) dimmotion.x, 
+                   (float) dimin.y / (float) dimmotion.y);
 
     for (int i = 0; i < this->sizein; i++) {
         this->field[i].x *= ratio.x;

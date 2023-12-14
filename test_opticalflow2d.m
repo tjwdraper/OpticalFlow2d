@@ -6,18 +6,21 @@ close all;
 Iref = imread("img/dirlab5_ref.tiff");
 Imov = imread("img/dirlab5_mov.tiff");
 
-[dimx, dimy] = size(Iref);
-
 Iref = double(squeeze(Iref));
 Imov = double(squeeze(Imov));
 
 Iref = (Iref - min(Iref(:))) / (max(Iref(:)) - min(Iref(:)));
 Imov = (Imov - min(Imov(:))) / (max(Imov(:)) - min(Imov(:)));
 
+Iref = padarray(Iref, [11 0], "replicate");
+Imov = padarray(Imov, [11 0], "replicate");
+
+[dimx, dimy] = size(Iref);
+
 %% Registration paramters
-niter = [800 400 200];
+niter = [100 100 200];
 nscales = 2;
-alpha = 0.50;
+alpha = 0.75;
 
 %% Load C++ object
 OpticalFlow2d([dimx, dimy], niter, nscales, alpha);
