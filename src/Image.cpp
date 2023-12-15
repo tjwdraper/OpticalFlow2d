@@ -159,7 +159,7 @@ void Image::warp2d(const Motion& mo) {
     return;
 } 
 
-// Overload operators
+// Overload operator=
 Image& Image::operator=(const Image& im) {
     if (this->dimin != im.get_dimensions()) {
         mexErrMsgTxt("Error: in Image::operator=(const Image& )," 
@@ -175,80 +175,26 @@ Image& Image::operator=(const Image& im) {
     return *this;
 }
 
+// Overload operators from base class
+Image Image::operator+(const Image& im) const {
+    Image imout(*this);
+    imout.Field<float>::operator+=(im);
+    //return imout.Field<float>::operator+=(im);
+    return imout;
+}
+
 Image& Image::operator+=(const Image& im) {
-    if (this->dimin != im.get_dimensions()) {
-        mexErrMsgTxt("Error: in Image::operator+=(const Image& )," 
-                      "assignment cannot be done because dimensions of "
-                      "input and output object are not the same.\n");
-    }
-    else {
-        // Get a copy to the pointer to the content of input
-        float *datain = im.get_field();
-
-        // Iterate over voxels, add together
-        for (unsigned int i = 0 ; i < this->sizein; i++) {
-            this->field[i] += datain[i];
-        }
-    }
-
-    // Done
+    this->Field<float>::operator+=(im);
     return *this;
 }
 
-Image Image::operator+(const Image& im) {
-    if (this->dimin != im.get_dimensions()) {
-        mexErrMsgTxt("Error: in Image::operator+(const Image& )," 
-                      "assignment cannot be done because dimensions of "
-                      "input and output object are not the same.\n");
-        return *this;
-    }
-    else {
-        // Create output field as copy of input
-        Image imout(*this);
-
-        // Add input to it
-        imout += im;
-
-        // Done
-        return imout;
-    }
+Image Image::operator-(const Image& im) const {
+    Image imout(*this);
+    imout.Field<float>::operator-=(im);
+    return imout;
 }
 
 Image& Image::operator-=(const Image& im) {
-    if (this->dimin != im.get_dimensions()) {
-        mexErrMsgTxt("Error: in Image::operator+=(const Image& )," 
-                      "assignment cannot be done because dimensions of "
-                      "input and output object are not the same.\n");
-    }
-    else {
-        // Get a copy to the pointer to the content of input
-        float *datain = im.get_field();
-
-        // Iterate over voxels, add together
-        for (unsigned int i = 0; i < this->sizein; i++) {
-            this->field[i] -= datain[i];
-        }
-    }
-
-    // Done
+    this->Field<float>::operator-=(im);
     return *this;
-}
-
-Image Image::operator-(const Image& im) {
-    if (this->dimin != im.get_dimensions()) {
-        mexErrMsgTxt("Error: in Image::operator+(const Image& )," 
-                      "assignment cannot be done because dimensions of "
-                      "input and output object are not the same.\n");
-        return *this;
-    }
-    else {
-        // Create output field as copy of input
-        Image imout(*this);
-
-        // Add input to it
-        imout -= im;
-
-        // Done
-        return imout;
-    }
 }

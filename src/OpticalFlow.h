@@ -4,45 +4,34 @@
 #include <src/coord2d.h>
 #include <src/Image.h>
 #include <src/Motion.h>
-#include <src/OpticalFlowSolver.h>
 
 class OpticalFlow {
     public:
         // Constructors and deconstructors
-        OpticalFlow(const dim dimin, const int nscales, const int* niter, const float alpha);
+        OpticalFlow(const dim dimin, const float alpha);
         ~OpticalFlow();
 
-        // Getters and setters
-        void set_reference_image(const Image& im);
-        void set_moving_image(const Image& im);
-        Motion* get_estimated_motion() const;
+        // Get the image gradients
+        void get_image_gradients(const Image* Iref, const Image* Imov);
 
-        // Copy the estimated motion
-        void copy_estimated_motion(Motion& mo) const;
-
-        // Estimate motion
-        void estimate_motion();
+        // Do one iteration
+        void get_update(Motion *motion);
 
     private:
-        void display_registration_parameters(const float alpha) const;
+        void get_quasi_laplacian(const Motion* motion);
 
-        void estimate_motion_at_current_resolution(Motion* motion, 
-                                                    const Image *Iref, Image *Imov,
-                                                    OpticalFlowSolver *solver, 
-                                                    const int niter,
-                                                    const dim dimin, const int sizein);
+        void horn_schunck_iteration(Motion* motion);
 
-        dim *dimin;
-        int *sizein;
-        int nscales;
-        int *niter;
+        dim dimin;
+        unsigned int sizein;
+        dim step;
 
-        OpticalFlowSolver **solver;
+        // Spatial and temporal image gradients
+        Motion *gradI;
+        Image *It;
 
-        Image **Iref;
-        Image **Imov;
-
-        Motion **motion;
+        float alpha;
+        Motion *qlaplacian;
 };
 
 #endif

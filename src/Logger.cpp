@@ -28,8 +28,9 @@ Logger::~Logger() {
 // Update error with new motion field
 void Logger::update_error(const Motion* motion) {
     // Take the difference between current and previous iteration
-    *this->diff = *motion;
-    *this->diff -= *this->prev;
+    //*this->diff = *motion;
+    //*this->diff -= *this->prev;
+    *this->diff = *motion - *this->prev;
 
     // Calculate the Euclidean norm of the difference
     float prevnorm = this->prev->norm();

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <math.h>
 #include <cstring>
+#include <mex.h>
 
 // Constructors and deconstructors
 template <class T>
@@ -20,9 +21,9 @@ Field<T>::Field(const dim dimin) {
 template <class T>
 Field<T>::Field(const Field& fieldin) {
     // Set the dimensions of the field
-    this->dimin = dimin;
-    this->sizein = dimin.x * dimin.y;
-    this->step = dim(1, dimin.x);
+    this->dimin  = fieldin.get_dimensions();
+    this->sizein = fieldin.get_size();
+    this->step   = fieldin.get_step();
 
     // Allocate memory for the field
     this->field = new T[this->sizein];
@@ -173,47 +174,85 @@ void Field<T>::upSample(const Field<T>& fieldin) {
     return;
 }
 
-/*
 // Overload operators
 template <class T>
-Field<T>& Field<T>::operator=(const Field<T>& fieldin) {
+Field<T>& Field<T>::operator+=(const Field<T>& fieldin) {
     if (this->dimin != fieldin.get_dimensions()) {
-        std::cout << "Error: in Field<T>::operator=(const Field<T>& )," 
+        mexErrMsgTxt("Error: in Field<T>::operator+=(const Field<T>& )," 
                       "assignment cannot be done because dimensions of "
-                      "input and output object are not the same." << std::endl;
+                      "input and output object are not the same.\n");
+    }
+    else {
+        // Get a copy to the pointer to the content of input
+        T *datain = fieldin.get_field();
+
+        // Iterate over voxels, add together
+        for (unsigned int i = 0 ; i < this->sizein; i++) {
+            this->field[i] += datain[i];
+        }
     }
 
-    // Copy the contents
-    memcpy(this->field, fieldin.get_field(), this->sizein*sizeof(T));
-    
     // Done
     return *this;
 }
 
 template <class T>
-Field<T> Field<T>::operator-(const Field<T>& fieldin) {
+Field<T> Field<T>::operator+(const Field<T>& fieldin) const {
     if (this->dimin != fieldin.get_dimensions()) {
-        std::cout << "Error: in Field<T>::operator=(const Field<T>& )," 
+        mexErrMsgTxt("Error: in Field<T>::operator+(const Field<T>& )," 
                       "assignment cannot be done because dimensions of "
-                      "input and output object are not the same." << std::endl;
+                      "input and output object are not the same.\n");
         return *this;
     }
     else {
-        // Create output
-        Field<T> fieldout(this->dimin);
+        // Create output field as copy of input
+        Field<T> fieldout(*this);
 
-        // Create copy to contents of the input and output field
-        T *datain = fieldin.get_field();
-        T *dataout = fieldout.get_field();
-
-        // Iterate over voxels
-        for (int i = 0; i < this->sizein; i++) {
-            dataout[i] = this->field[i] - datain[i];
-        }
+        // Add input to it
+        fieldout += fieldin;
 
         // Done
         return fieldout;
     }
 }
-*/
 
+template <class T>
+Field<T>& Field<T>::operator-=(const Field<T>& fieldin) {
+    if (this->dimin != fieldin.get_dimensions()) {
+        mexErrMsgTxt("Error: in Field<T>::operator+=(const Field<T>& )," 
+                      "assignment cannot be done because dimensions of "
+                      "input and output object are not the same.\n");
+    }
+    else {
+        // Get a copy to the pointer to the content of input
+        T *datain = fieldin.get_field();
+
+        // Iterate over voxels, add together
+        for (unsigned int i = 0; i < this->sizein; i++) {
+            this->field[i] -= datain[i];
+        }
+    }
+
+    // Done
+    return *this;
+}
+
+template <class T>
+Field<T> Field<T>::operator-(const Field<T>& fieldin) const {
+    if (this->dimin != fieldin.get_dimensions()) {
+        mexErrMsgTxt("Error: in Field<T>::operator+(const Field<T>& )," 
+                      "assignment cannot be done because dimensions of "
+                      "input and output object are not the same.\n");
+        return *this;
+    }
+    else {
+        // Create output field as copy of input
+        Field<T> fieldout(*this);
+
+        // Add input to it
+        fieldout -= fieldin;
+
+        // Done
+        return fieldout;
+    }
+}

@@ -23,11 +23,13 @@ class Motion : public Field<vector2d> {
         void upSample(const Motion& mo);
         void downSample(const Motion& mo);
 
-        // Overload operators
+        // Overload operator=
         Motion& operator=(const Motion& mo);
-        Motion operator+(const Motion& mo);
+
+        // Overload operators from base class
+        Motion operator+(const Motion& mo) const;
         Motion& operator+=(const Motion& mo);
-        Motion operator-(const Motion& mo);
+        Motion operator-(const Motion& mo) const;
         Motion& operator-=(const Motion& mo);
 };
 

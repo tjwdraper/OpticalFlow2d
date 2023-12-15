@@ -80,7 +80,7 @@ void Motion::downSample(const Motion& mo) {
     return;
 }
 
-// Overload operators
+// Overload operator=
 Motion& Motion::operator=(const Motion& im) {
     if (this->dimin != im.get_dimensions()) {
         mexErrMsgTxt("Error: in Motion::operator=(const Motion& )," 
@@ -96,81 +96,25 @@ Motion& Motion::operator=(const Motion& im) {
     return *this;
 }
 
-Motion& Motion::operator+=(const Motion& im) {
-    if (this->dimin != im.get_dimensions()) {
-        mexErrMsgTxt("Error: in Motion::operator+=(const Motion& )," 
-                      "assignment cannot be done because dimensions of "
-                      "input and output object are not the same.\n");
-    }
-    else {
-        // Get a copy to the pointer to the content of input
-        vector2d *datain = im.get_field();
+// Overload operators from base class
+Motion Motion::operator+(const Motion& mo) const {
+    Motion moout(*this);
+    moout.Field<vector2d>::operator+=(mo);
+    return moout;
+}
 
-        // Iterate over voxels, add together
-        for (unsigned int i = 0 ; i < this->sizein; i++) {
-            this->field[i] += datain[i];
-        }
-    }
-
-    // Done
+Motion& Motion::operator+=(const Motion& mo) {
+    this->Field<vector2d>::operator+=(mo);
     return *this;
 }
 
-Motion Motion::operator+(const Motion& im) {
-    if (this->dimin != im.get_dimensions()) {
-        mexErrMsgTxt("Error: in Motion::operator+(const Motion& )," 
-                      "assignment cannot be done because dimensions of "
-                      "input and output object are not the same.\n");
-        return *this;
-    }
-    else {
-        // Create output field as copy of input
-        Motion imout(*this);
-
-        // Add input to it
-        imout += im;
-
-        // Done
-        return imout;
-    }
+Motion Motion::operator-(const Motion& mo) const {
+    Motion moout(*this);
+    moout.Field<vector2d>::operator-=(mo);
+    return moout;
 }
 
-Motion& Motion::operator-=(const Motion& im) {
-    if (this->dimin != im.get_dimensions()) {
-        mexErrMsgTxt("Error: in Motion::operator+=(const Motion& )," 
-                      "assignment cannot be done because dimensions of "
-                      "input and output object are not the same.\n");
-    }
-    else {
-        // Get a copy to the pointer to the content of input
-        vector2d *datain = im.get_field();
-
-        // Iterate over voxels, add together
-        for (unsigned int i = 0 ; i < this->sizein; i++) {
-            this->field[i] -= datain[i];
-        }
-    }
-
-    // Done
+Motion& Motion::operator-=(const Motion& mo) {
+    this->Field<vector2d>::operator-=(mo);
     return *this;
 }
-
-Motion Motion::operator-(const Motion& im) {
-    if (this->dimin != im.get_dimensions()) {
-        mexErrMsgTxt("Error: in Motion::operator+(const Motion& )," 
-                      "assignment cannot be done because dimensions of "
-                      "input and output object are not the same.\n");
-        return *this;
-    }
-    else {
-        // Create output field as copy of input
-        Motion imout(*this);
-
-        // Add input to it
-        imout -= im;
-
-        // Done
-        return imout;
-    }
-}
-

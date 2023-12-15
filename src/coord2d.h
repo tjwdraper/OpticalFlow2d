@@ -108,11 +108,11 @@ class coord2d {
         }
 
         // Boolean operators
-        bool operator==(const coord2d& c) {
+        bool operator==(const coord2d& c) const {
             return (this->x == c.x) && (this->y == c.y);
         }
 
-        bool operator!=(const coord2d& c) {
+        bool operator!=(const coord2d& c) const {
             return (this->x != c.x) || (this->y != c.y);
         }
 

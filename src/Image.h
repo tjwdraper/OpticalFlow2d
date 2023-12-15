@@ -33,11 +33,13 @@ class Image : public Field<float> {
         // Warp image with motion field
         void warp2d(const Motion& mo);
 
-        // Overload operators
+        // Overload operator=
         Image& operator=(const Image& im);
-        Image operator+(const Image& im);
+        
+        // Overload operators from base class
+        Image operator+(const Image& im) const;
         Image& operator+=(const Image& im);
-        Image operator-(const Image& im);
+        Image operator-(const Image& im) const;
         Image& operator-=(const Image& im);
 };
 
