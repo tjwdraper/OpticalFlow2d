@@ -5,6 +5,8 @@
 #include <src/Motion.h>
 #include <src/ImageRegistration.h>
 
+#include <src/SolverOptions.h>
+
 static ImageRegistration *myImageRegistration = NULL;
 static mwSize *dim_image_mw;
 static mwSize *dim_motion_mw;
@@ -15,7 +17,7 @@ mexFunction (int nlhs, mxArray *plhs[],
              int nrhs, const mxArray *prhs[])
 {
     // Set registration parameters
-    if ((nlhs == 0) && (nrhs == 4) && (myImageRegistration == NULL)) {
+    if ((nlhs == 0) && (nrhs == 5) && (myImageRegistration == NULL)) {
         // Get the dimensions and the size of the images
         double *tmp;
         tmp = mxGetPr(prhs[0]);
@@ -34,8 +36,11 @@ mexFunction (int nlhs, mxArray *plhs[],
         tmp = mxGetPr(prhs[3]);
         float alpha = (float) tmp[0];
 
+        tmp = mxGetPr(prhs[4]);
+        IterativeMethod imethod = static_cast<IterativeMethod>(tmp[0]);
+
         // Pass parameters to ImageRegistration object
-        myImageRegistration = new ImageRegistration(dimin, nscales, niter, alpha);
+        myImageRegistration = new ImageRegistration(dimin, nscales, niter, alpha, imethod);
 
         // Set the output dimension for image and motion field
         dim_image_mw = new mwSize[2];

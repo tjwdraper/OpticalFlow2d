@@ -18,12 +18,16 @@ Imov = padarray(Imov, [11 0], "replicate");
 [dimx, dimy] = size(Iref);
 
 %% Registration paramters
-niter = [100 100 200];
+niter = [100 100 100];
 nscales = 2;
-alpha = 0.75;
+alpha = 0.55;
+
+solver = 0; % Options:
+            % 0) Standard gradient descent algorithm
+            % 1) Spectral method
 
 %% Load C++ object
-OpticalFlow2d([dimx, dimy], niter, nscales, alpha);
+OpticalFlow2d([dimx, dimy], niter, nscales, alpha, solver);
 
 %% Do the registration
 tic;

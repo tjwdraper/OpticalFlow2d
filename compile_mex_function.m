@@ -7,6 +7,6 @@ end
 
 disp("Compiling...");
 
-mkoctfile --mex -o "OpticalFlow2d.mex" WrapperOpticalFlow2d.cpp src/Image.cpp src/Motion.cpp src/Logger.cpp src/OpticalFlow.cpp src/ImageRegistration.cpp
+mkoctfile --mex -o "OpticalFlow2d.mex" WrapperOpticalFlow2d.cpp src/Image.cpp src/Motion.cpp src/Logger.cpp src/ImageRegistration.cpp src/ImageRegistrationSolver.cpp src/OpticalFlow.cpp src/OpticalFlowSpectral.cpp
 
 disp("Compilation success!");

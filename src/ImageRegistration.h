@@ -4,12 +4,13 @@
 #include <src/coord2d.h>
 #include <src/Image.h>
 #include <src/Motion.h>
-#include <src/OpticalFlow.h>
+#include <src/ImageRegistrationSolver.h>
+#include <src/SolverOptions.h>
 
 class ImageRegistration {
     public:
         // Constructors and deconstructors
-        ImageRegistration(const dim dimin, const int nscales, const int* niter, const float alpha);
+        ImageRegistration(const dim dimin, const int nscales, const int* niter, const float alpha, const IterativeMethod imethod);
         ~ImageRegistration();
 
         // Getters and setters
@@ -28,7 +29,7 @@ class ImageRegistration {
 
         void estimate_motion_at_current_resolution(Motion* motion, 
                                                     const Image *Iref, Image *Imov,
-                                                    OpticalFlow *solver, 
+                                                    ImageRegistrationSolver *solver, 
                                                     const int niter,
                                                     const dim dimin, const int sizein);
 
@@ -37,7 +38,7 @@ class ImageRegistration {
         int nscales;
         int *niter;
 
-        OpticalFlow **solver;
+        ImageRegistrationSolver **solver;
 
         Image **Iref;
         Image **Imov;

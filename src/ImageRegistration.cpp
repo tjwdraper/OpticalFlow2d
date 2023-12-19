@@ -1,4 +1,6 @@
 #include <src/ImageRegistration.h>
+#include <src/OpticalFlow.h>
+#include <src/OpticalFlowSpectral.h>
 #include <src/Logger.h>
 
 #include <mex.h>
@@ -19,7 +21,7 @@ void ImageRegistration::display_registration_parameters(const float alpha) const
     mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n");
 }
 
-ImageRegistration::ImageRegistration(const dim dimin, const int nscales, const int* niter, const float alpha) {
+ImageRegistration::ImageRegistration(const dim dimin, const int nscales, const int* niter, const float alpha, const IterativeMethod imethod) {
     // Size and dimensions of the input image
     this->dimin = new dim[nscales + 1];
     this->sizein = new int[nscales + 1];
@@ -36,9 +38,12 @@ ImageRegistration::ImageRegistration(const dim dimin, const int nscales, const i
     memcpy(this->niter, niter, (nscales+1)*sizeof(int));
 
     // Solver object
-    this->solver = new OpticalFlow*[nscales + 1];
+    this->solver = new ImageRegistrationSolver*[nscales + 1];
     for (int s = nscales; s >= 0; s--) {
-        this->solver[s] = new OpticalFlow(this->dimin[s], alpha);
+        switch(imethod) {
+            case IterativeMethod::GradientDescent: this->solver[s] = new OpticalFlow(this->dimin[s], alpha); break;
+            case IterativeMethod::Spectral:        this->solver[s] = new OpticalFlowSpectral(this->dimin[s], alpha); break;
+        }
     }
 
     // Allocate image and motion 
@@ -106,7 +111,7 @@ void ImageRegistration::copy_estimated_motion(Motion& mo) const {
 // Estimate motion
 void ImageRegistration::estimate_motion_at_current_resolution(Motion* motion, 
     const Image *Iref, Image *Imov,
-    OpticalFlow *solver, 
+    ImageRegistrationSolver *solver, 
     const int niter,
     const dim dimin, const int sizein) {
     
@@ -114,7 +119,7 @@ void ImageRegistration::estimate_motion_at_current_resolution(Motion* motion,
     Logger log(dimin, niter);
 
     // Calculating the image gradients only has to be done once
-    solver->get_image_gradients(Iref, Imov);
+    solver->set_image_gradients(Iref, Imov);
 
     // Iterate over resolution levels
     for (int iter = 0; iter < niter; iter++) {
