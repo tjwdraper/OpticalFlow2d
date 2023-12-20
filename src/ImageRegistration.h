@@ -9,7 +9,7 @@
 class ImageRegistration {
     public:
         // Constructors and deconstructors
-        ImageRegistration(const dim dimin, const int nscales, const int* niter, const float alpha);
+        ImageRegistration(const dim dimin, const int nscales, const int* niter, const int nrefine, const float alpha);
         ~ImageRegistration();
 
         // Getters and setters
@@ -36,6 +36,7 @@ class ImageRegistration {
         int *sizein;
         int nscales;
         int *niter;
+        int nrefine;
 
         OpticalFlow **solver;
 

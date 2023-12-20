@@ -15,11 +15,12 @@ void ImageRegistration::display_registration_parameters(const float alpha) const
     }
     mexPrintf(")\n");
     mexPrintf("nscales:\t\t\t\t%d\n", this->nscales);
+    mexPrintf("nrefine:\t\t\t\t%d\n", this->nrefine);
     mexPrintf("alpha:\t\t\t\t\t%.2f\n", alpha);
     mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n");
 }
 
-ImageRegistration::ImageRegistration(const dim dimin, const int nscales, const int* niter, const float alpha) {
+ImageRegistration::ImageRegistration(const dim dimin, const int nscales, const int* niter, const int nrefine, const float alpha) {
     // Size and dimensions of the input image
     this->dimin = new dim[nscales + 1];
     this->sizein = new int[nscales + 1];
@@ -31,6 +32,7 @@ ImageRegistration::ImageRegistration(const dim dimin, const int nscales, const i
     }
 
     // Registration parameters
+    this->nrefine = nrefine;
     this->nscales = nscales;
     this->niter = new int[nscales + 1];
     memcpy(this->niter, niter, (nscales+1)*sizeof(int));

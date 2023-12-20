@@ -18,8 +18,8 @@ Imov = padarray(Imov, [11 0], "replicate");
 [dimx, dimy] = size(Iref);
 
 %% Registration paramters
-niter = [1000 1000 1000];
-nscales = 2;
+niter = [0 0 0 1000];
+nscales = 3;
 alpha = 0.9;
 
 %% Load C++ object
