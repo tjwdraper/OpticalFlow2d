@@ -38,9 +38,10 @@ void Motion::copy_motion_to_input(double* mo) const {
 float Motion::norm() const {
     float norm = 0.0f;
     for (unsigned int i = 0; i < this->sizein; i++) {
-        norm += std::pow(this->field[i].x, 2) + std::pow(this->field[i].y, 2);
+        norm += std::sqrt(std::pow(this->field[i].x, 2) + std::pow(this->field[i].y, 2));
     }
-    return std::sqrt(norm)/this->sizein;
+    return norm / this->sizein;
+    //return std::sqrt(norm)/this->sizein;
 }
 
 // Upsample and downsample

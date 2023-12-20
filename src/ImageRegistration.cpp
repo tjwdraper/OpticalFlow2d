@@ -123,6 +123,12 @@ void ImageRegistration::estimate_motion_at_current_resolution(Motion* motion,
 
         // Calculate the difference between iterations
         log.update_error(motion);
+
+        // Converge check
+        if ((log.get_error_at_current_iteration() < 0.001f) &&
+            (iter > 1)) {
+            break;
+        }
     }
     
     // Done

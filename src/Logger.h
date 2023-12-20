@@ -13,6 +13,9 @@ class Logger {
         // Update error array with new motion field
         void update_error(const Motion* motion);
 
+        // Get currennt error
+        float get_error_at_current_iteration() const;
+
     private:
         // Display error
         void show_error_at_iteration(const unsigned int iter) const;

@@ -28,8 +28,6 @@ Logger::~Logger() {
 // Update error with new motion field
 void Logger::update_error(const Motion* motion) {
     // Take the difference between current and previous iteration
-    //*this->diff = *motion;
-    //*this->diff -= *this->prev;
     *this->diff = *motion - *this->prev;
 
     // Calculate the Euclidean norm of the difference
@@ -45,6 +43,14 @@ void Logger::update_error(const Motion* motion) {
 
     // Increment counter
     this->iter++;
+}
+
+// Get currennt error
+float Logger::get_error_at_current_iteration() const {
+    if ((this->iter-1 > this->niter) || (this->iter-1 < 0)) {
+        mexErrMsgTxt("Error: Logger::iter > Logger::niter, so current iteration cannot be shown,\n");
+    }
+    return this->error[this->iter-1];
 }
 
 // Display error

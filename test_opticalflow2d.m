@@ -18,9 +18,9 @@ Imov = padarray(Imov, [11 0], "replicate");
 [dimx, dimy] = size(Iref);
 
 %% Registration paramters
-niter = [100 100 100];
+niter = [1000 1000 1000];
 nscales = 2;
-alpha = 0.75;
+alpha = 0.9;
 
 %% Load C++ object
 OpticalFlow2d([dimx, dimy], niter, nscales, alpha);
