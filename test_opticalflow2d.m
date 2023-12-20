@@ -18,12 +18,14 @@ Imov = padarray(Imov, [11 0], "replicate");
 [dimx, dimy] = size(Iref);
 
 %% Registration paramters
-niter = [0 0 0 1000];
+niter = [1000 1000 1000 1000];
 nscales = 3;
-alpha = 0.9;
+nrefine = 2;
+alpha = 0.8;
+
 
 %% Load C++ object
-OpticalFlow2d([dimx, dimy], niter, nscales, alpha);
+OpticalFlow2d([dimx, dimy], niter, nscales, alpha, nrefine);
 
 %% Do the registration
 tic;

@@ -12,6 +12,7 @@ class Motion : public Field<vector2d> {
 
         // Getters and setters
         vector2d* get_motion() const;
+        void reset();
 
         // Copy to input
         void copy_motion_to_input(double* mo) const;
@@ -22,6 +23,9 @@ class Motion : public Field<vector2d> {
         // Upsample and downsample
         void upSample(const Motion& mo);
         void downSample(const Motion& mo);
+
+        // Accumulate motion
+        void accumulate(const Motion& mo);
 
         // Overload operator=
         Motion& operator=(const Motion& mo);

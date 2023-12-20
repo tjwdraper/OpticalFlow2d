@@ -14,6 +14,9 @@ vector2d* Motion::get_motion() const {
     return this->Field<vector2d>::get_field();
 }
 
+void Motion::reset() {
+    memset(this->field, 0, this->sizein*sizeof(vector2d));
+}
 
 // Copy to input
 void Motion::copy_motion_to_input(double* mo) const {
@@ -92,6 +95,73 @@ void Motion::downSample(const Motion& mo) {
         this->field[i].x *= ratio.x;
         this->field[i].y *= ratio.y;
     }
+
+    // Done
+    return;
+}
+
+void Motion::accumulate(const Motion& mo) {
+    if (this->dimin != mo.get_dimensions()) {
+        throw std::invalid_argument("Error in Motion::accumulate(const Motion& mo): input dimensions should match target dimensions");
+    }
+
+    // Get the dimensions of the motion field
+    const dim& dimin = this->dimin;
+    const dim& step = this->step;
+    
+    // Make a copy of this object
+    vector2d *motot = new vector2d[this->sizein];
+    memcpy(motot, this->field, this->sizein*sizeof(vector2d));
+
+    // Get a copy to the pointer of the input motion field
+    vector2d *moin = mo.get_field();
+
+    // Iterate over output voxels
+    unsigned int idx;
+    for (unsigned int i = 0; i < dimin.x; i++) {
+        for (unsigned int j = 0; j < dimin.y; j++) {
+            // Get index in image
+            idx = i * step.x + j * step.y;
+            
+            // Get the warped index
+            float px = i + moin[idx].x; int dx = std::floor(px); float fx = px - dx;
+            float py = j + moin[idx].y; int dy = std::floor(py); float fy = py - dy;
+
+            // Check if warped index is out of bounds
+            if ((dx < 0) || (dx >= dimin.x) ||
+                (dy < 0) || (dy >= dimin.y)) {
+                continue;
+            }
+
+            // Get initial update
+            this->field[idx] = moin[idx];
+            
+            // Otherwise, get the value through linear interpolation
+            int idxO = dx * step.x + dy * step.y;
+            vector2d val = motot[idxO]*(1-fx)*(1-fy);
+            float weight = (1-fx)*(1-fy);
+            if (dx < dimin.x-1) {
+                val += motot[idxO + step.x]*fx*(1-fy);
+                weight += fx*(1-fy);
+            }
+            if (dy < dimin.y-1) {
+                val += motot[idxO + step.y]*(1-fx)*fy;
+                weight += (1-fx)*fy;
+            }
+            if ((dx < dimin.x-1) && (dy < dimin.y-1)) {
+                val += motot[idxO + step.x + step.y]*fx*fy;
+                weight += fx*fy;
+            }
+
+            // Get new value
+            if (weight != 0) {
+                this->field[idx] += val / weight;
+            }
+        }
+    }
+
+    // Free up the memory
+    delete[] motot;
 
     // Done
     return;

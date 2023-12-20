@@ -112,26 +112,51 @@ void ImageRegistration::estimate_motion_at_current_resolution(Motion* motion,
     const int niter,
     const dim dimin, const int sizein) {
     
-    // Create a Logger object
-    Logger log(dimin, niter);
+    // Create auxiliary motion field
+    Image *Iaux = new Image(dimin);
 
-    // Calculating the image gradients only has to be done once
-    solver->get_image_gradients(Iref, Imov);
+    // Create auxiliary motion field
+    Motion *motion_est = new Motion(dimin);
 
-    // Iterate over resolution levels
-    for (int iter = 0; iter < niter; iter++) {
-        // Calculate the update step
-        solver->get_update(motion);
+    for (int refine = 0; refine < this->nrefine; refine++) {
+        // Reset Iaux to input image
+        *Iaux = *Imov;
 
-        // Calculate the difference between iterations
-        log.update_error(motion);
+        // Warp moving image with accumulated motion field
+        Iaux->warp2d(*motion);
 
-        // Converge check
-        if ((log.get_error_at_current_iteration() < 0.001f) &&
-            (iter > 1)) {
-            break;
+        // Create a Logger object
+        Logger log(dimin, niter);
+
+        // Calculating the image gradients only has to be done once
+        solver->get_image_gradients(Iref, Iaux);
+
+        // Iterate over resolution levels
+        for (int iter = 0; iter < niter; iter++) {
+            // Calculate the update step
+            solver->get_update(motion_est);
+
+            // Calculate the difference between iterations
+            log.update_error(motion_est);
+
+            // Converge check
+            if ((log.get_error_at_current_iteration() < 0.001f) &&
+                (iter > 1)) {
+                break;
+            }
         }
+
+        // Accumulate motion field
+        motion->accumulate(*motion_est);
+
+        // Reset auxiliary field
+        motion_est->reset();
+
     }
+
+    // Free up the mem
+    delete motion_est;
+    delete Iaux;
     
     // Done
     return;
