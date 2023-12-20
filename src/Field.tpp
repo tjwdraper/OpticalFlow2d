@@ -11,11 +11,17 @@ Field<T>::Field(const dim dimin) {
     this->sizein = dimin.x * dimin.y;
     this->step = dim(1, dimin.x);
 
-    // Allocate memory for the field
-    this->field = new T[this->sizein];
-
-    // Set values to zero
-    memset(this->field, 0, this->sizein*sizeof(T));
+    // Allocate memory for the field and set values to zero
+    try {
+        this->field = new T[this->sizein];
+        memset(this->field, 0, this->sizein*sizeof(T));
+    }
+    catch (const std::bad_alloc& e) {
+        const std::string mes = "Error in Field<T>::Field(const dim dimin): " + 
+            std::string(e.what()) + 
+            std::string("\n");
+        mexErrMsgTxt(mes.c_str());
+    }
 }
 
 template <class T>
@@ -25,16 +31,21 @@ Field<T>::Field(const Field& fieldin) {
     this->sizein = fieldin.get_size();
     this->step   = fieldin.get_step();
 
-    // Allocate memory for the field
-    this->field = new T[this->sizein];
-
-    // Copy contents from the input field to the object
-    memcpy(this->field, fieldin.get_field(), this->sizein*sizeof(T));
+    // Allocate memory for the field and copy values from input
+    try {
+        this->field = new T[this->sizein];
+        memcpy(this->field, fieldin.get_field(), this->sizein*sizeof(T));
+    }
+    catch (const std::bad_alloc& e) {
+        const std::string mes = "Error in Field<T>::Field(const Field& fieldin): " + 
+            std::string(e.what()) + 
+            std::string("\n");
+        mexErrMsgTxt(mes.c_str());
+    }
 }
 
 template <class T>
 Field<T>::~Field() {
-    // Free up the memory
     delete[] this->field;
 }
 
@@ -71,12 +82,26 @@ void Field<T>::downSample(const Field<T>& fieldin) {
     const dim& stepin = fieldin.get_step();
     const dim& stepout = this->step;
 
+    // Check that input field has larger input dimensions
+    if ((dimout.x > dimin.x) || (dimout.y > dimin.y)) {
+        throw std::invalid_argument("Error in Field<T>::downSample(const FIeld<T>& fieldin): input has to have same dimensions as target");
+    }
+
     // Get a copy to the data of the fields
     T* datain = fieldin.get_field();
     T* dataout = this->field;
 
     // Get the factor between input and output iomage
-    dim factor(dimin.x/dimout.x, dimin.y/dimout.y);
+    dim factor;
+    try {
+        factor = dimin / dimout;
+    }
+    catch (const std::runtime_error& e) {
+        const std::string mes = std::string("Error in Field<T>::downSample(const Field<T>& fieldin): ") + 
+            std::string(e.what()) + 
+            std::string("\n");
+        mexErrMsgTxt(mes.c_str());
+    }
 
     // Index in the input and output image
     unsigned int idxin;
@@ -126,6 +151,11 @@ void Field<T>::upSample(const Field<T>& fieldin) {
     const dim& dimout = this->dimin;
     const dim& stepin = fieldin.get_step();
     const dim& stepout = this->step;
+
+    // Check that input field has larger input dimensions
+    if ((dimout.x < dimin.x) || (dimout.y < dimin.y)) {
+        throw std::invalid_argument("Error in Field<T>::downSample(const FIeld<T>& fieldin): input has to have same dimensions as target");
+    }
 
     // Get a copy to the data of the fields
     T* datain = fieldin.get_field();
@@ -178,18 +208,14 @@ void Field<T>::upSample(const Field<T>& fieldin) {
 template <class T>
 Field<T>& Field<T>::operator+=(const Field<T>& fieldin) {
     if (this->dimin != fieldin.get_dimensions()) {
-        mexErrMsgTxt("Error: in Field<T>::operator+=(const Field<T>& )," 
-                      "assignment cannot be done because dimensions of "
-                      "input and output object are not the same.\n");
+        throw std::invalid_argument("input argument has to have same dimensions as target");
     }
-    else {
-        // Get a copy to the pointer to the content of input
-        T *datain = fieldin.get_field();
+    // Get a copy to the pointer to the content of input
+    T *datain = fieldin.get_field();
 
-        // Iterate over voxels, add together
-        for (unsigned int i = 0 ; i < this->sizein; i++) {
-            this->field[i] += datain[i];
-        }
+    // Iterate over voxels, add together
+    for (unsigned int i = 0 ; i < this->sizein; i++) {
+        this->field[i] += datain[i];
     }
 
     // Done
@@ -199,38 +225,29 @@ Field<T>& Field<T>::operator+=(const Field<T>& fieldin) {
 template <class T>
 Field<T> Field<T>::operator+(const Field<T>& fieldin) const {
     if (this->dimin != fieldin.get_dimensions()) {
-        mexErrMsgTxt("Error: in Field<T>::operator+(const Field<T>& )," 
-                      "assignment cannot be done because dimensions of "
-                      "input and output object are not the same.\n");
-        return *this;
+        throw std::invalid_argument("input argument has to have same dimensions as target");
     }
-    else {
-        // Create output field as copy of input
-        Field<T> fieldout(*this);
+    // Create output field as copy of input
+    Field<T> fieldout(*this);
 
-        // Add input to it
-        fieldout += fieldin;
+    // Add input to it
+    fieldout += fieldin;
 
-        // Done
-        return fieldout;
-    }
+    // Done
+    return fieldout;
 }
 
 template <class T>
 Field<T>& Field<T>::operator-=(const Field<T>& fieldin) {
     if (this->dimin != fieldin.get_dimensions()) {
-        mexErrMsgTxt("Error: in Field<T>::operator+=(const Field<T>& )," 
-                      "assignment cannot be done because dimensions of "
-                      "input and output object are not the same.\n");
+        throw std::invalid_argument("input argument has to have same dimensions as target");
     }
-    else {
-        // Get a copy to the pointer to the content of input
-        T *datain = fieldin.get_field();
+    // Get a copy to the pointer to the content of input
+    T *datain = fieldin.get_field();
 
-        // Iterate over voxels, add together
-        for (unsigned int i = 0; i < this->sizein; i++) {
-            this->field[i] -= datain[i];
-        }
+    // Iterate over voxels, add together
+    for (unsigned int i = 0; i < this->sizein; i++) {
+        this->field[i] -= datain[i];
     }
 
     // Done
@@ -240,19 +257,14 @@ Field<T>& Field<T>::operator-=(const Field<T>& fieldin) {
 template <class T>
 Field<T> Field<T>::operator-(const Field<T>& fieldin) const {
     if (this->dimin != fieldin.get_dimensions()) {
-        mexErrMsgTxt("Error: in Field<T>::operator+(const Field<T>& )," 
-                      "assignment cannot be done because dimensions of "
-                      "input and output object are not the same.\n");
-        return *this;
+        throw std::invalid_argument("input argument has to have same dimensions as target");
     }
-    else {
-        // Create output field as copy of input
-        Field<T> fieldout(*this);
+    // Create output field as copy of input
+    Field<T> fieldout(*this);
 
-        // Add input to it
-        fieldout -= fieldin;
+    // Add input to it
+    fieldout -= fieldin;
 
-        // Done
-        return fieldout;
-    }
+    // Done
+    return fieldout;
 }

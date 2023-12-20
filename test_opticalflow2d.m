@@ -18,7 +18,7 @@ Imov = padarray(Imov, [11 0], "replicate");
 [dimx, dimy] = size(Iref);
 
 %% Registration paramters
-niter = [100 100 200];
+niter = [100 100 100];
 nscales = 2;
 alpha = 0.75;
 

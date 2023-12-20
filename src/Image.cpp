@@ -50,11 +50,27 @@ void Image::copy_image_to_input(double* im) const {
 
 // Upsample and downsample
 void Image::upSample(const Image& im) {
-    this->Field<float>::upSample(im);
+    try {
+        this->Field<float>::upSample(im);
+    }
+    catch (const std::invalid_argument& e) {
+        const std::string mes = "Error in Image::upSample(const Image& im): " + 
+            std::string(e.what()) + 
+            std::string("\n");
+        mexErrMsgTxt(mes.c_str());
+    }
 }
 
 void Image::downSample(const Image& im) {
-    this->Field<float>::downSample(im);
+    try {
+        this->Field<float>::downSample(im);
+    }
+    catch (const std::invalid_argument& e) {
+        const std::string mes = "Error in Image::downSample(const Image& im): " + 
+            std::string(e.what()) + 
+            std::string("\n");
+        mexErrMsgTxt(mes.c_str());
+    }
 }
 
 // Get some information from the image
@@ -100,6 +116,11 @@ void Image::normalize() {
 
 // Warp image with motion field
 void Image::warp2d(const Motion& mo) {
+    // Check that input dimensions are OK
+    if (this->dimin != mo.get_dimensions()) {
+        throw std::invalid_argument("Error in Image::warp2d(const Motion& mo): input dimensions have to be the same as target");
+    }
+
     // Copy the image to a temporary array
     float *Itmp = new float[this->sizein];
     memcpy(Itmp, this->field, this->sizein*sizeof(float));
@@ -162,15 +183,19 @@ void Image::warp2d(const Motion& mo) {
 // Overload operator=
 Image& Image::operator=(const Image& im) {
     if (this->dimin != im.get_dimensions()) {
-        mexErrMsgTxt("Error: in Image::operator=(const Image& )," 
-                      "assignment cannot be done because dimensions of "
-                      "input and output object are not the same.\n");
-    }
-    else {
-        // Copy the contents from the input to object
-        memcpy(this->field, im.get_field(), this->sizein*sizeof(float));
+        throw std::invalid_argument("Image::operator=(const Image& im) input argument has to have same dimensions as target");
     }
 
+    // Copy the contents from the input to object
+    try {
+        memcpy(this->field, im.get_field(), this->sizein*sizeof(float));
+    }
+    catch(const std::bad_alloc& e) {
+        const std::string mes = "Error in Image::operator=(const Image& im) " + 
+            std::string(e.what()) + 
+            std::string("\n");
+        mexErrMsgTxt(mes.c_str());
+    }
     // Done
     return *this;
 }
@@ -178,23 +203,54 @@ Image& Image::operator=(const Image& im) {
 // Overload operators from base class
 Image Image::operator+(const Image& im) const {
     Image imout(*this);
-    imout.Field<float>::operator+=(im);
-    //return imout.Field<float>::operator+=(im);
+    try {
+        imout.Field<float>::operator+=(im);
+    }
+    catch (const std::invalid_argument& e) {
+        const std::string mes = std::string("Error in Image::operator+(const Image& im) ") +
+            std::string(e.what()) + 
+            std::string("\n");
+        mexErrMsgTxt(mes.c_str());
+    }
     return imout;
 }
 
 Image& Image::operator+=(const Image& im) {
-    this->Field<float>::operator+=(im);
+    try {
+        this->Field<float>::operator+=(im);
+    }
+    catch (const std::invalid_argument& e) {
+        const std::string mes = std::string("Error in Image::operator+=(const Image& im) ") +
+            std::string(e.what()) + 
+            std::string("\n");
+        mexErrMsgTxt(mes.c_str());
+    }
     return *this;
 }
 
 Image Image::operator-(const Image& im) const {
     Image imout(*this);
-    imout.Field<float>::operator-=(im);
+    try {
+        imout.Field<float>::operator-=(im);
+    }
+    catch (const std::invalid_argument& e) {
+        const std::string mes = std::string("Error in Image::operator-(const Image& im) ") +
+            std::string(e.what()) + 
+            std::string("\n");
+        mexErrMsgTxt(mes.c_str());
+    }
     return imout;
 }
 
 Image& Image::operator-=(const Image& im) {
-    this->Field<float>::operator-=(im);
+    try {
+        this->Field<float>::operator-=(im);
+    }
+    catch (const std::invalid_argument& e) {
+        const std::string mes = std::string("Error in Image::operator-=(const Image& im) ") +
+            std::string(e.what()) + 
+            std::string("\n");
+        mexErrMsgTxt(mes.c_str());
+    }
     return *this;
 }

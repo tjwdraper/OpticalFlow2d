@@ -45,7 +45,15 @@ float Motion::norm() const {
 
 // Upsample and downsample
 void Motion::upSample(const Motion& mo) {
-    this->Field<vector2d>::upSample(mo);
+    try {
+        this->Field<vector2d>::upSample(mo);
+    }
+    catch (const std::invalid_argument& e) {
+        const std::string mes = "Error in Motion::upSample(const Motion& mo): " + 
+            std::string(e.what()) + 
+            std::string("\n");
+        mexErrMsgTxt(mes.c_str());
+    }
 
     const dim& dimin     = this->get_dimensions();
     const dim& dimmotion = mo.get_dimensions();
@@ -63,7 +71,15 @@ void Motion::upSample(const Motion& mo) {
 }
 
 void Motion::downSample(const Motion& mo) {
-    this->Field<vector2d>::downSample(mo);
+    try {
+        this->Field<vector2d>::downSample(mo);
+    }
+    catch (const std::invalid_argument& e) {
+        const std::string mes = "Error in Motion::downSample(const Motion& im): " + 
+            std::string(e.what()) + 
+            std::string("\n");
+        mexErrMsgTxt(mes.c_str());
+    }
 
     const dim& dimin     = this->get_dimensions();
     const dim& dimmotion = mo.get_dimensions();
@@ -81,15 +97,20 @@ void Motion::downSample(const Motion& mo) {
 }
 
 // Overload operator=
-Motion& Motion::operator=(const Motion& im) {
-    if (this->dimin != im.get_dimensions()) {
-        mexErrMsgTxt("Error: in Motion::operator=(const Motion& )," 
-                      "assignment cannot be done because dimensions of "
-                      "input and output object are not the same.\n");
+Motion& Motion::operator=(const Motion& mo) {
+    if (this->dimin != mo.get_dimensions()) {
+        throw std::invalid_argument("Motion::operator=(const Motion& mo) input argument has to have same dimensions as target");
     }
-    else {
-        // Copy the contents from the input to object
-        memcpy(this->field, im.get_field(), this->sizein*sizeof(vector2d));
+
+    // Copy the contents from the input to object
+    try {
+        memcpy(this->field, mo.get_field(), this->sizein*sizeof(vector2d));
+    }
+    catch(const std::bad_alloc& e) {
+        const std::string mes = "Error in Motion::operator=(const Motion& mo) " + 
+            std::string(e.what()) + 
+            std::string("\n");
+        mexErrMsgTxt(mes.c_str());
     }
 
     // Done
