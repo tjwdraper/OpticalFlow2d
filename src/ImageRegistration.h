@@ -4,7 +4,7 @@
 #include <src/coord2d.h>
 #include <src/Image.h>
 #include <src/Motion.h>
-#include <src/OpticalFlowDiffusion.h>
+#include <src/OpticalFlow.h>
 
 class ImageRegistration {
     public:
@@ -28,7 +28,7 @@ class ImageRegistration {
 
         void estimate_motion_at_current_resolution(Motion* motion, 
                                                     const Image *Iref, Image *Imov,
-                                                    OpticalFlowDiffusion *solver, 
+                                                    OpticalFlow *solver, 
                                                     const int niter,
                                                     const dim dimin, const int sizein);
 
@@ -38,7 +38,7 @@ class ImageRegistration {
         int *niter;
         int nrefine;
 
-        OpticalFlowDiffusion **solver;
+        OpticalFlow **solver;
 
         Image **Iref;
         Image **Imov;

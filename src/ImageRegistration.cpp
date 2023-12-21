@@ -1,4 +1,5 @@
 #include <src/ImageRegistration.h>
+#include <src/OpticalFlowDiffusion.h>
 #include <src/Logger.h>
 
 #include <mex.h>
@@ -38,7 +39,7 @@ ImageRegistration::ImageRegistration(const dim dimin, const int nscales, const i
     memcpy(this->niter, niter, (nscales+1)*sizeof(int));
 
     // Solver object
-    this->solver = new OpticalFlowDiffusion*[nscales + 1];
+    this->solver = new OpticalFlow*[nscales + 1];
     for (int s = nscales; s >= 0; s--) {
         this->solver[s] = new OpticalFlowDiffusion(this->dimin[s], alpha);
     }
@@ -108,7 +109,7 @@ void ImageRegistration::copy_estimated_motion(Motion& mo) const {
 // Estimate motion
 void ImageRegistration::estimate_motion_at_current_resolution(Motion* motion, 
     const Image *Iref, Image *Imov,
-    OpticalFlowDiffusion *solver, 
+    OpticalFlow *solver, 
     const int niter,
     const dim dimin, const int sizein) {
     
