@@ -5,11 +5,11 @@
 #include <src/Image.h>
 #include <src/Motion.h>
 
-class OpticalFlow {
+class OpticalFlowDiffusion {
     public:
         // Constructors and deconstructors
-        OpticalFlow(const dim dimin, const float alpha);
-        ~OpticalFlow();
+        OpticalFlowDiffusion(const dim dimin, const float alpha);
+        ~OpticalFlowDiffusion();
 
         // Get the image gradients
         void get_image_gradients(const Image* Iref, const Image* Imov);

@@ -1,9 +1,9 @@
-#include <src/OpticalFlow.h>
+#include <src/OpticalFlowDiffusion.h>
 
 #include <src/gradients.h>
 
 // Constructors and deconstructors
-OpticalFlow::OpticalFlow(const dim dimin, const float alpha) {
+OpticalFlowDiffusion::OpticalFlowDiffusion(const dim dimin, const float alpha) {
     // Get the dimensions and size of the images
     this->dimin  = dimin;
     this->sizein = this->dimin.x * this->dimin.y;
@@ -20,7 +20,7 @@ OpticalFlow::OpticalFlow(const dim dimin, const float alpha) {
     this->It = new Image(this->dimin);
 }
 
-OpticalFlow::~OpticalFlow() {
+OpticalFlowDiffusion::~OpticalFlowDiffusion() {
     delete this->qlaplacian;
 
     delete this->gradI;
@@ -28,7 +28,7 @@ OpticalFlow::~OpticalFlow() {
 }
 
 // Get the spatial and temporal image gradients
-void OpticalFlow::get_image_gradients(const Image* Iref, const Image* Imov) {
+void OpticalFlowDiffusion::get_image_gradients(const Image* Iref, const Image* Imov) {
     // Get the dimensions and the step size of the image
     const dim& dimin = this->dimin;
     const dim& step = this->step;
@@ -57,7 +57,7 @@ void OpticalFlow::get_image_gradients(const Image* Iref, const Image* Imov) {
 }
 
 // Do one iteration
-void OpticalFlow::get_quasi_laplacian(const Motion* motion) {
+void OpticalFlowDiffusion::get_quasi_laplacian(const Motion* motion) {
     // Get the dimensions and step size of the motion field
     const dim& dimin = this->dimin;
     const dim& step = this->step;
@@ -80,7 +80,7 @@ void OpticalFlow::get_quasi_laplacian(const Motion* motion) {
     return;
 }
 
-void OpticalFlow::horn_schunck_iteration(Motion *motion) {
+void OpticalFlowDiffusion::horn_schunck_iteration(Motion *motion) {
     // Get the dimensions and step size of the motion field
     const dim& dimin = this->dimin;
     const dim& step = this->step;
@@ -108,7 +108,7 @@ void OpticalFlow::horn_schunck_iteration(Motion *motion) {
     return;
 }
 
-void OpticalFlow::get_update(Motion *motion) {
+void OpticalFlowDiffusion::get_update(Motion *motion) {
     // Get the laplacian map (without the central contribution)
     this->get_quasi_laplacian(motion);
 
