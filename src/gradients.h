@@ -63,9 +63,23 @@ namespace gradients {
             return T(0.0f);
         }
         else {
-            return (field[idx-1] + field[idx+1] + field[idx-dimin.x] + field[idx+dimin.x])/6.0f
-                + (field[idx-1-dimin.x] + field[idx-1+dimin.x] +  field[idx+1-dimin.x] + field[idx+1+dimin.x])/12.0f;
-            //return (field[idx - 1] + field[idx + 1] + field[idx - dimin.x] + field[idx + dimin.x])/4.0f;
+            //return (field[idx-1] + field[idx+1] + field[idx-dimin.x] + field[idx+dimin.x])/6.0f
+            //    + (field[idx-1-dimin.x] + field[idx-1+dimin.x] +  field[idx+1-dimin.x] + field[idx+1+dimin.x])/12.0f;
+            return (field[idx - 1] + field[idx + 1] + field[idx - dimin.x] + field[idx + dimin.x])/4.0f;
+        }
+    }
+
+    // Fourth order differential operator
+    template <typename T>
+    __inline__ T qbiharmonic(T *field, const unsigned int idx, const unsigned int i, const unsigned int j, const dim& dimin) {
+        if ((i <= 1) || (i >= dimin.x-2) ||
+            (j <= 1) || (j >= dimin.y-2)) {
+            return T(0.0f);
+        }
+        else {
+            return (field[idx-2] + field[idx+2] + field[idx-2*dimin.x] + field[idx+2*dimin.x]) / -20.0f - 
+                   (field[idx-1-dimin.x] + field[idx-1+dimin.x] + field[idx+1-dimin.x] + field[idx+1+dimin.x])/10.0f + 
+                   (field[idx-1] + field[idx+1] + field[idx-dimin.x] + field[idx+dimin.x])/2.5f;
         }
     }
 }

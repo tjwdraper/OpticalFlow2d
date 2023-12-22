@@ -1,11 +1,12 @@
 #include <src/ImageRegistration.h>
 #include <src/OpticalFlowDiffusion.h>
+#include <src/OpticalFlowCurvature.h>
 #include <src/Logger.h>
 
 #include <mex.h>
 #include <cstring>
 
-void ImageRegistration::display_registration_parameters(const float alpha) const {
+void ImageRegistration::display_registration_parameters(const Regularisation reg, const float alpha) const {
     mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
     mexPrintf("Optical flow image registration started... (2D C++ implementation)...\n");
     mexPrintf("Registration parameters:\n");
@@ -17,11 +18,15 @@ void ImageRegistration::display_registration_parameters(const float alpha) const
     mexPrintf(")\n");
     mexPrintf("nscales:\t\t\t\t%d\n", this->nscales);
     mexPrintf("nrefine:\t\t\t\t%d\n", this->nrefine);
+    switch(reg) {
+        case Regularisation::Diffusion: mexPrintf("regularisation:\tdiffusion\n"); break;
+        case Regularisation::Curvature: mexPrintf("regularisation:\tcurvature\n"); break;
+    }
     mexPrintf("alpha:\t\t\t\t\t%.2f\n", alpha);
     mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n");
 }
 
-ImageRegistration::ImageRegistration(const dim dimin, const int nscales, const int* niter, const int nrefine, const float alpha) {
+ImageRegistration::ImageRegistration(const dim dimin, const int nscales, const int* niter, const int nrefine, const Regularisation reg, const float alpha) {
     // Size and dimensions of the input image
     this->dimin = new dim[nscales + 1];
     this->sizein = new int[nscales + 1];
@@ -41,7 +46,10 @@ ImageRegistration::ImageRegistration(const dim dimin, const int nscales, const i
     // Solver object
     this->solver = new OpticalFlow*[nscales + 1];
     for (int s = nscales; s >= 0; s--) {
-        this->solver[s] = new OpticalFlowDiffusion(this->dimin[s], alpha);
+        switch(reg) {
+            case Regularisation::Diffusion: this->solver[s] = new OpticalFlowDiffusion(this->dimin[s], alpha); break;
+            case Regularisation::Curvature: this->solver[s] = new OpticalFlowCurvature(this->dimin[s], alpha); break;
+        }
     }
 
     // Allocate image and motion 
@@ -55,7 +63,7 @@ ImageRegistration::ImageRegistration(const dim dimin, const int nscales, const i
     }
 
     // Show loaded registration parameters to terminal
-    display_registration_parameters(alpha);
+    display_registration_parameters(reg, alpha);
 }
 
 ImageRegistration::~ImageRegistration() {

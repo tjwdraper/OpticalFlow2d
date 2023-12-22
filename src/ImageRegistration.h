@@ -5,11 +5,12 @@
 #include <src/Image.h>
 #include <src/Motion.h>
 #include <src/OpticalFlow.h>
+#include <src/SolverOptions.h>
 
 class ImageRegistration {
     public:
         // Constructors and deconstructors
-        ImageRegistration(const dim dimin, const int nscales, const int* niter, const int nrefine, const float alpha);
+        ImageRegistration(const dim dimin, const int nscales, const int* niter, const int nrefine, const Regularisation reg, const float alpha);
         ~ImageRegistration();
 
         // Getters and setters
@@ -24,7 +25,7 @@ class ImageRegistration {
         void estimate_motion();
 
     private:
-        void display_registration_parameters(const float alpha) const;
+        void display_registration_parameters(const Regularisation reg, const float alpha) const;
 
         void estimate_motion_at_current_resolution(Motion* motion, 
                                                     const Image *Iref, Image *Imov,

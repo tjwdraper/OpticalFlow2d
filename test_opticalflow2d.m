@@ -23,9 +23,13 @@ nscales = 3;
 nrefine = 2;
 alpha = 0.8;
 
+regularisation = 0; % Options:
+                    % 0) Diffusion
+                    % 1) Curvature
+
 
 %% Load C++ object
-OpticalFlow2d([dimx, dimy], niter, nscales, alpha, nrefine);
+OpticalFlow2d([dimx, dimy], niter, nscales, regularisation, alpha, nrefine);
 
 %% Do the registration
 tic;
