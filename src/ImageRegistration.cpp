@@ -1,6 +1,7 @@
 #include <src/ImageRegistration.h>
 #include <src/OpticalFlowDiffusion.h>
 #include <src/OpticalFlowCurvature.h>
+#include <src/OpticalFlowElastic.h>
 #include <src/Logger.h>
 
 #include <mex.h>
@@ -21,6 +22,7 @@ void ImageRegistration::display_registration_parameters(const Regularisation reg
     switch(reg) {
         case Regularisation::Diffusion: mexPrintf("regularisation:\tdiffusion\n"); break;
         case Regularisation::Curvature: mexPrintf("regularisation:\tcurvature\n"); break;
+        case Regularisation::Elastic:   mexPrintf("regularisation:\telastic\n"); break;
     }
     mexPrintf("alpha:\t\t\t\t\t%.2f\n", alpha);
     mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n");
@@ -49,6 +51,7 @@ ImageRegistration::ImageRegistration(const dim dimin, const int nscales, const i
         switch(reg) {
             case Regularisation::Diffusion: this->solver[s] = new OpticalFlowDiffusion(this->dimin[s], alpha); break;
             case Regularisation::Curvature: this->solver[s] = new OpticalFlowCurvature(this->dimin[s], alpha); break;
+            case Regularisation::Elastic:   this->solver[s] = new OpticalFlowElastic(this->dimin[s], alpha); break;
         }
     }
 

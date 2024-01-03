@@ -14,16 +14,13 @@ class OpticalFlow {
         // Get the image gradients
         void get_image_gradients(const Image* Iref, const Image* Imov);
 
+        // Construct the force from the image gradients and motion estimate
+        void get_force(Motion* force, const Motion* motion) const;
+
         // Do one iteration
-        void get_update(Motion *motion);
+        virtual void get_update(Motion *motion) {};
 
     protected:
-        // Do one iteration of the Horn-Schunck method (= Optical Flow Diffusion)
-        void optical_flow_iteration(Motion* motion);
-
-        // Get the FD approximation of the motion, wwithout the "central" contribution
-        virtual void get_quasi_differential_operator(const Motion* motion) {};
-
         dim dimin;
         unsigned int sizein;
         dim step;
@@ -31,9 +28,6 @@ class OpticalFlow {
         // Spatial and temporal image gradients
         Motion *gradI;
         Image *It;
-
-        // Quasi differential operator
-        Motion *qdiffoperator;
 
         float alpha;
 };

@@ -12,9 +12,18 @@ class OpticalFlowDiffusion : public OpticalFlow {
         OpticalFlowDiffusion(const dim dimin, const float alpha);
         ~OpticalFlowDiffusion();
 
-    private:        
         // Overload method from base class
+        void get_update(Motion *motion);
+
+    private:    
+        // Do one iteration of the Horn-Schunck method (= Optical Flow Diffusion)
+        void optical_flow_iteration(Motion* motion);
+
+        // Get the FD approximation of the motion, wwithout the "central" contribution
         void get_quasi_differential_operator(const Motion* motion);
+
+        // Quasi differential operator
+        Motion *qdiffoperator;
 };
 
 #endif

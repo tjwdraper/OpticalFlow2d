@@ -9,9 +9,9 @@ class OpticalFlowCurvature : public OpticalFlow {
         OpticalFlowCurvature(const dim dimin, const float alpha);
         ~OpticalFlowCurvature();
 
+        void get_update(Motion* motion) {};
+
     private:
-        // Overload method from base class
-        void get_quasi_differential_operator(const Motion* motion);
 };
 
 #endif

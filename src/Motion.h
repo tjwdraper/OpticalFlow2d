@@ -27,6 +27,9 @@ class Motion : public Field<vector2d> {
         // Accumulate motion
         void accumulate(const Motion& mo);
 
+        // Enforce boundary conditions
+        void Neumann_boundaryconditions();
+
         // Overload operator=
         Motion& operator=(const Motion& mo);
 
