@@ -20,10 +20,10 @@ Imov = padarray(Imov, [11 0], "replicate");
 [dimx, dimy] = size(Iref);
 
 %% Registration paramters
-niter = [10];
-nscales = 0;
+niter = [1000 1000 1000 1000];
+nscales = 3;
 nrefine = 3;
-alpha = 1.0;
+alpha = 0.8;
 
 regularisation = 1; % Options:
                     % 0) Diffusion

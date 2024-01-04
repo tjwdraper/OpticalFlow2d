@@ -17,12 +17,8 @@ void OpticalFlowCurvature::set_eigenvalues() {
     unsigned int idx;
     for (unsigned int p = 0; p < dimin.x; p++) {
         for (unsigned int q = 0; q < dimin.y; q++) {
-            // FFT shift the coefficients
-            unsigned int p_shift = (p < dimin.x/2 ? p + dimin.x/2 : p - dimin.x/2);
-            unsigned int q_shift = (q < dimin.y/2 ? q + dimin.y/2 : q - dimin.y/2);
-
             // Get the index in the eigenvalue matrix
-            idx = p_shift * step.x + q_shift * step.y;
+            idx = p * step.x + q * step.y;
 
             // Get the eigenvalue of the curvature operator
             this->eigenvalues[idx] = 1.0f / (1.0f + tau * alpha * pow(-4 + 2*cos(p*PI/dimin.x) + 2*cos(q*PI/dimin.y), 2)); 
@@ -95,8 +91,8 @@ void OpticalFlowCurvature::construct_rhs(const Motion* motion) {
             idx_rm = i * step_rm.x + j * step_rm.y;
             idx_cm = i * step_cm.x + j * step_cm.y;
 
-            this->rhs_x[idx_rm] = u[idx_cm].x + tau * f[idx_cm].x;
-            this->rhs_y[idx_rm] = u[idx_cm].y + tau * f[idx_cm].y;
+            this->rhs_x[idx_rm] = u[idx_cm].x - tau * f[idx_cm].x;
+            this->rhs_y[idx_rm] = u[idx_cm].y - tau * f[idx_cm].y;
         }
     }
 
@@ -122,7 +118,7 @@ void OpticalFlowCurvature::construct_motion(Motion *motion) const {
             idx_cm = i * step_cm.x + j * step_cm.y;
 
             u[idx_cm] = vector2d(this->rhs_x[idx_rm],
-                                 this->rhs_y[idx_rm]) / sizein;
+                                 this->rhs_y[idx_rm]) / (4.0f*sizein);
         }
     }
 

@@ -40,7 +40,7 @@ class OpticalFlowCurvature : public OpticalFlow {
         double *eigenvalues;
 
         // Step size in time-marching algorithm
-        const float tau = 100;
+        const float tau = 1;
 };
 
 #endif
