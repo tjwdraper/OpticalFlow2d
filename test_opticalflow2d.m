@@ -49,10 +49,10 @@ Ireg = OpticalFlow2d(Imov);
 OpticalFlow2d();
 
 %% Unpad images and motion field
-%Iref = Iref(1+11:end-11, 1+11:end-11);
-%Imov = Imov(1+11:end-11, 1+11:end-11);
-%Ireg = Ireg(1+11:end-11, 1+11:end-11);
-%motion = motion(1+11:end-11, 1+11:end-11, :);
+Iref = Iref(1+11:end-11, 1+11:end-11);
+Imov = Imov(1+11:end-11, 1+11:end-11);
+Ireg = Ireg(1+11:end-11, 1+11:end-11);
+motion = motion(1+11:end-11, 1+11:end-11, :);
 
 %% Show some info
 fprintf("Distribution: %.3f +/ %.3f\n", mean(motion(:)), std(motion(:)));
