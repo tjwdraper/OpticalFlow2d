@@ -20,12 +20,12 @@ Imov = padarray(Imov, [11 0], "replicate");
 [dimx, dimy] = size(Iref);
 
 %% Registration paramters
-niter = [1000 1000 1000 1000];
-nscales = 3;
+niter = [10];
+nscales = 0;
 nrefine = 3;
 alpha = 1.0;
 
-regularisation = 2; % Options:
+regularisation = 1; % Options:
                     % 0) Diffusion
                     % 1) Curvature
                     % 2) Elastic
