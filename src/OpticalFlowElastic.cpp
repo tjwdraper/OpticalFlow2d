@@ -14,8 +14,6 @@ void OpticalFlowElastic::get_update(Motion* motion) {
     // Get the force
     this->OpticalFlow::get_force(this->force, motion);
 
-    mexPrintf("Norm force: %.3f\n", this->force->norm());
-
     // Do a SOR iteration
     this->OpticalFlowElastic::SOR_iteration(motion);
 }
@@ -36,8 +34,8 @@ void OpticalFlowElastic::SOR_iteration(Motion* motion) const {
 
     // Iterate over voxels
     unsigned int idx;
-    for (unsigned int i = 1; i < dimin.x-2; i++) {
-        for (unsigned int j = 1; j < dimin.y-2; j++) {
+    for (unsigned int i = 1; i < dimin.x-1; i++) {
+        for (unsigned int j = 1; j < dimin.y-1; j++) {
             idx = i * step.x + j * step.y;
 
             x[idx].x = (1.0f-omega)*x[idx].x + omega / (-6*mu-2*lambda) * ( b[idx].x - 
@@ -51,9 +49,6 @@ void OpticalFlowElastic::SOR_iteration(Motion* motion) const {
             );
         }
     }
-
-    // Enforce boundary conditions
-    motion->Neumann_boundaryconditions();
 
     // Done
     return;

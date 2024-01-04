@@ -79,8 +79,6 @@ mexFunction (int nlhs, mxArray *plhs[],
         // Copy estimated motion from device to host
         myImageRegistration->copy_estimated_motion(motion);
 
-        motion.Neumann_boundaryconditions();
-
         // Create output array and pointer to data
         plhs[0] = mxCreateNumericArray(3, dim_motion_mw, mxDOUBLE_CLASS, mxREAL);
         double *tmp = mxGetPr(plhs[0]);

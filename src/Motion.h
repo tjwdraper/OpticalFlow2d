@@ -29,6 +29,7 @@ class Motion : public Field<vector2d> {
 
         // Enforce boundary conditions
         void Neumann_boundaryconditions();
+        void Dirichlet_boundaryconditions();
 
         // Overload operator=
         Motion& operator=(const Motion& mo);

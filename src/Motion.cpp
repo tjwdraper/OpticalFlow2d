@@ -177,31 +177,67 @@ void Motion::Neumann_boundaryconditions() {
     vector2d *u = this->field;
 
     unsigned int idx;
-    for (unsigned int i = 1; i < dimin.x-2; i++) {
+    for (unsigned int i = 1; i < dimin.x-1; i++) {
         // Left side
         idx = i * step.x;
-        u[idx] = u[idx + step.x];
+        u[idx] = u[idx + step.y];
 
         // Right side
         idx += (dimin.y-1) * step.y;
-        u[idx] = u[idx - step.x];
-    }
-
-    for (unsigned int j = 1; j < dimin.y-2; j++) {
-        // Bottom side
-        idx = j * step.y;
-        u[idx] = u[idx + step.y];
-
-        // Top side
-        idx += (dimin.x-1) * step.x;
         u[idx] = u[idx - step.y];
     }
 
+    for (unsigned int j = 1; j < dimin.y-1; j++) {
+        // Bottom side
+        idx = j * step.y;
+        u[idx] = u[idx + step.x];
+
+        // Top side
+        idx += (dimin.x-1) * step.x;
+        u[idx] = u[idx - step.x];
+    }
+
     // Corners
-    //u[0 * step.x           + 0 * step.y]           = u[1 * step.x           + 1 * step.y];
-    //u[0 * step.x           + (dimin.y-1) * step.y] = u[1 * step.x           + (dimin.y-2) * step.y];
-    //u[(dimin.x-1) * step.x + 0 * step.y]           = u[(dimin.y-2) * step.x + 1 * step.y];
-    //u[(dimin.x-1) * step.x + (dimin.y-1) * step.y] = u[(dimin.x-2) * step.x + (dimin.y-2) * step.y];
+    u[0 * step.x           + 0 * step.y]           = u[1 * step.x           + 1 * step.y];
+    u[0 * step.x           + (dimin.y-1) * step.y] = u[1 * step.x           + (dimin.y-2) * step.y];
+    u[(dimin.x-1) * step.x + 0 * step.y]           = u[(dimin.y-2) * step.x + 1 * step.y];
+    u[(dimin.x-1) * step.x + (dimin.y-1) * step.y] = u[(dimin.x-2) * step.x + (dimin.y-2) * step.y];
+}
+
+void Motion::Dirichlet_boundaryconditions() {
+    // Get the dimensions of the motion field
+    const dim& dimin = this->dimin;
+    const dim& step = this->step;
+
+    // Copy of pointer to data
+    vector2d *u = this->field;
+
+    unsigned int idx;
+    for (unsigned int i = 1; i < dimin.x-1; i++) {
+        // Left side
+        idx = i * step.x;
+        u[idx] = 0.0f;
+
+        // Right side
+        idx += (dimin.y-1) * step.y;
+        u[idx] = 0.0f;
+    }
+
+    for (unsigned int j = 1; j < dimin.y-1; j++) {
+        // Bottom side
+        idx = j * step.y;
+        u[idx] = 0.0f;
+
+        // Top side
+        idx += (dimin.x-1) * step.x;
+        u[idx] = 0.0f;
+    }
+
+    // Corners
+    u[0 * step.x           + 0 * step.y]           = 0.0f;
+    u[0 * step.x           + (dimin.y-1) * step.y] = 0.0f;
+    u[(dimin.x-1) * step.x + 0 * step.y]           = 0.0f;
+    u[(dimin.x-1) * step.x + (dimin.y-1) * step.y] = 0.0f;
 }
 
 // Overload operator=
