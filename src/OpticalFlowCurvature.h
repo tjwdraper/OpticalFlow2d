@@ -32,9 +32,7 @@ class OpticalFlowCurvature : public OpticalFlow {
 
         // Auxiliary fields
         Motion* force;
-
         double *rhs_x, *rhs_y;
-        double *coef_x, *coef_y;
 
         // Eigenvalue matrix of the biharmonic operator
         double *eigenvalues;

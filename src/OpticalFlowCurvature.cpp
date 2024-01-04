@@ -40,8 +40,6 @@ OpticalFlowCurvature::OpticalFlowCurvature(const dim dimin, const float alpha) :
 
     this->rhs_x = new double[this->sizein];
     this->rhs_y = new double[this->sizein];
-    this->coef_x = new double[this->sizein];
-    this->coef_y = new double[this->sizein];
 
     this->eigenvalues = new double[this->sizein];
 
@@ -49,10 +47,10 @@ OpticalFlowCurvature::OpticalFlowCurvature(const dim dimin, const float alpha) :
     this->OpticalFlowCurvature::set_eigenvalues();
 
     // FFTW plans
-    this->pf_x = fftw_plan_r2r_2d(this->dimin.x, this->dimin.y, this->rhs_x, this->coef_x, FFTW_REDFT10, FFTW_REDFT10, FFTW_MEASURE);
-    this->pf_y = fftw_plan_r2r_2d(this->dimin.x, this->dimin.y, this->rhs_y, this->coef_y, FFTW_REDFT10, FFTW_REDFT10, FFTW_MEASURE);
-    this->pb_x = fftw_plan_r2r_2d(this->dimin.x, this->dimin.y, this->coef_x, this->rhs_x, FFTW_REDFT01, FFTW_REDFT01, FFTW_MEASURE);
-    this->pb_y = fftw_plan_r2r_2d(this->dimin.x, this->dimin.y, this->coef_y, this->rhs_y, FFTW_REDFT01, FFTW_REDFT01, FFTW_MEASURE);
+    this->pf_x = fftw_plan_r2r_2d(this->dimin.x, this->dimin.y, this->rhs_x, this->rhs_x, FFTW_REDFT10, FFTW_REDFT10, FFTW_MEASURE);
+    this->pf_y = fftw_plan_r2r_2d(this->dimin.x, this->dimin.y, this->rhs_y, this->rhs_y, FFTW_REDFT10, FFTW_REDFT10, FFTW_MEASURE);
+    this->pb_x = fftw_plan_r2r_2d(this->dimin.x, this->dimin.y, this->rhs_x, this->rhs_x, FFTW_REDFT01, FFTW_REDFT01, FFTW_MEASURE);
+    this->pb_y = fftw_plan_r2r_2d(this->dimin.x, this->dimin.y, this->rhs_y, this->rhs_y, FFTW_REDFT01, FFTW_REDFT01, FFTW_MEASURE);
 }
 
 OpticalFlowCurvature::~OpticalFlowCurvature() {
@@ -60,8 +58,6 @@ OpticalFlowCurvature::~OpticalFlowCurvature() {
 
     delete this->rhs_x;
     delete this->rhs_y;
-    delete this->coef_x;
-    delete this->coef_y;
 
     delete this->eigenvalues;
 
@@ -136,8 +132,8 @@ void OpticalFlowCurvature::multiply_eigenvalues() {
     for (unsigned int i = 0; i < sizein; i++) {
         eigenvalue = this->eigenvalues[i];
 
-        this->coef_x[i] *= eigenvalue;
-        this->coef_y[i] *= eigenvalue;
+        this->rhs_x[i] *= eigenvalue;
+        this->rhs_y[i] *= eigenvalue;
     }
 
     // Done
@@ -153,15 +149,15 @@ void OpticalFlowCurvature::get_update(Motion *motion) {
     this->OpticalFlowCurvature::construct_rhs(motion);
 
     // Do the DCT on both components of the rhs
-    fftw_execute_r2r(this->pf_x, this->rhs_x, this->coef_x);
-    fftw_execute_r2r(this->pf_y, this->rhs_y, this->coef_y);
+    fftw_execute_r2r(this->pf_x, this->rhs_x, this->rhs_x);
+    fftw_execute_r2r(this->pf_y, this->rhs_y, this->rhs_y);
 
     // Multiply DCT components with eigenvalues of the curvature operator
     this->OpticalFlowCurvature::multiply_eigenvalues();
 
     // Do the inverse DCT
-    fftw_execute_r2r(this->pb_x, this->coef_x, this->rhs_x);
-    fftw_execute_r2r(this->pb_y, this->coef_y, this->rhs_y);
+    fftw_execute_r2r(this->pb_x, this->rhs_x, this->rhs_x);
+    fftw_execute_r2r(this->pb_y, this->rhs_y, this->rhs_y);
 
     // Reconstruct the motion field
     this->OpticalFlowCurvature::construct_motion(motion);
