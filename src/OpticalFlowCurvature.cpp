@@ -59,7 +59,7 @@ OpticalFlowCurvature::~OpticalFlowCurvature() {
     delete this->rhs_x;
     delete this->rhs_y;
 
-    delete this->eigenvalues;
+    delete[] this->eigenvalues;
 
     fftw_destroy_plan(this->pf_x);
     fftw_destroy_plan(this->pf_y);
