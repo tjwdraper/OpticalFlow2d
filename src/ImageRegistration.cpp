@@ -60,9 +60,51 @@ ImageRegistration::ImageRegistration(const dim dimin,
     this->solver = new OpticalFlow*[nscales + 1];
     for (int s = nscales; s >= 0; s--) {
         switch(reg) {
-            case Regularisation::Diffusion: this->solver[s] = new OpticalFlowDiffusion(this->dimin[s], regparams[0]); break;
-            case Regularisation::Curvature: this->solver[s] = new OpticalFlowCurvature(this->dimin[s], regparams[0]); break;
-            case Regularisation::Elastic:   this->solver[s] = new OpticalFlowElastic(this->dimin[s], regparams[0], regparams[1]); break;
+            case Regularisation::Diffusion: {
+                // Get the regularisation parameter
+                const float& alpha = regparams[0];
+
+                // Set the solver
+                this->solver[s] = new OpticalFlowDiffusion(this->dimin[s], alpha); 
+
+                // Done
+                break;
+            }
+            case Regularisation::Curvature: { 
+                // Get the regularisation parameter
+                const float &alpha = regparams[0];
+
+                // Check if relaxation parameter is passed
+                if (nparams == 1) {
+                    this->solver[s] = new OpticalFlowCurvature(this->dimin[s], alpha);
+                }
+                else {
+                    const float& omega = regparams[1];
+
+                    this->solver[s] = new OpticalFlowCurvature(this->dimin[s], alpha, omega);                    
+                }
+
+                // Done
+                break;
+            }
+            case Regularisation::Elastic: {
+                // Get the regularisation parameters
+                const float& mu = regparams[0];
+                const float& lambda = regparams[1];
+
+                // Check if time-step parameter is passed
+                if (nparams != 3) {
+                    this->solver[s] = new OpticalFlowElastic(this->dimin[s], mu, lambda);
+                }
+                else {
+                    const float& tau = regparams[2];
+
+                    this->solver[s] = new OpticalFlowElastic(this->dimin[s], mu, lambda, tau);
+                }
+                
+                // Done
+                break;
+            }
         }
     }
 

@@ -23,7 +23,7 @@ Imov = padarray(Imov, [11 0], "replicate");
 niter = [1000 1000 1000 1000];
 nscales = 3;
 nrefine = 3;
-alpha = [0.8, 0.0];
+alpha = [0.8, 0.0, 0.5];
 
 regularisation = 2; % Options:
                     % 0) Diffusion
