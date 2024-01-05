@@ -1,3 +1,5 @@
+#include <cstring>
+#include <stdexcept>
 #include <mex.h>
 
 #include <src/coord2d.h>
@@ -52,7 +54,16 @@ mexFunction (int nlhs, mxArray *plhs[],
         int nrefine = (int) tmp[0];
 
         // Pass parameters to ImageRegistration object
-        myImageRegistration = new ImageRegistration(dimin, nscales, niter, nrefine, reg, regparams, nparams);
+        try {
+            myImageRegistration = new ImageRegistration(dimin, nscales, niter, nrefine, reg, regparams, nparams);
+        }
+        catch (const std::runtime_error& e) {
+            const std::string mes = std::string("Error in parameter initialization in WrapperOpticalFlow2d: ") +
+                std::string(e.what()) + 
+                std::string("\n");
+            mexErrMsgTxt(mes.c_str());
+        }
+
 
         // Set the output dimension for image and motion field
         dim_image_mw = new mwSize[2];

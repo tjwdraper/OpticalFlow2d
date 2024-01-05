@@ -27,6 +27,8 @@ class ImageRegistration {
         void estimate_motion();
 
     private:
+        bool valid_regularisation_parameters(const Regularisation reg, const unsigned int nparams) const;
+
         void display_registration_parameters(const Regularisation reg, const float* regparams, const unsigned int nparams) const;
 
         void estimate_motion_at_current_resolution(Motion* motion, 

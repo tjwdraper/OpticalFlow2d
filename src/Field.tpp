@@ -1,6 +1,7 @@
 #include <iostream>
 #include <math.h>
 #include <cstring>
+#include <stdexcept>
 #include <mex.h>
 
 // Constructors and deconstructors

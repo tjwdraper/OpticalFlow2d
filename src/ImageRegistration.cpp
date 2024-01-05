@@ -37,6 +37,12 @@ void ImageRegistration::display_registration_parameters(const Regularisation reg
     mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n");
 }
 
+bool ImageRegistration::valid_regularisation_parameters(const Regularisation reg, const unsigned int nparams) const {
+    return ((reg == Regularisation::Diffusion) && (nparams == 1)) || 
+           ((reg == Regularisation::Curvature) && (nparams >= 1) && (nparams <= 2)) ||
+           ((reg == Regularisation::Elastic) && (nparams >= 2) && (nparams <= 3));
+}
+
 ImageRegistration::ImageRegistration(const dim dimin, 
     const int nscales, const int* niter, const int nrefine, 
     const Regularisation reg, const float* regparams, const unsigned int nparams) {
@@ -57,6 +63,10 @@ ImageRegistration::ImageRegistration(const dim dimin,
     memcpy(this->niter, niter, (nscales+1)*sizeof(int));
 
     // Solver object
+    if (!this->ImageRegistration::valid_regularisation_parameters(reg, nparams)) {
+        throw std::invalid_argument("Invalid number of regularisation parameters for given regularisation method.\n");
+    }
+
     this->solver = new OpticalFlow*[nscales + 1];
     for (int s = nscales; s >= 0; s--) {
         switch(reg) {
