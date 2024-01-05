@@ -23,16 +23,16 @@ Imov = padarray(Imov, [11 0], "replicate");
 niter = [1000 1000 1000 1000];
 nscales = 3;
 nrefine = 3;
-alpha = 0.8;
+alpha = [0.8, 0.0];
 
-regularisation = 1; % Options:
+regularisation = 2; % Options:
                     % 0) Diffusion
                     % 1) Curvature
                     % 2) Elastic
 
 
 %% Load C++ object
-OpticalFlow2d([dimx, dimy], niter, nscales, regularisation, alpha, nrefine);
+OpticalFlow2d([dimx, dimy], niter, nscales, regularisation, alpha, length(alpha), nrefine);
 
 %% Do the registration
 tic;
@@ -69,7 +69,7 @@ subplot(235); imagesc(Iref - Ireg); colormap gray; caxis([-1/2 1/2]); title("Dif
 
 %%
 figure();
-quiver(motion(end:-1:1,:,2), motion(end:-1:1,:,1), 0); title("Motion field"); axis off;
+quiver(motion(end:-1:1,:,2), motion(end:-1:1,:,1), 0); title("Motion field", "fontsize", 20); axis off;
 
 %%
 function jac = jacobian(motion)

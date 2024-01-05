@@ -7,7 +7,7 @@
 #include <mex.h>
 #include <cstring>
 
-void ImageRegistration::display_registration_parameters(const Regularisation reg, const float alpha) const {
+void ImageRegistration::display_registration_parameters(const Regularisation reg, const float* regparams, const unsigned int nparams) const {
     mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
     mexPrintf("Optical flow image registration started... (2D C++ implementation)...\n");
     mexPrintf("Registration parameters:\n");
@@ -24,11 +24,22 @@ void ImageRegistration::display_registration_parameters(const Regularisation reg
         case Regularisation::Curvature: mexPrintf("regularisation:\tcurvature\n"); break;
         case Regularisation::Elastic:   mexPrintf("regularisation:\telastic\n"); break;
     }
-    mexPrintf("alpha:\t\t\t\t\t%.2f\n", alpha);
+    if (nparams == 1) {
+        mexPrintf("reg. param:\t\t%.2f\n", regparams[0]);
+    }
+    else {
+        mexPrintf("reg. params:\t\t(%.2f", regparams[0]);
+        for (unsigned int p = 1; p < nparams; p++) {
+            mexPrintf(" %.2f", regparams[p]);
+        }
+        mexPrintf(")\n");
+    }
     mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n");
 }
 
-ImageRegistration::ImageRegistration(const dim dimin, const int nscales, const int* niter, const int nrefine, const Regularisation reg, const float alpha) {
+ImageRegistration::ImageRegistration(const dim dimin, 
+    const int nscales, const int* niter, const int nrefine, 
+    const Regularisation reg, const float* regparams, const unsigned int nparams) {
     // Size and dimensions of the input image
     this->dimin = new dim[nscales + 1];
     this->sizein = new int[nscales + 1];
@@ -49,9 +60,9 @@ ImageRegistration::ImageRegistration(const dim dimin, const int nscales, const i
     this->solver = new OpticalFlow*[nscales + 1];
     for (int s = nscales; s >= 0; s--) {
         switch(reg) {
-            case Regularisation::Diffusion: this->solver[s] = new OpticalFlowDiffusion(this->dimin[s], alpha); break;
-            case Regularisation::Curvature: this->solver[s] = new OpticalFlowCurvature(this->dimin[s], alpha); break;
-            case Regularisation::Elastic:   this->solver[s] = new OpticalFlowElastic(this->dimin[s], alpha); break;
+            case Regularisation::Diffusion: this->solver[s] = new OpticalFlowDiffusion(this->dimin[s], regparams[0]); break;
+            case Regularisation::Curvature: this->solver[s] = new OpticalFlowCurvature(this->dimin[s], regparams[0]); break;
+            case Regularisation::Elastic:   this->solver[s] = new OpticalFlowElastic(this->dimin[s], regparams[0], regparams[1]); break;
         }
     }
 
@@ -66,7 +77,7 @@ ImageRegistration::ImageRegistration(const dim dimin, const int nscales, const i
     }
 
     // Show loaded registration parameters to terminal
-    display_registration_parameters(reg, alpha);
+    display_registration_parameters(reg, regparams, nparams);
 }
 
 ImageRegistration::~ImageRegistration() {

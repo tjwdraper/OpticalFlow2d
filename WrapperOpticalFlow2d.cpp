@@ -16,7 +16,7 @@ mexFunction (int nlhs, mxArray *plhs[],
              int nrhs, const mxArray *prhs[])
 {
     // Set registration parameters
-    if ((nlhs == 0) && (nrhs == 6) && (myImageRegistration == NULL)) {
+    if ((nlhs == 0) && (nrhs == 7) && (myImageRegistration == NULL)) {
         // Get the dimensions and the size of the images
         double *tmp;
         tmp = mxGetPr(prhs[0]);
@@ -34,14 +34,25 @@ mexFunction (int nlhs, mxArray *plhs[],
         }
         tmp = mxGetPr(prhs[3]);
         Regularisation reg = static_cast<Regularisation>( (int) tmp[0]);
-        tmp = mxGetPr(prhs[4]);
-        float alpha = (float) tmp[0];
 
         tmp = mxGetPr(prhs[5]);
+        unsigned int nparams = (unsigned int) tmp[0];
+        tmp = mxGetPr(prhs[4]);
+        float *regparams = new float[nparams];
+        for (int p = 0; p < nparams; p++) {
+            regparams[p] = (float) tmp[p];
+        }
+
+        //tmp = mxGetPr(prhs[4]);
+        //float alpha = (float) tmp[0];
+
+
+
+        tmp = mxGetPr(prhs[6]);
         int nrefine = (int) tmp[0];
 
         // Pass parameters to ImageRegistration object
-        myImageRegistration = new ImageRegistration(dimin, nscales, niter, nrefine, reg, alpha);
+        myImageRegistration = new ImageRegistration(dimin, nscales, niter, nrefine, reg, regparams, nparams);
 
         // Set the output dimension for image and motion field
         dim_image_mw = new mwSize[2];
@@ -49,8 +60,9 @@ mexFunction (int nlhs, mxArray *plhs[],
         dim_motion_mw = new mwSize[3];
         dim_motion_mw[0] = dimx; dim_motion_mw[1] = dimy; dim_motion_mw[2] = 2;
 
-        // Free up the niter array
+        // Free up the niter and regparams array
         delete[] niter;
+        delete[] regparams;
     }
 
     // Load the images and estimate motion through image registration

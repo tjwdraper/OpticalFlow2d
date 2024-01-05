@@ -2,8 +2,12 @@
 #include <src/gradients.h>
 
 // Constructors and deconstructors
-OpticalFlowElastic::OpticalFlowElastic(const dim dimin, const float alpha) : OpticalFlow(dimin, alpha) {
+OpticalFlowElastic::OpticalFlowElastic(const dim dimin, const float mu, const float lambda, const float omega) : OpticalFlow(dimin) {
     this->force = new Motion(this->dimin);
+
+    this->mu = mu;
+    this->lambda = lambda;
+    this->omega = omega;
 }
 
 OpticalFlowElastic::~OpticalFlowElastic() {
@@ -24,9 +28,9 @@ void OpticalFlowElastic::SOR_iteration(Motion* motion) const {
     const dim& step = this->step;
 
     // Get the overrelaxation and regularisation parameters
-    const float& omega = this->omega;
-    const float mu = this->alpha;
-    const float lambda = 0.0f;
+    const float& omega  = this->omega;
+    const float& mu     = this->mu;
+    const float& lambda = this->lambda;
 
     // Get a copy to the pointer of the vector fields
     vector2d *x = motion->get_motion();

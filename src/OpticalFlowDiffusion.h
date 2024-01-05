@@ -24,6 +24,9 @@ class OpticalFlowDiffusion : public OpticalFlow {
 
         // Quasi differential operator
         Motion *qdiffoperator;
+
+        // Regularisation parameter
+        float alpha;
 };
 
 #endif

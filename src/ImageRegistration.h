@@ -10,7 +10,9 @@
 class ImageRegistration {
     public:
         // Constructors and deconstructors
-        ImageRegistration(const dim dimin, const int nscales, const int* niter, const int nrefine, const Regularisation reg, const float alpha);
+        ImageRegistration(const dim dimin, 
+                          const int nscales, const int* niter, const int nrefine, 
+                          const Regularisation reg, const float* regparams, const unsigned int nparams);
         ~ImageRegistration();
 
         // Getters and setters
@@ -25,7 +27,7 @@ class ImageRegistration {
         void estimate_motion();
 
     private:
-        void display_registration_parameters(const Regularisation reg, const float alpha) const;
+        void display_registration_parameters(const Regularisation reg, const float* regparams, const unsigned int nparams) const;
 
         void estimate_motion_at_current_resolution(Motion* motion, 
                                                     const Image *Iref, Image *Imov,

@@ -8,7 +8,7 @@
 class OpticalFlow {
     public:
         // Constructors and deconstructors
-        OpticalFlow(const dim dimin, const float alpha);
+        OpticalFlow(const dim dimin);
         ~OpticalFlow();
 
         // Get the image gradients
@@ -28,8 +28,6 @@ class OpticalFlow {
         // Spatial and temporal image gradients
         Motion *gradI;
         Image *It;
-
-        float alpha;
 };
 
 #endif

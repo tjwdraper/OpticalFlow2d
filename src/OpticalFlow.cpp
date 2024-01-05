@@ -3,14 +3,11 @@
 
 
 // Constructors and deconstructors
-OpticalFlow::OpticalFlow(const dim dimin, const float alpha) {
+OpticalFlow::OpticalFlow(const dim dimin) {
     // Get the dimensions and size of the images
     this->dimin  = dimin;
     this->sizein = this->dimin.x * this->dimin.y;
     this->step   = dim(1, this->dimin.x);
-
-    // Get the registration parameters
-    this->alpha = alpha;
 
     // Allocate memory for the spatial and temporal image gradients
     this->gradI = new Motion(this->dimin);

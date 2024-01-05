@@ -30,7 +30,7 @@ void OpticalFlowCurvature::set_eigenvalues() {
 }
 
 // Constructors and deconstructors
-OpticalFlowCurvature::OpticalFlowCurvature(const dim dimin, const float alpha) : OpticalFlow(dimin, alpha) {
+OpticalFlowCurvature::OpticalFlowCurvature(const dim dimin, const float alpha, const float tau) : OpticalFlow(dimin) {
     // Get the image dimensions
     this->step_cm = dim(1, this->dimin.x);
     this->step_rm = dim(this->dimin.y, 1);
@@ -42,6 +42,10 @@ OpticalFlowCurvature::OpticalFlowCurvature(const dim dimin, const float alpha) :
     this->rhs_y = new double[this->sizein];
 
     this->eigenvalues = new double[this->sizein];
+
+    // Get the regularisation parameters
+    this->alpha = alpha;
+    this->tau = tau;
 
     // Set the eigenvalues
     this->OpticalFlowCurvature::set_eigenvalues();

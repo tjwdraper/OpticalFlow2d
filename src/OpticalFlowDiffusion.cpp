@@ -3,9 +3,12 @@
 #include <src/gradients.h>
 
 // Constructors and deconstructors
-OpticalFlowDiffusion::OpticalFlowDiffusion(const dim dimin, const float alpha) : OpticalFlow(dimin, alpha) {
+OpticalFlowDiffusion::OpticalFlowDiffusion(const dim dimin, const float alpha) : OpticalFlow(dimin) {
     // Allocate memory for the quasi differential operator
     this->qdiffoperator = new Motion(this->dimin);
+
+    // Set the regularisation parameter
+    this->alpha = alpha;
 }
 
 OpticalFlowDiffusion::~OpticalFlowDiffusion() {

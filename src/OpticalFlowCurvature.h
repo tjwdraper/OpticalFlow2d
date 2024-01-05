@@ -7,7 +7,7 @@
 
 class OpticalFlowCurvature : public OpticalFlow {
     public:
-        OpticalFlowCurvature(const dim dimin, const float alpha);
+        OpticalFlowCurvature(const dim dimin, const float alpha, const float tau = 1.0f);
         ~OpticalFlowCurvature();
 
         // Overload method from base class
@@ -38,7 +38,8 @@ class OpticalFlowCurvature : public OpticalFlow {
         double *eigenvalues;
 
         // Step size in time-marching algorithm
-        const float tau = 1;
+        float alpha;
+        float tau;
 };
 
 #endif
