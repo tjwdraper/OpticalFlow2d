@@ -1,7 +1,7 @@
 #include <src/ImageRegistration.h>
-#include <src/OpticalFlowDiffusion.h>
-#include <src/OpticalFlowCurvature.h>
-#include <src/OpticalFlowElastic.h>
+#include <src/regularization/OpticalFlowDiffusion.h>
+#include <src/regularization/OpticalFlowCurvature.h>
+#include <src/regularization/OpticalFlowElastic.h>
 #include <src/Logger.h>
 
 #include <mex.h>
@@ -11,6 +11,8 @@ void ImageRegistration::display_registration_parameters(const Regularisation reg
     mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
     mexPrintf("Optical flow image registration started... (2D C++ implementation)...\n");
     mexPrintf("Registration parameters:\n");
+
+    // Image dimensions and multiresolution parameters
     mexPrintf("dimensions:\t\t\t\t(%d %d)\n", this->dimin[0].x, this->dimin[0].y);
     mexPrintf("niter:\t\t\t\t\t(%d", this->niter[0]);
     for (int s = 1; s < this->nscales+1; s++) {
@@ -19,21 +21,26 @@ void ImageRegistration::display_registration_parameters(const Regularisation reg
     mexPrintf(")\n");
     mexPrintf("nscales:\t\t\t\t%d\n", this->nscales);
     mexPrintf("nrefine:\t\t\t\t%d\n", this->nrefine);
+
+    // Regularisation method
     switch(reg) {
-        case Regularisation::Diffusion: mexPrintf("regularisation:\tdiffusion\n"); break;
-        case Regularisation::Curvature: mexPrintf("regularisation:\tcurvature\n"); break;
-        case Regularisation::Elastic:   mexPrintf("regularisation:\telastic\n"); break;
+        case Regularisation::Diffusion: mexPrintf("regularisation:\t\t\t\tdiffusion\n"); break;
+        case Regularisation::Curvature: mexPrintf("regularisation:\t\t\t\tcurvature\n"); break;
+        case Regularisation::Elastic:   mexPrintf("regularisation:\t\t\t\telastic\n"); break;
     }
+
+    // Regularization parameters
     if (nparams == 1) {
-        mexPrintf("reg. param:\t\t%.2f\n", regparams[0]);
+        mexPrintf("reg. param:\t\t\t\t%.2f\n", regparams[0]);
     }
     else {
-        mexPrintf("reg. params:\t\t(%.2f", regparams[0]);
+        mexPrintf("reg. params:\t\t\t\t(%.2f", regparams[0]);
         for (unsigned int p = 1; p < nparams; p++) {
             mexPrintf(" %.2f", regparams[p]);
         }
         mexPrintf(")\n");
     }
+
     mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n");
 }
 
@@ -43,32 +50,13 @@ bool ImageRegistration::valid_regularisation_parameters(const Regularisation reg
            ((reg == Regularisation::Elastic) && (nparams >= 2) && (nparams <= 3));
 }
 
-ImageRegistration::ImageRegistration(const dim dimin, 
-    const int nscales, const int* niter, const int nrefine, 
-    const Regularisation reg, const float* regparams, const unsigned int nparams) {
-    // Size and dimensions of the input image
-    this->dimin = new dim[nscales + 1];
-    this->sizein = new int[nscales + 1];
-    for (int s = nscales; s >= 0; s--) {
-        float scale = pow(2, s);
-        this->dimin[s] = dim(dimin.x/scale,
-                             dimin.y/scale);
-        this->sizein[s] = this->dimin[s].x * this->dimin[s].y;
-    }
-
-    // Registration parameters
-    this->nrefine = nrefine;
-    this->nscales = nscales;
-    this->niter = new int[nscales + 1];
-    memcpy(this->niter, niter, (nscales+1)*sizeof(int));
-
-    // Solver object
+void ImageRegistration::set_solver(const Regularisation reg, const float* regparams, const unsigned int nparams) {
     if (!this->ImageRegistration::valid_regularisation_parameters(reg, nparams)) {
         throw std::invalid_argument("Invalid number of regularisation parameters for given regularisation method.\n");
     }
 
-    this->solver = new OpticalFlow*[nscales + 1];
-    for (int s = nscales; s >= 0; s--) {
+    this->solver = new OpticalFlow*[this->nscales + 1];
+    for (int s = this->nscales; s >= 0; s--) {
         switch(reg) {
             case Regularisation::Diffusion: {
                 // Get the regularisation parameter
@@ -117,6 +105,29 @@ ImageRegistration::ImageRegistration(const dim dimin,
             }
         }
     }
+}
+
+ImageRegistration::ImageRegistration(const dim dimin, 
+    const int nscales, const int* niter, const int nrefine, 
+    const Regularisation reg, const float* regparams, const unsigned int nparams) {
+    // Size and dimensions of the input image
+    this->dimin = new dim[nscales + 1];
+    this->sizein = new int[nscales + 1];
+    for (int s = nscales; s >= 0; s--) {
+        float scale = pow(2, s);
+        this->dimin[s] = dim(dimin.x/scale,
+                             dimin.y/scale);
+        this->sizein[s] = this->dimin[s].x * this->dimin[s].y;
+    }
+
+    // Registration parameters
+    this->nrefine = nrefine;
+    this->nscales = nscales;
+    this->niter = new int[nscales + 1];
+    memcpy(this->niter, niter, (nscales+1)*sizeof(int));
+
+    // Solver object
+    this->ImageRegistration::set_solver(reg, regparams, nparams);
 
     // Allocate image and motion 
     this->Iref = new Image*[nscales + 1];

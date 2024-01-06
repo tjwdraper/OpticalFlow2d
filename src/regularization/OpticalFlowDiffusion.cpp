@@ -1,4 +1,4 @@
-#include <src/OpticalFlowDiffusion.h>
+#include <src/regularization/OpticalFlowDiffusion.h>
 
 #include <src/gradients.h>
 

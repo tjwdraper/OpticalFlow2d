@@ -4,7 +4,7 @@
 #include <src/coord2d.h>
 #include <src/Image.h>
 #include <src/Motion.h>
-#include <src/OpticalFlow.h>
+#include <src/regularization/OpticalFlow.h>
 #include <src/SolverOptions.h>
 
 class ImageRegistration {
@@ -30,6 +30,8 @@ class ImageRegistration {
         bool valid_regularisation_parameters(const Regularisation reg, const unsigned int nparams) const;
 
         void display_registration_parameters(const Regularisation reg, const float* regparams, const unsigned int nparams) const;
+
+        void set_solver(const Regularisation reg, const float* regparams, const unsigned int nparams);
 
         void estimate_motion_at_current_resolution(Motion* motion, 
                                                     const Image *Iref, Image *Imov,

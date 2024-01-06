@@ -2,7 +2,7 @@ clc;
 clear all;
 close all;
 
-pkg load image;
+pkg load image; % GNU Octave only
 
 %% Load images
 Iref = imread("img/dirlab5_ref.tiff");
@@ -23,7 +23,7 @@ Imov = padarray(Imov, [11 0], "replicate");
 niter = [1000 1000 1000 1000];
 nscales = 3;
 nrefine = 3;
-alpha = [0.8, 0.0, 0.5];
+alpha = [0.8, 0.0, 1.0];
 
 regularisation = 2; % Options:
                     % 0) Diffusion
