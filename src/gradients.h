@@ -63,8 +63,6 @@ namespace gradients {
             return T(0.0f);
         }
         else {
-            //return (field[idx-1] + field[idx+1] + field[idx-dimin.x] + field[idx+dimin.x])/6.0f
-            //    + (field[idx-1-dimin.x] + field[idx-1+dimin.x] +  field[idx+1-dimin.x] + field[idx+1+dimin.x])/12.0f;
             return (field[idx - 1] + field[idx + 1] + field[idx - dimin.x] + field[idx + dimin.x])/4.0f;
         }
     }

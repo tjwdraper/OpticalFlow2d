@@ -2,6 +2,7 @@
 #include <src/regularization/OpticalFlowDiffusion.h>
 #include <src/regularization/OpticalFlowCurvature.h>
 #include <src/regularization/OpticalFlowElastic.h>
+#include <src/regularization/OpticalFlowThirionsDemons.h>
 #include <src/Logger.h>
 
 #include <mex.h>
@@ -27,6 +28,8 @@ void ImageRegistration::display_registration_parameters(const Regularisation reg
         case Regularisation::Diffusion: mexPrintf("regularisation:\t\t\t\tdiffusion\n"); break;
         case Regularisation::Curvature: mexPrintf("regularisation:\t\t\t\tcurvature\n"); break;
         case Regularisation::Elastic:   mexPrintf("regularisation:\t\t\t\telastic\n"); break;
+        case Regularisation::ThirionsDemons: mexPrintf("regularisation:\t\t\t\tThirions Demons\n"); break;
+        case Regularisation::LogDemons: mexPrintf("regularisation:\t\t\t\tLog-Demons:\n"); break;
     }
 
     // Regularization parameters
@@ -47,7 +50,8 @@ void ImageRegistration::display_registration_parameters(const Regularisation reg
 bool ImageRegistration::valid_regularisation_parameters(const Regularisation reg, const unsigned int nparams) const {
     return ((reg == Regularisation::Diffusion) && (nparams == 1)) || 
            ((reg == Regularisation::Curvature) && (nparams >= 1) && (nparams <= 2)) ||
-           ((reg == Regularisation::Elastic) && (nparams >= 2) && (nparams <= 3));
+           ((reg == Regularisation::Elastic) && (nparams >= 2) && (nparams <= 3)) ||
+           ((reg == Regularisation::ThirionsDemons) && (nparams == 5));
 }
 
 void ImageRegistration::set_solver(const Regularisation reg, const float* regparams, const unsigned int nparams) {
@@ -102,6 +106,19 @@ void ImageRegistration::set_solver(const Regularisation reg, const float* regpar
                 
                 // Done
                 break;
+            }
+            case Regularisation::ThirionsDemons: {
+                // Get the regularisation parameters
+                const float sigma_i = regparams[0];
+                const float sigma_x = regparams[1];
+                const float sigma_diffusion = regparams[2];
+                const float sigma_fluid = regparams[3];
+                const unsigned int kernelwidth = static_cast<unsigned int>(regparams[4]);
+
+                this->solver[s] = new OpticalFlowThirionsDemons(this->dimin[s], 
+                                        sigma_i, sigma_x, 
+                                        sigma_diffusion, sigma_fluid,
+                                        kernelwidth);
             }
         }
     }

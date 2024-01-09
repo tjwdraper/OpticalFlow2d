@@ -45,11 +45,6 @@ mexFunction (int nlhs, mxArray *plhs[],
             regparams[p] = (float) tmp[p];
         }
 
-        //tmp = mxGetPr(prhs[4]);
-        //float alpha = (float) tmp[0];
-
-
-
         tmp = mxGetPr(prhs[6]);
         int nrefine = (int) tmp[0];
 

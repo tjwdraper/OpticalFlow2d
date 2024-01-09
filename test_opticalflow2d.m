@@ -3,7 +3,7 @@ clear all;
 close all;
 
 pkg load image; % GNU Octave only
-
+0
 %% Load images
 Iref = imread("img/dirlab5_ref.tiff");
 Imov = imread("img/dirlab5_mov.tiff");
@@ -23,12 +23,13 @@ Imov = padarray(Imov, [11 0], "replicate");
 niter = [1000 1000 1000 1000];
 nscales = 3;
 nrefine = 3;
-alpha = [0.8, 0.0, 1.0];
+alpha = [1.0, 1.0, 1.0, 1.0, 4];
 
-regularisation = 2; % Options:
+regularisation = 3; % Options:
                     % 0) Diffusion
                     % 1) Curvature
                     % 2) Elastic
+                    % 3) Thirions demons
 
 
 %% Load C++ object
