@@ -9,9 +9,9 @@ class OpticalFlowThirionsDemons : public OpticalFlow {
     public:
         // Constructors and deconstructors
         OpticalFlowThirionsDemons(const dim dimin, 
-            const float sigma_i = 1.0, const float sigma_x = 1.0, 
-            const float sigma_diffusion = 1.0, const float sigma_fluid = 1.0,
-            const unsigned int kernelwidth = 3);
+            const float sigma_i = 1.0, const float sigma_x = 0.25, 
+            const float sigma_diffusion = 2.0, const float sigma_fluid = 2.0,
+            const unsigned int kernelwidth = 5);
         ~OpticalFlowThirionsDemons();
 
         // Overload method from base class
