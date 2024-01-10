@@ -24,7 +24,7 @@ void OpticalFlowThirionsDemons::create_gaussian_kernel(double *kernel, const flo
 
     // Normalize the weights
     for (int i = 0; i < sizekernel; i++) {
-        kernel[idx] /= weight;
+        kernel[i] /= weight;
     }
 
     // Done
