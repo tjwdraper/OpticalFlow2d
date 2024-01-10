@@ -20,6 +20,8 @@ class OpticalFlow {
         // Do one iteration
         virtual void get_update(Motion *motion) {};
 
+        virtual void get_update(Motion *motion, const Image* Iref, const Image* Imov) {};
+
     protected:
         dim dimin;
         unsigned int sizein;

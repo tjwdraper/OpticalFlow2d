@@ -17,6 +17,8 @@ class OpticalFlowThirionsDemons : public OpticalFlow {
         // Overload method from base class
         void get_update(Motion *motion);
 
+        void get_update(Motion* motion, const Image* Iref, const Image* Imov);
+
     private:
         // Create convolution kernels
         void create_gaussian_kernel(double *kernel, const float sigma) const; // Move outside class

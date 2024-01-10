@@ -120,13 +120,10 @@ void ImageRegistrationDemons::estimate_motion_at_current_resolution(Motion* moti
         // Create a Logger object
         Logger log(dimin, niter);
 
-        // Calculating the image gradients only has to be done once
-        solver->get_image_gradients(Iref, Iaux);
-
         // Iterate over resolution levels
         for (int iter = 0; iter < niter; iter++) {
             // Calculate the update step
-            solver->get_update(motion_est);
+            solver->get_update(motion_est, Iref, Iaux);
 
             // Calculate the difference between iterations
             log.update_error(motion_est);

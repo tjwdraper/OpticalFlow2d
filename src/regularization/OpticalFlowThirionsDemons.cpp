@@ -138,7 +138,7 @@ void OpticalFlowThirionsDemons::demons_iteration(Motion *motion) {
     // Get a copy of the pointer to the motion, correspondence and force data
     vector2d *u = this->correspondence->get_motion();
     vector2d *s = motion->get_motion();
-    vector2d *f = force->get_motion();
+    //vector2d *f = force->get_motion();
 
     // Get a copy of the pointer to the image gradient data
     float *It = this->It->get_image();
@@ -154,8 +154,8 @@ void OpticalFlowThirionsDemons::demons_iteration(Motion *motion) {
         for (unsigned int j = 0; j < dimin.y; j++) {
             idx = i * step.x + j * step.y;
 
-            u[idx] = f[idx] / (dI[idx].x * dI[idx].x + dI[idx].y * dI[idx].y + 
-                                pow(It[idx] + s[idx].x * dI[idx].x + s[idx].y * dI[idx].y, 2) * sigma_isq / sigma_xsq) * -1;
+            u[idx] = dI[idx] * It[idx] / (dI[idx].x * dI[idx].x + dI[idx].y * dI[idx].y + It[idx]*It[idx] * sigma_isq / sigma_xsq) * -1;
+        
         }
     }
 
@@ -168,6 +168,28 @@ void OpticalFlowThirionsDemons::demons_iteration(Motion *motion) {
 void OpticalFlowThirionsDemons::get_update(Motion *motion) {
     // Get the force  term
     this->OpticalFlow::get_force(this->force, motion);
+
+    // Execute Demons iteration - calculate the correspondence update
+    this->OpticalFlowThirionsDemons::demons_iteration(motion);
+
+    // Smoothen the correpondence update
+    this->OpticalFlowThirionsDemons::convolute(this->correspondence, this->kernel_fluid);
+
+    // Update the motion field (Additive demons)
+    //*motion += *this->correspondence;
+    motion->accumulate(*this->correspondence);
+
+    // Smoothen the motion field
+    this->OpticalFlowThirionsDemons::convolute(motion, this->kernel_diffusion);
+}
+
+void OpticalFlowThirionsDemons::get_update(Motion *motion, const Image* Iref, const Image* Imov) {
+    // Warp the input image with current estimate of the motion field
+    *this->Iwar = *Imov;
+    this->Iwar->warp2d(*motion);
+
+    // Get the image gradients
+    this->OpticalFlow::get_image_gradients(Iref, this->Iwar);
 
     // Execute Demons iteration - calculate the correspondence update
     this->OpticalFlowThirionsDemons::demons_iteration(motion);
