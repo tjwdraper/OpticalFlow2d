@@ -26,18 +26,18 @@ class ImageRegistration {
         // Estimate motion
         void estimate_motion();
 
-    private:
-        bool valid_regularisation_parameters(const Regularisation reg, const unsigned int nparams) const;
+    protected:
+        virtual bool valid_regularisation_parameters(const Regularisation reg, const unsigned int nparams) const {return true;};
 
-        void display_registration_parameters(const Regularisation reg, const float* regparams, const unsigned int nparams) const;
+        virtual void display_registration_parameters(const Regularisation reg, const float* regparams, const unsigned int nparams) const {};
 
-        void set_solver(const Regularisation reg, const float* regparams, const unsigned int nparams);
+        virtual void set_solver(const Regularisation reg, const float* regparams, const unsigned int nparams) {};
 
-        void estimate_motion_at_current_resolution(Motion* motion, 
-                                                    const Image *Iref, Image *Imov,
-                                                    OpticalFlow *solver, 
-                                                    const int niter,
-                                                    const dim dimin, const int sizein);
+        virtual void estimate_motion_at_current_resolution(Motion* motion, 
+                                                           const Image *Iref, Image *Imov,
+                                                           OpticalFlow *solver, 
+                                                           const int niter,
+                                                           const dim dimin, const int sizein) {};
 
         dim *dimin;
         int *sizein;

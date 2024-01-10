@@ -5,7 +5,8 @@
 #include <src/coord2d.h>
 #include <src/Image.h>
 #include <src/Motion.h>
-#include <src/ImageRegistration.h>
+#include <src/ImageRegistrationOpticalFlow.h>
+#include <src/ImageRegistrationDemons.h>
 #include <src/SolverOptions.h>
 
 static ImageRegistration *myImageRegistration = NULL;
@@ -49,14 +50,16 @@ mexFunction (int nlhs, mxArray *plhs[],
         int nrefine = (int) tmp[0];
 
         // Pass parameters to ImageRegistration object
-        try {
-            myImageRegistration = new ImageRegistration(dimin, nscales, niter, nrefine, reg, regparams, nparams);
+        if ((reg == Regularisation::Diffusion) ||
+            (reg == Regularisation::Curvature) ||
+            (reg == Regularisation::Elastic)) {
+            myImageRegistration = new ImageRegistrationOpticalFlow(dimin, nscales, niter, nrefine, reg, regparams, nparams);
         }
-        catch (const std::runtime_error& e) {
-            const std::string mes = std::string("Error in parameter initialization in WrapperOpticalFlow2d: ") +
-                std::string(e.what()) + 
-                std::string("\n");
-            mexErrMsgTxt(mes.c_str());
+        else if (reg == Regularisation::ThirionsDemons) {
+            myImageRegistration = new ImageRegistrationDemons(dimin, nscales, niter, nrefine, reg, regparams, nparams);
+        }
+        else {
+            mexErrMsgTxt("Error: invalid regularisation given\n");
         }
 
 
