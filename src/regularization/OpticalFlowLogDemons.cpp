@@ -1,7 +1,7 @@
-#include <src/regularization/OpticalFlowThirionsDemons.h>
+#include <src/regularization/OpticalFlowLogDemons.h>
 
 // Create Gaussian kernels
-void OpticalFlowThirionsDemons::create_gaussian_kernel(double *kernel, const float sigma) const {
+void OpticalFlowLogDemons::create_gaussian_kernel(double *kernel, const float sigma) const {
     // Get kernel dimensions
     const dim& dimkernel = this->dimkernel;
     const dim& stepkernel = this->stepkernel;
@@ -32,7 +32,7 @@ void OpticalFlowThirionsDemons::create_gaussian_kernel(double *kernel, const flo
 }
 
 // Constructors and deconstructors
-OpticalFlowThirionsDemons::OpticalFlowThirionsDemons(const dim dimin, 
+OpticalFlowLogDemons::OpticalFlowLogDemons(const dim dimin, 
     const float sigma_i, const float sigma_x,
     const float sigma_diffusion, const float sigma_fluid,
     const unsigned int kernelwidth) : OpticalFlow(dimin) {
@@ -58,11 +58,11 @@ OpticalFlowThirionsDemons::OpticalFlowThirionsDemons(const dim dimin,
     this->kernel_fluid = new double[this->sizekernel];
 
     // Set values
-    this->OpticalFlowThirionsDemons::create_gaussian_kernel(this->kernel_diffusion, this->sigma_diffusion);
-    this->OpticalFlowThirionsDemons::create_gaussian_kernel(this->kernel_fluid, this->sigma_fluid);
+    this->OpticalFlowLogDemons::create_gaussian_kernel(this->kernel_diffusion, this->sigma_diffusion);
+    this->OpticalFlowLogDemons::create_gaussian_kernel(this->kernel_fluid, this->sigma_fluid);
 }
 
-OpticalFlowThirionsDemons::~OpticalFlowThirionsDemons() {
+OpticalFlowLogDemons::~OpticalFlowLogDemons() {
     delete this->Iwar;
     delete this->force;
     delete this->correspondence;
@@ -71,7 +71,7 @@ OpticalFlowThirionsDemons::~OpticalFlowThirionsDemons() {
 }
 
 // Smooth motion field with Gaussian convolution
-void OpticalFlowThirionsDemons::convolute(Motion *motion, const double *kernel) const {
+void OpticalFlowLogDemons::convolute(Motion *motion, const double *kernel) const {
     // Get the dimensions of the field
     const dim& dimin = this->dimin;
     const dim& step = this->step;
@@ -130,7 +130,7 @@ void OpticalFlowThirionsDemons::convolute(Motion *motion, const double *kernel) 
 }
 
 // Do one iteration with the Demons algorithm
-void OpticalFlowThirionsDemons::demons_iteration(Motion *motion) {
+void OpticalFlowLogDemons::demons_iteration(Motion *motion) {
     // Get the field dimensions
     const dim& dimin = this->dimin;
     const dim& step = this->step;
@@ -163,22 +163,25 @@ void OpticalFlowThirionsDemons::demons_iteration(Motion *motion) {
     return;
 }
 
+void OpticalFlowLogDemons::get_demons_force(Motion *force, const Motion *motion) const {
+    
+}
 
 // Overload method from base class
-void OpticalFlowThirionsDemons::get_update(Motion *motion) {
+void OpticalFlowLogDemons::get_update(Motion *motion) {
     // Get the force  term
-    this->OpticalFlow::get_force(this->force, motion);
+    this->OpticalFlowLogDemons::get_demons_force(this->force, motion);
 
     // Execute Demons iteration - calculate the correspondence update
-    this->OpticalFlowThirionsDemons::demons_iteration(motion);
+    this->OpticalFlowLogDemons::demons_iteration(motion);
 
     // Smoothen the correpondence update
-    this->OpticalFlowThirionsDemons::convolute(this->correspondence, this->kernel_fluid);
+    this->OpticalFlowLogDemons::convolute(this->correspondence, this->kernel_fluid);
 
     // Update the motion field (Additive demons)
-    //*motion += *this->correspondence;
+    this->OpticalFlowLogDemons::exp(this->correspondence);
     motion->accumulate(*this->correspondence);
 
     // Smoothen the motion field
-    this->OpticalFlowThirionsDemons::convolute(motion, this->kernel_diffusion);
+    this->OpticalFlowLogDemons::convolute(motion, this->kernel_diffusion);
 }
