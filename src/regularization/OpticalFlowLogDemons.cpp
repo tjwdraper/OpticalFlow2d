@@ -138,7 +138,7 @@ void OpticalFlowLogDemons::demons_iteration(Motion *motion) {
     // Get a copy of the pointer to the motion, correspondence and force data
     vector2d *u = this->correspondence->get_motion();
     vector2d *s = motion->get_motion();
-    vector2d *f = force->get_motion();
+    //vector2d *f = force->get_motion();
 
     // Get a copy of the pointer to the image gradient data
     float *It = this->It->get_image();
@@ -154,8 +154,8 @@ void OpticalFlowLogDemons::demons_iteration(Motion *motion) {
         for (unsigned int j = 0; j < dimin.y; j++) {
             idx = i * step.x + j * step.y;
 
-            u[idx] = f[idx] / (dI[idx].x * dI[idx].x + dI[idx].y * dI[idx].y + 
-                                pow(It[idx] + s[idx].x * dI[idx].x + s[idx].y * dI[idx].y, 2) * sigma_isq / sigma_xsq) * -1;
+            u[idx] = dI[idx] * It[idx] / (dI[idx].x * dI[idx].x + dI[idx].y * dI[idx].y + It[idx]*It[idx] * sigma_isq / sigma_xsq) * -1;
+        
         }
     }
 
@@ -163,14 +163,42 @@ void OpticalFlowLogDemons::demons_iteration(Motion *motion) {
     return;
 }
 
-void OpticalFlowLogDemons::get_demons_force(Motion *force, const Motion *motion) const {
+// Scaling and squaring algorithm
+void OpticalFlowLogDemons::expfield(Motion *motion) const {
+    // Get the scale
+    int N = static_cast<int>( std::ceil(1 + std::log2(motion->maxabs())) );
+    N = std::max(N, 0);
+
+    if (N > 20) {
+        mexPrintf("%d\n", N);
+        mexErrMsgTxt("Error: the number of scales is too large\n");
+        return;
+    }
+    else {
+        mexPrintf("Maxabs of correspondence: %.3f\tNumber of levels in expfield: %d\n", motion->maxabs(), N);
+    }
     
+    // Resize the input field
+    double resizefactor = std::pow(2, -N);
+    vector2d *u = motion->get_motion();
+    for (unsigned int i = 0; i < this->sizein; i++) {
+        u[i] *= resizefactor;
+    }
+
+    // Square
+    Motion *Mtmp = new Motion(this->dimin);
+    for (unsigned int n = 0; n < N; n++) {
+        *Mtmp = *motion;
+
+        motion->accumulate(*Mtmp);
+    }
+    delete Mtmp;
 }
 
 // Overload method from base class
 void OpticalFlowLogDemons::get_update(Motion *motion) {
     // Get the force  term
-    this->OpticalFlowLogDemons::get_demons_force(this->force, motion);
+    this->OpticalFlow::get_force(this->force, motion);
 
     // Execute Demons iteration - calculate the correspondence update
     this->OpticalFlowLogDemons::demons_iteration(motion);
@@ -179,7 +207,29 @@ void OpticalFlowLogDemons::get_update(Motion *motion) {
     this->OpticalFlowLogDemons::convolute(this->correspondence, this->kernel_fluid);
 
     // Update the motion field (Additive demons)
-    this->OpticalFlowLogDemons::exp(this->correspondence);
+    //*motion += *this->correspondence;
+    motion->accumulate(*this->correspondence);
+
+    // Smoothen the motion field
+    this->OpticalFlowLogDemons::convolute(motion, this->kernel_diffusion);
+}
+
+void OpticalFlowLogDemons::get_update(Motion *motion, const Image* Iref, const Image* Imov) {
+    // Warp the input image with current estimate of the motion field
+    *this->Iwar = *Imov;
+    this->Iwar->warp2d(*motion);
+
+    // Get the image gradients
+    this->OpticalFlow::get_image_gradients(Iref, this->Iwar);
+
+    // Execute Demons iteration - calculate the correspondence update
+    this->OpticalFlowLogDemons::demons_iteration(motion);
+
+    // Smoothen the correpondence update
+    this->OpticalFlowLogDemons::convolute(this->correspondence, this->kernel_fluid);
+
+    // Update the motion field (Additive demons)
+    this->OpticalFlowLogDemons::expfield(this->correspondence);
     motion->accumulate(*this->correspondence);
 
     // Smoothen the motion field

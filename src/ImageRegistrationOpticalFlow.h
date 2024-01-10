@@ -2,6 +2,11 @@
 #define _IMAGE_REGISTRATION_OPTICAL_FLOW_H_
 
 #include <src/ImageRegistration.h>
+#include <src/coord2d.h>
+#include <src/regularization/OpticalFlow.h>
+#include <src/Motion.h>
+#include <src/Image.h>
+#include <src/SolverOptions.h>
 
 class ImageRegistrationOpticalFlow : public ImageRegistration {
     public:

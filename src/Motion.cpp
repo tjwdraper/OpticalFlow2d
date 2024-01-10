@@ -47,6 +47,15 @@ float Motion::norm() const {
     //return std::sqrt(norm)/this->sizein;
 }
 
+float Motion::maxabs() const {
+    float maxabs = 0.0f;
+    for (unsigned int i = 0; i < this->sizein; i++) {
+        float normsq = std::pow(this->field[i].y, 2) + std::pow(this->field[i].y, 2);
+        maxabs = std::max(maxabs, normsq);
+    }
+    return std::sqrt(maxabs);
+}
+
 // Upsample and downsample
 void Motion::upSample(const Motion& mo) {
     try {

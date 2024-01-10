@@ -20,17 +20,18 @@ Imov = padarray(Imov, [11 0], "replicate");
 [dimx, dimy] = size(Iref);
 
 %% Registration paramters
-niter = [1000 1000 1000 1000];
+niter = [100 1000 1000 1000];
 nscales = 3;
 nrefine = 3;
 alpha = [1.0, 0.25, 2.0, 2.0, 5];
 ##alpha = [0.8];
 
-regularisation = 3; % Options:
+regularisation = 4; % Options:
                     % 0) Diffusion
                     % 1) Curvature
                     % 2) Elastic
                     % 3) Thirions demons
+                    % 4) Log-Demons
 
 
 %% Load C++ object

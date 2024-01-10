@@ -15,12 +15,14 @@ class OpticalFlowLogDemons : public OpticalFlow {
         // Overload method from base class
         void get_update(Motion *motion);
 
+        void get_update(Motion *motion, const Image *Iref, const Image* Imov);
+
     private:
         // Get the force  term
         void get_demons_force(Motion *force, const Motion *motion) const;
 
         // The the exponent of a vector field
-        void exp(Motion *motion) const;
+        void expfield(Motion *motion) const; // Move outside of class
 
         // Create convolution kernels
         void create_gaussian_kernel(double *kernel, const float sigma) const; // Move outside class

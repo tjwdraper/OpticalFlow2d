@@ -2,6 +2,7 @@
 #include <src/Logger.h>
 
 #include <src/regularization/OpticalFlowThirionsDemons.h>
+#include <src/regularization/OpticalFlowLogDemons.h>
 
 void ImageRegistrationDemons::display_registration_parameters(const Regularisation reg, const float* regparams, const unsigned int nparams) const {
     mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
@@ -21,6 +22,7 @@ void ImageRegistrationDemons::display_registration_parameters(const Regularisati
     // Regularisation method
     switch(reg) {
         case Regularisation::ThirionsDemons: mexPrintf("regularisation:\t\t\t\tThirions Demons\n"); break;
+        case Regularisation::LogDemons:      mexPrintf("regularisation:\t\t\t\tLog-Demons\n");      break;
     }
 
     // Regularization parameters
@@ -39,7 +41,8 @@ void ImageRegistrationDemons::display_registration_parameters(const Regularisati
 }
 
 bool ImageRegistrationDemons::valid_regularisation_parameters(const Regularisation reg, const unsigned int nparams) const {
-    return ((reg == Regularisation::ThirionsDemons) && (nparams == 5));
+    return ((reg == Regularisation::ThirionsDemons) && (nparams == 5)) ||
+           ((reg == Regularisation::LogDemons) && (nparams == 5));
 }
 
 void ImageRegistrationDemons::set_solver(const Regularisation reg, const float* regparams, const unsigned int nparams) {
@@ -60,6 +63,23 @@ void ImageRegistrationDemons::set_solver(const Regularisation reg, const float* 
 
                 // Set solver
                 this->solver[s] = new OpticalFlowThirionsDemons(this->dimin[s],
+                    sigma_i, sigma_x,
+                    sigma_diffusion, sigma_fluid,
+                    kernelwidth);
+
+                // Done
+                break;
+            }
+            case Regularisation::LogDemons: {
+                // Get the regularisation parameter
+                const float& sigma_i = regparams[0];
+                const float& sigma_x = regparams[1];
+                const float& sigma_diffusion = regparams[2];
+                const float& sigma_fluid = regparams[3];
+                const unsigned int kernelwidth = regparams[4];
+
+                // Set solver
+                this->solver[s] = new OpticalFlowLogDemons(this->dimin[s],
                     sigma_i, sigma_x,
                     sigma_diffusion, sigma_fluid,
                     kernelwidth);

@@ -19,6 +19,7 @@ class Motion : public Field<vector2d> {
 
         // Get some motion field properties
         float norm() const;
+        float maxabs() const;
 
         // Upsample and downsample
         void upSample(const Motion& mo);
