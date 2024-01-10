@@ -27,9 +27,9 @@ class ImageRegistration {
         void estimate_motion();
 
     protected:
-        virtual bool valid_regularisation_parameters(const Regularisation reg, const unsigned int nparams) const {return true;};
+        void display_registration_parameters(const Regularisation reg, const float* regparams, const unsigned int nparams) const;
 
-        virtual void display_registration_parameters(const Regularisation reg, const float* regparams, const unsigned int nparams) const {};
+        virtual bool valid_regularisation_parameters(const Regularisation reg, const unsigned int nparams) const {return true;};
 
         virtual void set_solver(const Regularisation reg, const float* regparams, const unsigned int nparams) {};
 

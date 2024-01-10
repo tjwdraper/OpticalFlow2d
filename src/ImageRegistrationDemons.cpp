@@ -4,42 +4,6 @@
 #include <src/regularization/OpticalFlowThirionsDemons.h>
 #include <src/regularization/OpticalFlowLogDemons.h>
 
-void ImageRegistrationDemons::display_registration_parameters(const Regularisation reg, const float* regparams, const unsigned int nparams) const {
-    mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
-    mexPrintf("Optical flow image registration started... (2D C++ implementation)...\n");
-    mexPrintf("Registration parameters:\n");
-
-    // Image dimensions and multiresolution parameters
-    mexPrintf("dimensions:\t\t\t\t(%d %d)\n", this->dimin[0].x, this->dimin[0].y);
-    mexPrintf("niter:\t\t\t\t\t(%d", this->niter[0]);
-    for (int s = 1; s < this->nscales+1; s++) {
-        mexPrintf(" %d", this->niter[s]);
-    }
-    mexPrintf(")\n");
-    mexPrintf("nscales:\t\t\t\t%d\n", this->nscales);
-    mexPrintf("nrefine:\t\t\t\t%d\n", this->nrefine);
-
-    // Regularisation method
-    switch(reg) {
-        case Regularisation::ThirionsDemons: mexPrintf("regularisation:\t\t\t\tThirions Demons\n"); break;
-        case Regularisation::LogDemons:      mexPrintf("regularisation:\t\t\t\tLog-Demons\n");      break;
-    }
-
-    // Regularization parameters
-    if (nparams == 1) {
-        mexPrintf("reg. param:\t\t\t\t%.2f\n", regparams[0]);
-    }
-    else {
-        mexPrintf("reg. params:\t\t\t\t(%.2f", regparams[0]);
-        for (unsigned int p = 1; p < nparams; p++) {
-            mexPrintf(" %.2f", regparams[p]);
-        }
-        mexPrintf(")\n");
-    }
-
-    mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n");
-}
-
 bool ImageRegistrationDemons::valid_regularisation_parameters(const Regularisation reg, const unsigned int nparams) const {
     return ((reg == Regularisation::ThirionsDemons) && (nparams == 5)) ||
            ((reg == Regularisation::LogDemons) && (nparams == 5));
@@ -106,9 +70,6 @@ ImageRegistrationDemons::ImageRegistrationDemons(const dim dimin,
         nparams) {
     // Solver object
     this->ImageRegistrationDemons::set_solver(reg, regparams, nparams);
-
-    // Show loaded registration parameters to terminal
-    this->ImageRegistrationDemons::display_registration_parameters(reg, regparams, nparams);
 }
 
 ImageRegistrationDemons::~ImageRegistrationDemons() {
