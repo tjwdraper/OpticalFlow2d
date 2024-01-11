@@ -1,11 +1,12 @@
 #ifndef _OPTICAL_FLOW_H_
 #define _OPTICAL_FLOW_H_
 
+#include <src/regularization/IterativeSolver.h>
 #include <src/coord2d.h>
 #include <src/Image.h>
 #include <src/Motion.h>
 
-class OpticalFlow {
+class OpticalFlow : public IterativeSolver {
     public:
         // Constructors and deconstructors
         OpticalFlow(const dim dimin);
@@ -20,13 +21,7 @@ class OpticalFlow {
         // Do one iteration
         virtual void get_update(Motion *motion) {};
 
-        virtual void get_update(Motion *motion, const Image* Iref, const Image* Imov) {};
-
     protected:
-        dim dimin;
-        unsigned int sizein;
-        dim step;
-
         // Spatial and temporal image gradients
         Motion *gradI;
         Image *It;
