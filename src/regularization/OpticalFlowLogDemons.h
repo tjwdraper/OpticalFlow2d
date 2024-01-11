@@ -1,9 +1,9 @@
 #ifndef _OPTICAL_FLOW_LOG_DEMONS_H_
 #define _OPTICAL_FLOW_LOG_DEMONS_H_
 
-#include <src/regularization/OpticalFlow.h>
+#include <src/regularization/Demons.h>
 
-class OpticalFlowLogDemons : public OpticalFlow {
+class OpticalFlowLogDemons : public Demons {
     public:
         // Constructors and deconstructors
         OpticalFlowLogDemons(const dim dimin, 
@@ -13,45 +13,11 @@ class OpticalFlowLogDemons : public OpticalFlow {
         ~OpticalFlowLogDemons();
 
         // Overload method from base class
-        void get_update(Motion *motion);
-
         void get_update(Motion *motion, const Image *Iref, const Image* Imov);
 
     private:
-        // Get the force  term
-        void get_demons_force(Motion *force, const Motion *motion) const;
-
         // The the exponent of a vector field
         void expfield(Motion *motion) const; // Move outside of class
-
-        // Create convolution kernels
-        void create_gaussian_kernel(double *kernel, const float sigma) const; // Move outside class
-
-        // Smooth motion field with Gaussian convolution
-        void convolute(Motion *motion, const double *kernel) const; // Perhaps better to move to Motion class later
-
-        // Do one iteration with the Demons algorithm
-        void demons_iteration(Motion *motion);
-
-        // Auxiliary fields
-        Image *Iwar;
-
-        Motion *force;
-        Motion *correspondence;
-
-        // Demons parameters
-        float sigma_i;
-        float sigma_x;
-        float sigma_diffusion;
-        float sigma_fluid;
-
-        // Convolution kernels
-        dim dimkernel;
-        dim stepkernel;
-        unsigned int sizekernel;
-
-        double *kernel_diffusion;
-        double *kernel_fluid;
 };
 
 #endif

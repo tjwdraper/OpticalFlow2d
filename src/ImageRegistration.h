@@ -4,7 +4,7 @@
 #include <src/coord2d.h>
 #include <src/Image.h>
 #include <src/Motion.h>
-#include <src/regularization/OpticalFlow.h>
+#include <src/regularization/IterativeSolver.h>
 #include <src/SolverOptions.h>
 
 class ImageRegistration {
@@ -35,7 +35,7 @@ class ImageRegistration {
 
         virtual void estimate_motion_at_current_resolution(Motion* motion, 
                                                            const Image *Iref, Image *Imov,
-                                                           OpticalFlow *solver, 
+                                                           IterativeSolver *solver, 
                                                            const int niter,
                                                            const dim dimin, const int sizein) {};
 
@@ -45,7 +45,7 @@ class ImageRegistration {
         int *niter;
         int nrefine;
 
-        OpticalFlow **solver;
+        IterativeSolver **solver;
 
         Image **Iref;
         Image **Imov;

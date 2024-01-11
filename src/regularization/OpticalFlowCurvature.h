@@ -11,7 +11,7 @@ class OpticalFlowCurvature : public OpticalFlow {
         ~OpticalFlowCurvature();
 
         // Overload method from base class
-        void get_update(Motion *motion);
+        void get_update(Motion *motion, const Image* Iref = NULL, const Image* Imov = NULL);
 
     private:
         void construct_rhs(const Motion *motion);
@@ -31,7 +31,6 @@ class OpticalFlowCurvature : public OpticalFlow {
         fftw_plan pb_x, pb_y;
 
         // Auxiliary fields
-        Motion* force;
         double *rhs_x, *rhs_y;
 
         // Eigenvalue matrix of the biharmonic operator

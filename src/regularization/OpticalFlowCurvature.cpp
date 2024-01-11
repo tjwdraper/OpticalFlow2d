@@ -36,8 +36,6 @@ OpticalFlowCurvature::OpticalFlowCurvature(const dim dimin, const float alpha, c
     this->step_rm = dim(this->dimin.y, 1);
 
     // Allocate memory for the auxiliary fields
-    this->force = new Motion(this->dimin);
-
     this->rhs_x = new double[this->sizein];
     this->rhs_y = new double[this->sizein];
 
@@ -58,8 +56,6 @@ OpticalFlowCurvature::OpticalFlowCurvature(const dim dimin, const float alpha, c
 }
 
 OpticalFlowCurvature::~OpticalFlowCurvature() {
-    delete this->force;
-
     delete this->rhs_x;
     delete this->rhs_y;
 
@@ -145,7 +141,7 @@ void OpticalFlowCurvature::multiply_eigenvalues() {
 }
 
 // Overload function from base class
-void OpticalFlowCurvature::get_update(Motion *motion) {
+void OpticalFlowCurvature::get_update(Motion *motion, const Image* Iref, const Image* Imov) {
     // Get the force
     this->OpticalFlow::get_force(this->force, motion);
 

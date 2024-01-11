@@ -12,19 +12,15 @@ class OpticalFlow : public IterativeSolver {
         OpticalFlow(const dim dimin);
         ~OpticalFlow();
 
-        // Get the image gradients
-        void get_image_gradients(const Image* Iref, const Image* Imov);
-
         // Construct the force from the image gradients and motion estimate
         void get_force(Motion* force, const Motion* motion) const;
 
         // Do one iteration
-        virtual void get_update(Motion *motion) {};
+        virtual void get_update(Motion *motion, const Image* Iref = NULL, const Image* Imov = NULL) {};
 
     protected:
         // Spatial and temporal image gradients
-        Motion *gradI;
-        Image *It;
+        Motion *force;
 };
 
 #endif

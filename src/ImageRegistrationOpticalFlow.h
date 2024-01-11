@@ -3,7 +3,7 @@
 
 #include <src/ImageRegistration.h>
 #include <src/coord2d.h>
-#include <src/regularization/OpticalFlow.h>
+#include <src/regularization/IterativeSolver.h>
 #include <src/Motion.h>
 #include <src/Image.h>
 #include <src/SolverOptions.h>
@@ -23,7 +23,7 @@ class ImageRegistrationOpticalFlow : public ImageRegistration {
 
         void estimate_motion_at_current_resolution(Motion* motion, 
                                                    const Image *Iref, Image *Imov,
-                                                   OpticalFlow *solver, 
+                                                   IterativeSolver *solver, 
                                                    const int niter,
                                                    const dim dimin, const int sizein);
 };

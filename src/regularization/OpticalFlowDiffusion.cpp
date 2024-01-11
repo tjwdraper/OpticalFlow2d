@@ -40,9 +40,12 @@ void OpticalFlowDiffusion::get_quasi_differential_operator(const Motion* motion)
 }
 
 // Get the update using the iterative method
-void OpticalFlowDiffusion::get_update(Motion *motion) {
+void OpticalFlowDiffusion::get_update(Motion *motion, const Image* Iref, const Image* Imov) {
     // Get the laplacian map (without the central contribution)
     this->get_quasi_differential_operator(motion);
+
+    // Get the force using the quasi-laplacian
+    this->get_force(this->force, this->qdiffoperator);
 
     // Use this map, the images and the motion field to get the next iteration
     this->optical_flow_iteration(motion);
@@ -57,10 +60,11 @@ void OpticalFlowDiffusion::optical_flow_iteration(Motion *motion) {
     const dim& step = this->step;
 
     // Get a copy of the pointer to the data of the vector fields
-    vector2d *mo    = motion->get_motion();
+    vector2d *u     = motion->get_motion();
     vector2d *qdiff = this->qdiffoperator->get_motion();
     vector2d *dI    = this->gradI->get_motion();
     float *It       = this->It->get_image();
+    vector2d *f     = this->force->get_motion();
 
     // Get the regularisation parameter
     const float alphasq = alpha * alpha;
@@ -71,7 +75,7 @@ void OpticalFlowDiffusion::optical_flow_iteration(Motion *motion) {
         for (unsigned int j = 0; j < dimin.y; j++) {
             idx = i * step.x + j * step.y;
 
-            mo[idx] = qdiff[idx] - dI[idx] * ( (It[idx] + dI[idx].x * qdiff[idx].x + dI[idx].y * qdiff[idx].y) / (alphasq + dI[idx].x*dI[idx].x + dI[idx].y*dI[idx].y) );
+            u[idx] = qdiff[idx] - f[idx] / (alphasq + dI[idx].x*dI[idx].x + dI[idx].y*dI[idx].y);
         }
     }
 

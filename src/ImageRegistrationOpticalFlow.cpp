@@ -16,7 +16,7 @@ void ImageRegistrationOpticalFlow::set_solver(const Regularisation reg, const fl
         throw std::invalid_argument("Invalid number of regularisation parameters for given regularisation method.\n");
     }
 
-    this->solver = new OpticalFlow*[this->nscales + 1];
+    this->solver = new IterativeSolver*[this->nscales + 1];
     for (int s = this->nscales; s >= 0; s--) {
         switch(reg) {
             case Regularisation::Diffusion: {
@@ -94,7 +94,7 @@ ImageRegistrationOpticalFlow::~ImageRegistrationOpticalFlow() {
 
 void ImageRegistrationOpticalFlow::estimate_motion_at_current_resolution(Motion* motion, 
     const Image *Iref, Image *Imov,
-    OpticalFlow *solver, 
+    IterativeSolver *solver, 
     const int niter,
     const dim dimin, const int sizein) {
     
@@ -115,7 +115,7 @@ void ImageRegistrationOpticalFlow::estimate_motion_at_current_resolution(Motion*
         Logger log(dimin, niter);
 
         // Calculating the image gradients only has to be done once
-        solver->get_image_gradients(Iref, Iaux);
+        solver->set_derivatives(Iref, Iaux);
 
         // Iterate over resolution levels
         for (int iter = 0; iter < niter; iter++) {

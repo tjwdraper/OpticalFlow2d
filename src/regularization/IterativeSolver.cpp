@@ -7,9 +7,16 @@ IterativeSolver::IterativeSolver(const dim dimin) {
     this->dimin  = dimin;
     this->sizein = this->dimin.x * this->dimin.y;
     this->step   = dim(1, this->dimin.x);
+
+    // Allocate memory for image gradients
+    this->gradI = new Motion(this->dimin);
+    this->It = new Image(this->dimin);
 }
 
-IterativeSolver::~IterativeSolver() {}
+IterativeSolver::~IterativeSolver() {
+    delete this->gradI;
+    delete this->It;
+}
 
 // Image derivatives
 void IterativeSolver::spatial_derivative(Motion* grad_image, const Image* image) const {
@@ -41,4 +48,9 @@ void IterativeSolver::temporal_derivative(Image* It, const Image* Iref, const Im
 
     // Done
     return;
+}
+
+void IterativeSolver::set_derivatives(const Image* Iref, const Image* Imov) const {
+    this->IterativeSolver::spatial_derivative(this->gradI, Imov);
+    this->IterativeSolver::temporal_derivative(this->It, Iref, Imov);
 }

@@ -3,18 +3,14 @@
 
 // Constructors and deconstructors
 OpticalFlowElastic::OpticalFlowElastic(const dim dimin, const float mu, const float lambda, const float omega) : OpticalFlow(dimin) {
-    this->force = new Motion(this->dimin);
-
     this->mu = mu;
     this->lambda = lambda;
     this->omega = omega;
 }
 
-OpticalFlowElastic::~OpticalFlowElastic() {
-    delete this->force;
-}
+OpticalFlowElastic::~OpticalFlowElastic() {}
 
-void OpticalFlowElastic::get_update(Motion* motion) {
+void OpticalFlowElastic::get_update(Motion* motion, const Image* Iref, const Image* Imov) {
     // Get the force
     this->OpticalFlow::get_force(this->force, motion);
 

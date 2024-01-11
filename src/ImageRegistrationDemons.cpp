@@ -14,7 +14,7 @@ void ImageRegistrationDemons::set_solver(const Regularisation reg, const float* 
         throw std::invalid_argument("Invalid number of regularisation parameters for given regularisation method.\n");
     }
 
-    this->solver = new OpticalFlow*[this->nscales + 1];
+    this->solver = new IterativeSolver*[this->nscales + 1];
     for (int s = this->nscales; s >= 0; s--) {
         switch(reg) {
             case Regularisation::ThirionsDemons: {
@@ -81,7 +81,7 @@ ImageRegistrationDemons::~ImageRegistrationDemons() {
 
 void ImageRegistrationDemons::estimate_motion_at_current_resolution(Motion* motion, 
     const Image *Iref, Image *Imov,
-    OpticalFlow *solver, 
+    IterativeSolver *solver, 
     const int niter,
     const dim dimin, const int sizein) {
     

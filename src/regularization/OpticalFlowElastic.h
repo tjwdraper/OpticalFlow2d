@@ -10,12 +10,10 @@ class OpticalFlowElastic : public OpticalFlow {
         ~OpticalFlowElastic();
 
         // Overload method from base class
-        void get_update(Motion* motion);
+        void get_update(Motion* motion, const Image* Iref = NULL, const Image* Imov = NULL);
 
     private:
         void SOR_iteration(Motion* motion) const;
-
-        Motion* force;
 
         // Regularisation and relaxation parameters
         float mu;

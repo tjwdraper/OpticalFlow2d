@@ -4,14 +4,11 @@
 
 // Constructors and deconstructors
 OpticalFlow::OpticalFlow(const dim dimin) : IterativeSolver(dimin) {
-    // Allocate memory for the spatial and temporal image gradients
-    this->gradI = new Motion(this->dimin);
-    this->It = new Image(this->dimin);
+    this->force = new Motion(this->dimin);
 }
 
 OpticalFlow::~OpticalFlow() {
-    delete this->gradI;
-    delete this->It;
+    delete this->force;
 }
 
 // Construct the force from the image gradients and motion estimate

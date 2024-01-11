@@ -13,7 +13,7 @@ class OpticalFlowDiffusion : public OpticalFlow {
         ~OpticalFlowDiffusion();
 
         // Overload method from base class
-        void get_update(Motion *motion);
+        void get_update(Motion *motion, const Image* Iref = NULL, const Image* Imov = NULL);
 
     private:    
         // Do one iteration of the Horn-Schunck method (= Optical Flow Diffusion)
