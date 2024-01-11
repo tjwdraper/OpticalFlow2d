@@ -180,6 +180,11 @@ void Image::warp2d(const Motion& mo) {
     return;
 } 
 
+void Image::convolute(const Kernel& kernel) {
+    this->Field<float>::convolute(kernel);
+    return;
+}
+
 // Overload operator=
 Image& Image::operator=(const Image& im) {
     if (this->dimin != im.get_dimensions()) {

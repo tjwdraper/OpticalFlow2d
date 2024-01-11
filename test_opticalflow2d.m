@@ -3,7 +3,7 @@ clear all;
 close all;
 
 pkg load image; % GNU Octave only
-0
+
 %% Load images
 Iref = imread("img/dirlab5_ref.tiff");
 Imov = imread("img/dirlab5_mov.tiff");
@@ -26,7 +26,7 @@ nrefine = 3;
 alpha = [1.0, 0.25, 2.0, 2.0, 5];
 ##alpha = [0.8 0.0];
 
-regularisation = 4; % Options:
+regularisation = 3; % Options:
                     % 0) Diffusion
                     % 1) Curvature
                     % 2) Elastic

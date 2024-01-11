@@ -1,6 +1,7 @@
 #include <src/regularization/Demons/Demons.h>
 
 // Create Gaussian kernels
+/*
 void Demons::create_gaussian_kernel(double *kernel, const float sigma) const {
     // Get kernel dimensions
     const dim& dimkernel = this->dimkernel;
@@ -30,6 +31,7 @@ void Demons::create_gaussian_kernel(double *kernel, const float sigma) const {
     // Done
     return;
 }
+*/
 
 // Constructors and deconstructors
 Demons::Demons(const dim dimin, 
@@ -47,9 +49,18 @@ Demons::Demons(const dim dimin,
     this->sigma_fluid = sigma_fluid;
 
     // Convolution kernels
-    this->dimkernel = dim(kernelwidth, kernelwidth);
-    this->stepkernel = dim(1, this->dimkernel.x);
-    this->sizekernel = this->dimkernel.x * this->dimkernel.y;
+    //this->dimkernel = dim(kernelwidth, kernelwidth);
+    //this->stepkernel = dim(1, this->dimkernel.x);
+    //this->sizekernel = this->dimkernel.x * this->dimkernel.y;
+
+    // Create convolution kernels and use Gaussian filtering
+    //this->kernel_diffusion = new Kernel(kernelwidth);
+    //this->kernel_fluid     = new Kernel(kernelwidth);
+
+    //this->kernel_diffusion->set_gaussian(this->sigma_diffusion);
+    //this->kernel_fluid->set_gaussian(this->sigma_fluid);
+
+    /*
 
     // Allocate memory for the convolution kernels
     this->kernel_diffusion = new double[this->sizekernel];
@@ -58,16 +69,19 @@ Demons::Demons(const dim dimin,
     // Set values
     this->Demons::create_gaussian_kernel(this->kernel_diffusion, this->sigma_diffusion);
     this->Demons::create_gaussian_kernel(this->kernel_fluid, this->sigma_fluid);
+
+    */
 }
 
 Demons::~Demons() {
     delete this->Iwar;
     delete this->correspondence;
-    delete[] this->kernel_diffusion;
-    delete[] this->kernel_fluid;
+    //delete this->kernel_diffusion;
+    //delete this->kernel_fluid;
 }
 
 // Smooth motion field with Gaussian convolution
+/*
 void Demons::convolute(Motion *motion, const double *kernel) const {
     // Get the dimensions of the field
     const dim& dimin = this->dimin;
@@ -125,6 +139,7 @@ void Demons::convolute(Motion *motion, const double *kernel) const {
     // Done
     return;
 }
+*/
 
 // Do one iteration with the Demons algorithm
 void Demons::demons_iteration(Motion *motion) {

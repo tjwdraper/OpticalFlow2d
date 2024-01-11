@@ -2,6 +2,7 @@
 #define _FIELD_H_
 
 #include <src/coord2d.h>
+#include <src/Kernel.h>
 
 template <class T>
 class Field {
@@ -19,6 +20,9 @@ class Field {
         // Upsample and downsample the field
         void upSample(const Field<T>& fieldin);
         void downSample(const Field<T>& fieldin);
+
+        // Convolute with kernel
+        void convolute(const Kernel& kernel);
 
         // Overload operators
         virtual Field<T> operator+(const Field<T>& fieldin) const;

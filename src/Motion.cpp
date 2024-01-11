@@ -1,6 +1,7 @@
 #include <src/Motion.h>
 
 #include <mex.h>
+#include <math.h>
 
 // Constructors and deconstructors
 Motion::Motion(const dim dimin) : Field<vector2d>(dimin) {}
@@ -273,6 +274,11 @@ void Motion::exp() {
 
     // Done
     return; 
+}
+
+void Motion::convolute(const Kernel& kernel) {
+    this->Field<vector2d>::convolute(kernel);
+    return;
 }
 
 // Overload operator=

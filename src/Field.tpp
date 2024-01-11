@@ -1,7 +1,7 @@
 #include <iostream>
-#include <math.h>
 #include <cstring>
 #include <stdexcept>
+#include <math.h>
 #include <mex.h>
 
 // Constructors and deconstructors
@@ -197,6 +197,69 @@ void Field<T>::upSample(const Field<T>& fieldin) {
             // Check if weight is non-zero
             if (weight != 0) {
                 dataout[idx] = val / weight;
+            }
+        }
+    }
+
+    // Done
+    return;
+}
+
+// Convolute with kernel
+template<class T>
+void Field<T>::convolute(const Kernel& kernel) {
+    // Get the dimensions of the field
+    const dim& dimin = this->dimin;
+    const dim& step = this->step;
+
+    // Get the dimensions of the kernel
+    const dim& dimkernel = kernel.get_dimensions();
+    const dim& stepkernel = kernel.get_step();
+
+    const int cx = (dimkernel.x - 1) / 2;
+    const int cy = (dimkernel.y - 1) / 2;
+
+    // Get a copy to the pointer of the kernel data
+    const double* k = kernel.get_kernel();
+
+    // Make a copy of the input field
+    Field<T> tmp(*this);
+
+    // Get a copy to the pointer to the motion data
+    T *field    = this->get_field();
+    T *fieldtmp = tmp.get_field();
+
+    // Iterate over voxels
+    int idx, idxkernel;
+    for (int i = 0; i < dimin.x; i++) {
+        for (int j = 0; j < dimin.y; j++) {
+            // Get absolute index
+            idx = i * step.x + j * step.y;
+
+            // Iterate over kernel
+            T val;
+            double weight = 0.0f;
+            for (int ii = -cx; ii <= cx; ii++) {
+                for (int jj = -cy; jj <= cy; jj++) {
+                    // Check if we are within bounds
+                    if ((i + ii) * step.x + (j + jj) * step.y < 0 ||
+                        (i + ii) * step.x + (j + jj) * step.y >= sizein) {
+                        continue;
+                    } 
+                    else {
+                        // Get absolute index in the kernel
+                        idxkernel = (ii + cx) * stepkernel.x + (jj + cy) * stepkernel.y;
+
+                        // Add contribution of the kernel element
+                        val += fieldtmp[idx + ii * step.x + jj * step.y] * k[idxkernel];
+                        weight += k[idxkernel];
+                    }
+                }
+            }
+
+            // Set value in motion field
+            if (weight != 0) {
+                field[idx] = val / weight;
             }
         }
     }

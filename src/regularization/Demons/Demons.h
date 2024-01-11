@@ -2,6 +2,7 @@
 #define _DEMONS_H_
 
 #include <src/regularization/IterativeSolver.h>
+#include <src/Kernel.h>
 
 class Demons : public IterativeSolver {
     public:
@@ -17,10 +18,10 @@ class Demons : public IterativeSolver {
 
     protected:
         // Create a Gaussian convolution kernel
-        void create_gaussian_kernel(double *kernel, const float sigma) const;
+        //void create_gaussian_kernel(double *kernel, const float sigma) const;
 
         // Convolute motion field with kernel
-        void convolute(Motion *motion, const double *kernel) const;
+        //void convolute(Motion *motion, const double *kernel) const;
 
         // Do one iteration with the Demons algorithm
         void demons_iteration(Motion *motion);
@@ -36,12 +37,17 @@ class Demons : public IterativeSolver {
         float sigma_fluid;
         
         // Convolution kernels
+        Kernel* kernel_diffusion;
+        Kernel* kernel_fluid;
+
+        /*
         dim dimkernel;
         dim stepkernel;
         unsigned int sizekernel;
 
         double *kernel_diffusion;
         double *kernel_fluid;
+        */
 };
 
 #endif

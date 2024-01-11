@@ -24,12 +24,14 @@ void DemonsThirions::get_update(Motion *motion, const Image* Iref, const Image* 
     this->Demons::demons_iteration(motion);
 
     // Smoothen the correpondence update
-    this->Demons::convolute(this->correspondence, this->kernel_fluid);
+    this->correspondence->convolute(*this->kernel_fluid);
+    //this->Demons::convolute(this->correspondence, this->kernel_fluid);
 
     // Update the motion field (Additive demons or Composite demons)
     //*motion += *this->correspondence;
     motion->accumulate(*this->correspondence);
 
     // Smoothen the motion field
-    this->Demons::convolute(motion, this->kernel_diffusion);
+    motion->convolute(*this->kernel_diffusion);
+    //this->Demons::convolute(motion, this->kernel_diffusion);
 }

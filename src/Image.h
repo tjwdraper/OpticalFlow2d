@@ -3,6 +3,7 @@
 
 #include <src/Field.h>
 #include <src/Motion.h>
+#include <src/Kernel.h>
 
 class Image : public Field<float> {
     public:
@@ -32,6 +33,9 @@ class Image : public Field<float> {
 
         // Warp image with motion field
         void warp2d(const Motion& mo);
+
+        // Convolute with kernel
+        void convolute(const Kernel& kernel);
 
         // Overload operator=
         Image& operator=(const Image& im);

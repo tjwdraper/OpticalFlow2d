@@ -2,6 +2,7 @@
 #define _MOTION_H_
 
 #include <src/Field.h>
+#include <src/Kernel.h>
 
 class Motion : public Field<vector2d> {
     public:
@@ -34,6 +35,9 @@ class Motion : public Field<vector2d> {
 
         // Motion field exponential
         void exp();
+
+        // Convolute with kernel
+        void convolute(const Kernel& kernel);
 
         // Overload operator=
         Motion& operator=(const Motion& mo);
