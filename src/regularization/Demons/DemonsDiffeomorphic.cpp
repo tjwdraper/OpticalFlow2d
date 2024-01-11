@@ -11,38 +11,6 @@ DemonsDiffeomorphic::DemonsDiffeomorphic(const dim dimin,
 
 DemonsDiffeomorphic::~DemonsDiffeomorphic() {}
 
-// Scaling and squaring algorithm
-void DemonsDiffeomorphic::expfield(Motion *motion) const {
-    // Get the scale
-    int N = static_cast<int>( std::ceil(1 + std::log2(motion->maxabs())) );
-    N = std::max(N, 0);
-
-    if (N > 20) {
-        mexPrintf("%d\n", N);
-        mexErrMsgTxt("Error: the number of scales is too large\n");
-        return;
-    }
-    else {
-        mexPrintf("Maxabs of correspondence: %.3f\tNumber of levels in expfield: %d\n", motion->maxabs(), N);
-    }
-    
-    // Resize the input field
-    double resizefactor = std::pow(2, -N);
-    vector2d *u = motion->get_motion();
-    for (unsigned int i = 0; i < this->sizein; i++) {
-        u[i] *= resizefactor;
-    }
-
-    // Square
-    Motion *Mtmp = new Motion(this->dimin);
-    for (unsigned int n = 0; n < N; n++) {
-        *Mtmp = *motion;
-
-        motion->accumulate(*Mtmp);
-    }
-    delete Mtmp;
-}
-
 // Overload method from base class
 void DemonsDiffeomorphic::get_update(Motion *motion, const Image* Iref, const Image* Imov) {
     // Warp the input image with current estimate of the motion field
@@ -59,7 +27,8 @@ void DemonsDiffeomorphic::get_update(Motion *motion, const Image* Iref, const Im
     this->Demons::convolute(this->correspondence, this->kernel_fluid);
 
     // Update the motion field (Diffeomorphic demons demons)
-    this->DemonsDiffeomorphic::expfield(this->correspondence);
+    this->correspondence->exp();
+    //this->DemonsDiffeomorphic::expfield(this->correspondence);
     motion->accumulate(*this->correspondence);
 
     // Smoothen the motion field

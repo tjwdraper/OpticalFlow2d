@@ -269,3 +269,14 @@ Field<T> Field<T>::operator-(const Field<T>& fieldin) const {
     // Done
     return fieldout;
 }
+
+template <class T>
+Field<T>& Field<T>::operator*=(const float& val) {
+    // Iterate over voxels, add together
+    for (unsigned int i = 0; i < this->sizein; i++) {
+        this->field[i] *= val;
+    }
+
+    // Done
+    return *this;
+}

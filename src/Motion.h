@@ -32,6 +32,9 @@ class Motion : public Field<vector2d> {
         void Neumann_boundaryconditions();
         void Dirichlet_boundaryconditions();
 
+        // Motion field exponential
+        void exp();
+
         // Overload operator=
         Motion& operator=(const Motion& mo);
 
@@ -40,6 +43,8 @@ class Motion : public Field<vector2d> {
         Motion& operator+=(const Motion& mo);
         Motion operator-(const Motion& mo) const;
         Motion& operator-=(const Motion& mo);
+
+        Motion& operator*=(const float& val);
 };
 
 #endif

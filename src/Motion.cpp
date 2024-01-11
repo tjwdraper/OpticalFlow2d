@@ -249,6 +249,32 @@ void Motion::Dirichlet_boundaryconditions() {
     u[(dimin.x-1) * step.x + (dimin.y-1) * step.y] = 0.0f;
 }
 
+void Motion::exp() {
+     // Get the scale
+    int nsquares = static_cast<int>( std::ceil(1 + std::log2(this->maxabs())) );
+    nsquares = std::max(nsquares, 0);
+
+    // If the values in the field are small, nothing has to be done
+    if (nsquares == 0) {
+        return;
+    }
+
+    // Recale the values of the input field
+    this->operator*=(std::pow(2, -nsquares));
+
+    // Do nsquare recursive squarings
+    Motion *Mtmp = new Motion(this->dimin);
+    for (unsigned int square = 0; square < nsquares; square++) {
+        *Mtmp = *this;
+
+        this->accumulate(*Mtmp);
+    }
+    delete Mtmp;  
+
+    // Done
+    return; 
+}
+
 // Overload operator=
 Motion& Motion::operator=(const Motion& mo) {
     if (this->dimin != mo.get_dimensions()) {
@@ -290,5 +316,10 @@ Motion Motion::operator-(const Motion& mo) const {
 
 Motion& Motion::operator-=(const Motion& mo) {
     this->Field<vector2d>::operator-=(mo);
+    return *this;
+}
+
+Motion& Motion::operator*=(const float& val) {
+    this->Field<vector2d>::operator*=(val);
     return *this;
 }

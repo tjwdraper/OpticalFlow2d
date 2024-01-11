@@ -20,13 +20,13 @@ Imov = padarray(Imov, [11 0], "replicate");
 [dimx, dimy] = size(Iref);
 
 %% Registration paramters
-niter = [100 1000 1000 1000];
+niter = [1000 1000 1000 1000];
 nscales = 3;
 nrefine = 3;
-##alpha = [1.0, 0.25, 2.0, 2.0, 5];
-alpha = [0.8 0.0];
+alpha = [1.0, 0.25, 2.0, 2.0, 5];
+##alpha = [0.8 0.0];
 
-regularisation = 2; % Options:
+regularisation = 4; % Options:
                     % 0) Diffusion
                     % 1) Curvature
                     % 2) Elastic
@@ -75,15 +75,12 @@ figure();
 quiver(motion(end:-1:1,:,2), motion(end:-1:1,:,1), 0); title("Motion field", "fontsize", 20); axis off;
 
 %%
-function jac = jacobian(motion)
-  [dudx, dudy] = gradient(squeeze(motion(:,:,1)));
-  [dvdx, dvdy] = gradient(squeeze(motion(:,:,2)));
+[dudx, dudy] = gradient(squeeze(motion(:,:,1)));
+[dvdx, dvdy] = gradient(squeeze(motion(:,:,2)));
 
-  jac = (1.0 + dudx).*(1.0 + dvdy) - dudy.*dvdx;
-endfunction
+jac = (1.0 + dudx).*(1.0 + dvdy) - dudy.*dvdx;
 
 normu = sqrt(motion(:,:,1).^2 + motion(:,:,2).^2);
-jac = jacobian(motion);
 
 figure();
 subplot(121); imagesc(normu); colormap jet; colorbar; title("||u||", "fontsize", 20); axis off;

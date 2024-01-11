@@ -41,6 +41,8 @@ class Image : public Field<float> {
         Image& operator+=(const Image& im);
         Image operator-(const Image& im) const;
         Image& operator-=(const Image& im);
+
+        Image& operator*=(const float& val);
 };
 
 #endif

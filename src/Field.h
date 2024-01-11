@@ -26,6 +26,8 @@ class Field {
         virtual Field<T> operator-(const Field<T>& fieldin) const;
         virtual Field<T>& operator-=(const Field<T>& fieldin);
 
+        virtual Field<T>& operator*=(const float& val);
+
     protected:
         // Getters and setters
         T* get_field() const;

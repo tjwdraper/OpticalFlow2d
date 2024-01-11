@@ -254,3 +254,8 @@ Image& Image::operator-=(const Image& im) {
     }
     return *this;
 }
+
+Image& Image::operator*=(const float& val) {
+    this->Field<float>::operator*=(val);
+    return *this;
+}

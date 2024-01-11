@@ -14,10 +14,6 @@ class DemonsDiffeomorphic : public Demons {
 
         // Overload method from base class
         void get_update(Motion *motion, const Image *Iref, const Image* Imov);
-
-    private:
-        // The the exponent of a vector field
-        void expfield(Motion *motion) const; // Move outside of class
 };
 
 #endif
