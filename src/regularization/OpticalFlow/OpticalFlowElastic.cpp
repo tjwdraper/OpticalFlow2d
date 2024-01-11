@@ -1,4 +1,4 @@
-#include <src/regularization/OpticalFlowElastic.h>
+#include <src/regularization/OpticalFlow/OpticalFlowElastic.h>
 #include <src/gradients.h>
 
 // Constructors and deconstructors

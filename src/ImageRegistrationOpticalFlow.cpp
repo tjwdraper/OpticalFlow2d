@@ -1,9 +1,9 @@
 #include <src/ImageRegistrationOpticalFlow.h>
 #include <src/Logger.h>
 
-#include <src/regularization/OpticalFlowDiffusion.h>
-#include <src/regularization/OpticalFlowCurvature.h>
-#include <src/regularization/OpticalFlowElastic.h>
+#include <src/regularization/OpticalFlow/OpticalFlowDiffusion.h>
+#include <src/regularization/OpticalFlow/OpticalFlowCurvature.h>
+#include <src/regularization/OpticalFlow/OpticalFlowElastic.h>
 
 bool ImageRegistrationOpticalFlow::valid_regularisation_parameters(const Regularisation reg, const unsigned int nparams) const {
     return ((reg == Regularisation::Diffusion) && (nparams == 1)) || 

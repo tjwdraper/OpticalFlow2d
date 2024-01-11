@@ -1,4 +1,4 @@
-#include <src/regularization/OpticalFlowCurvature.h>
+#include <src/regularization/OpticalFlow/OpticalFlowCurvature.h>
 #include <src/gradients.h>
 
 #define PI 3.14159265

@@ -4,7 +4,7 @@
 #include <src/coord2d.h>
 #include <src/Image.h>
 #include <src/Motion.h>
-#include <src/regularization/OpticalFlow.h>
+#include <src/regularization/OpticalFlow/OpticalFlow.h>
 
 class OpticalFlowDiffusion : public OpticalFlow {
     public:

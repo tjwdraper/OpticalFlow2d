@@ -12,12 +12,6 @@ class Demons : public IterativeSolver {
             const unsigned int kernelwidth = 5);
         ~Demons();
 
-        // Get the image gradients
-        void set_derivatives(const Image* Iref, const Image* Imov);
-
-        // Construct the force from the image gradients and motion estimate
-        void get_force(Motion* force, const Motion* motion) const;
-
         // Do one iteration
         virtual void get_update(Motion *motion, const Image* Iref, const Image* Imov) {};
 

@@ -1,7 +1,7 @@
 #ifndef _OPTICAL_FLOW_LOG_DEMONS_H_
 #define _OPTICAL_FLOW_LOG_DEMONS_H_
 
-#include <src/regularization/Demons.h>
+#include <src/regularization/Demons/Demons.h>
 
 class OpticalFlowLogDemons : public Demons {
     public:

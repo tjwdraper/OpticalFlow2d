@@ -4,8 +4,9 @@
 #include <src/coord2d.h>
 #include <src/Image.h>
 #include <src/Motion.h>
-#include <src/regularization/IterativeSolver.h>
 #include <src/SolverOptions.h>
+
+#include <src/regularization/IterativeSolver.h>
 
 class ImageRegistration {
     public:

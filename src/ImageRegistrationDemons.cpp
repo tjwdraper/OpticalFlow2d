@@ -1,8 +1,8 @@
 #include <src/ImageRegistrationDemons.h>
 #include <src/Logger.h>
 
-#include <src/regularization/OpticalFlowThirionsDemons.h>
-#include <src/regularization/OpticalFlowLogDemons.h>
+#include <src/regularization/Demons/OpticalFlowThirionsDemons.h>
+#include <src/regularization/Demons/OpticalFlowLogDemons.h>
 
 bool ImageRegistrationDemons::valid_regularisation_parameters(const Regularisation reg, const unsigned int nparams) const {
     return ((reg == Regularisation::ThirionsDemons) && (nparams == 5)) ||

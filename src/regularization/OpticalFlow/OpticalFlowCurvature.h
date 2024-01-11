@@ -1,7 +1,7 @@
 #ifndef _OPTICAL_FLOW_CURVATURE_H_
 #define _OPTICAL_FLOW_CURVATURE_H_
 
-#include <src/regularization/OpticalFlow.h>
+#include <src/regularization/OpticalFlow/OpticalFlow.h>
 #include <src/Motion.h>
 #include <fftw3.h>
 

@@ -24,9 +24,9 @@ niter = [100 1000 1000 1000];
 nscales = 3;
 nrefine = 3;
 ##alpha = [1.0, 0.25, 2.0, 2.0, 5];
-alpha = [0.8];
+alpha = [0.8 0.0];
 
-regularisation = 0; % Options:
+regularisation = 2; % Options:
                     % 0) Diffusion
                     % 1) Curvature
                     % 2) Elastic

@@ -1,7 +1,7 @@
 #ifndef _OPTICAL_FLOW_THIRIONS_DEMONS_H_
 #define _OPTICAL_FLOW_THIRIONS_DEMONS_H_
 
-#include <src/regularization/Demons.h>
+#include <src/regularization/Demons/Demons.h>
 #include <src/Image.h>
 #include <src/Motion.h>
 

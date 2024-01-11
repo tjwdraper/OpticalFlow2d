@@ -1,4 +1,4 @@
-#include <src/regularization/Demons.h>
+#include <src/regularization/Demons/Demons.h>
 
 // Create Gaussian kernels
 void Demons::create_gaussian_kernel(double *kernel, const float sigma) const {
@@ -135,7 +135,6 @@ void Demons::demons_iteration(Motion *motion) {
     // Get a copy of the pointer to the motion, correspondence and force data
     vector2d *u = this->correspondence->get_motion();
     vector2d *s = motion->get_motion();
-    //vector2d *f = force->get_motion();
 
     // Get a copy of the pointer to the image gradient data
     float *It = this->It->get_image();

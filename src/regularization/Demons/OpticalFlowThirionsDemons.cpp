@@ -1,4 +1,4 @@
-#include <src/regularization/OpticalFlowThirionsDemons.h>
+#include <src/regularization/Demons/OpticalFlowThirionsDemons.h>
 
 // Constructors and deconstructors
 OpticalFlowThirionsDemons::OpticalFlowThirionsDemons(const dim dimin, 
@@ -26,7 +26,7 @@ void OpticalFlowThirionsDemons::get_update(Motion *motion, const Image* Iref, co
     // Smoothen the correpondence update
     this->Demons::convolute(this->correspondence, this->kernel_fluid);
 
-    // Update the motion field (Additive demons)
+    // Update the motion field (Additive demons or Composite demons)
     //*motion += *this->correspondence;
     motion->accumulate(*this->correspondence);
 

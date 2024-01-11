@@ -1,7 +1,7 @@
 #ifndef _OPTICAL_FLOW_ELASTIC_H_
 #define _OPTICAL_FLOW_ELASTIC_H_
 
-#include <src/regularization/OpticalFlow.h>
+#include <src/regularization/OpticalFlow/OpticalFlow.h>
 #include <src/Motion.h>
 
 class OpticalFlowElastic : public OpticalFlow {

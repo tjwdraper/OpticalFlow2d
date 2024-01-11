@@ -3,10 +3,11 @@
 
 #include <src/ImageRegistration.h>
 #include <src/coord2d.h>
-#include <src/regularization/IterativeSolver.h>
 #include <src/Motion.h>
 #include <src/Image.h>
 #include <src/SolverOptions.h>
+
+#include <src/regularization/IterativeSolver.h>
 
 class ImageRegistrationOpticalFlow : public ImageRegistration {
     public:

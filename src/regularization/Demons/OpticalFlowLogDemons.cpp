@@ -1,4 +1,4 @@
-#include <src/regularization/OpticalFlowLogDemons.h>
+#include <src/regularization/Demons/OpticalFlowLogDemons.h>
 
 // Constructors and deconstructors
 OpticalFlowLogDemons::OpticalFlowLogDemons(const dim dimin, 
