@@ -20,11 +20,11 @@ void ImageRegistration::display_registration_parameters(const Regularisation reg
 
     // Regularisation method
     switch(reg) {
-        case Regularisation::Diffusion:      mexPrintf("regularisation:\t\t\t\tDiffusion\n");       break;
-        case Regularisation::Curvature:      mexPrintf("regularisation:\t\t\t\tCurvature\n");       break;
-        case Regularisation::Elastic:        mexPrintf("regularisation:\t\t\t\tElastic\n");         break;
-        case Regularisation::ThirionsDemons: mexPrintf("regularisation:\t\t\t\tThirions Demons\n"); break;
-        case Regularisation::LogDemons:      mexPrintf("regularisation:\t\t\t\tLog-Demons\n");      break;
+        case Regularisation::Diffusion:           mexPrintf("regularisation:\t\t\t\tDiffusion\n");            break;
+        case Regularisation::Curvature:           mexPrintf("regularisation:\t\t\t\tCurvature\n");            break;
+        case Regularisation::Elastic:             mexPrintf("regularisation:\t\t\t\tElastic\n");              break;
+        case Regularisation::ThirionsDemons:      mexPrintf("regularisation:\t\t\t\tThirions Demons\n");      break;
+        case Regularisation::DiffeomorphicDemons: mexPrintf("regularisation:\t\t\t\tDiffeomorphic Demons\n"); break;
     }
 
     // Regularization parameters

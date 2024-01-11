@@ -56,7 +56,7 @@ mexFunction (int nlhs, mxArray *plhs[],
             myImageRegistration = new ImageRegistrationOpticalFlow(dimin, nscales, niter, nrefine, reg, regparams, nparams);
         }
         else if ((reg == Regularisation::ThirionsDemons) ||
-                 (reg == Regularisation::LogDemons)) {
+                 (reg == Regularisation::DiffeomorphicDemons)) {
             myImageRegistration = new ImageRegistrationDemons(dimin, nscales, niter, nrefine, reg, regparams, nparams);
         }
         else {

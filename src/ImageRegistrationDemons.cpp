@@ -1,12 +1,12 @@
 #include <src/ImageRegistrationDemons.h>
 #include <src/Logger.h>
 
-#include <src/regularization/Demons/OpticalFlowThirionsDemons.h>
-#include <src/regularization/Demons/OpticalFlowLogDemons.h>
+#include <src/regularization/Demons/DemonsThirions.h>
+#include <src/regularization/Demons/DemonsDiffeomorphic.h>
 
 bool ImageRegistrationDemons::valid_regularisation_parameters(const Regularisation reg, const unsigned int nparams) const {
     return ((reg == Regularisation::ThirionsDemons) && (nparams == 5)) ||
-           ((reg == Regularisation::LogDemons) && (nparams == 5));
+           ((reg == Regularisation::DiffeomorphicDemons) && (nparams == 5));
 }
 
 void ImageRegistrationDemons::set_solver(const Regularisation reg, const float* regparams, const unsigned int nparams) {
@@ -26,7 +26,7 @@ void ImageRegistrationDemons::set_solver(const Regularisation reg, const float* 
                 const unsigned int kernelwidth = regparams[4];
 
                 // Set solver
-                this->solver[s] = new OpticalFlowThirionsDemons(this->dimin[s],
+                this->solver[s] = new DemonsThirions(this->dimin[s],
                     sigma_i, sigma_x,
                     sigma_diffusion, sigma_fluid,
                     kernelwidth);
@@ -34,7 +34,7 @@ void ImageRegistrationDemons::set_solver(const Regularisation reg, const float* 
                 // Done
                 break;
             }
-            case Regularisation::LogDemons: {
+            case Regularisation::DiffeomorphicDemons: {
                 // Get the regularisation parameter
                 const float& sigma_i = regparams[0];
                 const float& sigma_x = regparams[1];
@@ -43,7 +43,7 @@ void ImageRegistrationDemons::set_solver(const Regularisation reg, const float* 
                 const unsigned int kernelwidth = regparams[4];
 
                 // Set solver
-                this->solver[s] = new OpticalFlowLogDemons(this->dimin[s],
+                this->solver[s] = new DemonsDiffeomorphic(this->dimin[s],
                     sigma_i, sigma_x,
                     sigma_diffusion, sigma_fluid,
                     kernelwidth);

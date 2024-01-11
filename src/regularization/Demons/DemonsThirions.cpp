@@ -1,7 +1,7 @@
-#include <src/regularization/Demons/OpticalFlowThirionsDemons.h>
+#include <src/regularization/Demons/DemonsThirions.h>
 
 // Constructors and deconstructors
-OpticalFlowThirionsDemons::OpticalFlowThirionsDemons(const dim dimin, 
+DemonsThirions::DemonsThirions(const dim dimin, 
     const float sigma_i, const float sigma_x,
     const float sigma_diffusion, const float sigma_fluid,
     const unsigned int kernelwidth) : Demons(dimin, 
@@ -9,10 +9,10 @@ OpticalFlowThirionsDemons::OpticalFlowThirionsDemons(const dim dimin,
         sigma_diffusion, sigma_fluid,
         kernelwidth) {}
 
-OpticalFlowThirionsDemons::~OpticalFlowThirionsDemons() {}
+DemonsThirions::~DemonsThirions() {}
 
 // Overload method from base class
-void OpticalFlowThirionsDemons::get_update(Motion *motion, const Image* Iref, const Image* Imov) {
+void DemonsThirions::get_update(Motion *motion, const Image* Iref, const Image* Imov) {
     // Warp the input image with current estimate of the motion field
     *this->Iwar = *Imov;
     this->Iwar->warp2d(*motion);

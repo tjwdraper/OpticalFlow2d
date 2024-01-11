@@ -1,7 +1,7 @@
-#include <src/regularization/Demons/OpticalFlowLogDemons.h>
+#include <src/regularization/Demons/DemonsDiffeomorphic.h>
 
 // Constructors and deconstructors
-OpticalFlowLogDemons::OpticalFlowLogDemons(const dim dimin, 
+DemonsDiffeomorphic::DemonsDiffeomorphic(const dim dimin, 
     const float sigma_i, const float sigma_x,
     const float sigma_diffusion, const float sigma_fluid,
     const unsigned int kernelwidth) : Demons(dimin, 
@@ -9,10 +9,10 @@ OpticalFlowLogDemons::OpticalFlowLogDemons(const dim dimin,
         sigma_diffusion, sigma_fluid,
         kernelwidth) {}
 
-OpticalFlowLogDemons::~OpticalFlowLogDemons() {}
+DemonsDiffeomorphic::~DemonsDiffeomorphic() {}
 
 // Scaling and squaring algorithm
-void OpticalFlowLogDemons::expfield(Motion *motion) const {
+void DemonsDiffeomorphic::expfield(Motion *motion) const {
     // Get the scale
     int N = static_cast<int>( std::ceil(1 + std::log2(motion->maxabs())) );
     N = std::max(N, 0);
@@ -44,7 +44,7 @@ void OpticalFlowLogDemons::expfield(Motion *motion) const {
 }
 
 // Overload method from base class
-void OpticalFlowLogDemons::get_update(Motion *motion, const Image* Iref, const Image* Imov) {
+void DemonsDiffeomorphic::get_update(Motion *motion, const Image* Iref, const Image* Imov) {
     // Warp the input image with current estimate of the motion field
     *this->Iwar = *Imov;
     this->Iwar->warp2d(*motion);
@@ -59,7 +59,7 @@ void OpticalFlowLogDemons::get_update(Motion *motion, const Image* Iref, const I
     this->Demons::convolute(this->correspondence, this->kernel_fluid);
 
     // Update the motion field (Diffeomorphic demons demons)
-    this->OpticalFlowLogDemons::expfield(this->correspondence);
+    this->DemonsDiffeomorphic::expfield(this->correspondence);
     motion->accumulate(*this->correspondence);
 
     // Smoothen the motion field
