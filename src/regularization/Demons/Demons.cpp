@@ -54,11 +54,11 @@ Demons::Demons(const dim dimin,
     //this->sizekernel = this->dimkernel.x * this->dimkernel.y;
 
     // Create convolution kernels and use Gaussian filtering
-    //this->kernel_diffusion = new Kernel(kernelwidth);
-    //this->kernel_fluid     = new Kernel(kernelwidth);
+    this->kernel_diffusion = new Kernel(kernelwidth);
+    this->kernel_fluid     = new Kernel(kernelwidth);
 
-    //this->kernel_diffusion->set_gaussian(this->sigma_diffusion);
-    //this->kernel_fluid->set_gaussian(this->sigma_fluid);
+    this->kernel_diffusion->set_gaussian(this->sigma_diffusion);
+    this->kernel_fluid->set_gaussian(this->sigma_fluid);
 
     /*
 
@@ -76,8 +76,8 @@ Demons::Demons(const dim dimin,
 Demons::~Demons() {
     delete this->Iwar;
     delete this->correspondence;
-    //delete this->kernel_diffusion;
-    //delete this->kernel_fluid;
+    delete this->kernel_diffusion;
+    delete this->kernel_fluid;
 }
 
 // Smooth motion field with Gaussian convolution

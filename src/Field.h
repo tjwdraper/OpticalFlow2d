@@ -9,7 +9,7 @@ class Field {
     public:
         // Constructors and deconstructors
         Field(const dim dimin);
-        Field (const Field& fieldin);
+        Field (const Field<T>& fieldin);
         ~Field();
 
         // Getters and setters

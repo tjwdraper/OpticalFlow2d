@@ -26,7 +26,7 @@ Field<T>::Field(const dim dimin) {
 }
 
 template <class T>
-Field<T>::Field(const Field& fieldin) {
+Field<T>::Field(const Field<T>& fieldin) {
     // Set the dimensions of the field
     this->dimin  = fieldin.get_dimensions();
     this->sizein = fieldin.get_size();
