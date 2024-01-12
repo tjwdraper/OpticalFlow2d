@@ -5,7 +5,7 @@
 #include <src/regularization/Demons/DemonsDiffeomorphic.h>
 
 bool ImageRegistrationDemons::valid_regularisation_parameters(const Regularisation reg, const unsigned int nparams) const {
-    return ((reg == Regularisation::ThirionsDemons) && (nparams == 5)) ||
+    return ((reg == Regularisation::ThirionsDemons) && (nparams == 6)) ||
            ((reg == Regularisation::DiffeomorphicDemons) && (nparams == 5));
 }
 
@@ -23,13 +23,15 @@ void ImageRegistrationDemons::set_solver(const Regularisation reg, const float* 
                 const float& sigma_x = regparams[1];
                 const float& sigma_diffusion = regparams[2];
                 const float& sigma_fluid = regparams[3];
-                const unsigned int kernelwidth = regparams[4];
+                const unsigned int kernelwidth = static_cast<unsigned int>(regparams[4]);
+                const MotionAccumulation motion_accumulation_option = static_cast<MotionAccumulation>( (int) regparams[5]);
 
                 // Set solver
                 this->solver[s] = new DemonsThirions(this->dimin[s],
                     sigma_i, sigma_x,
                     sigma_diffusion, sigma_fluid,
-                    kernelwidth);
+                    kernelwidth,
+                    motion_accumulation_option);
 
                 // Done
                 break;

@@ -4,10 +4,13 @@
 DemonsThirions::DemonsThirions(const dim dimin, 
     const float sigma_i, const float sigma_x,
     const float sigma_diffusion, const float sigma_fluid,
-    const unsigned int kernelwidth) : Demons(dimin, 
+    const unsigned int kernelwidth,
+    const MotionAccumulation motion_accumulation_method) : Demons(dimin, 
         sigma_i, sigma_x,
         sigma_diffusion, sigma_fluid,
-        kernelwidth) {}
+        kernelwidth) {
+    this->motion_accumulation_method = motion_accumulation_method;
+}
 
 DemonsThirions::~DemonsThirions() {}
 
@@ -28,8 +31,12 @@ void DemonsThirions::get_update(Motion *motion, const Image* Iref, const Image* 
     //this->Demons::convolute(this->correspondence, this->kernel_fluid);
 
     // Update the motion field (Additive demons or Composite demons)
-    //*motion += *this->correspondence;
-    motion->accumulate(*this->correspondence);
+    if (this->motion_accumulation_method == MotionAccumulation::Composition) {
+        motion->accumulate(*this->correspondence);
+    }
+    else if (this->motion_accumulation_method == MotionAccumulation::Addition) {
+        *motion += *this->correspondence;
+    }
 
     // Smoothen the motion field
     motion->convolute(*this->kernel_diffusion);

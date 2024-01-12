@@ -5,4 +5,6 @@ enum Regularisation {Diffusion = 0, Curvature = 1, Elastic = 2, ThirionsDemons =
 
 enum Verbose {Off = 0, On = 1};
 
+enum MotionAccumulation {Composition = 0, Addition = 1};
+
 #endif

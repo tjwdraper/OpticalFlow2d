@@ -8,7 +8,7 @@
 class Logger {
     public:
         // Constructors and deconstrucotrs
-        Logger(const dim dimin, const unsigned int niter, const Verbose verb);
+        Logger(const dim dimin, const unsigned int niter, const Verbose verbose);
         ~Logger();
 
         // Update error array with new motion field
@@ -40,7 +40,7 @@ class Logger {
         unsigned int iter = 0;
 
         // Verbose 
-        Verbose verb;
+        Verbose verbose;
 };
 
 #endif
