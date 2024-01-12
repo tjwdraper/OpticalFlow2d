@@ -3,7 +3,7 @@
 #include <mex.h>
 
 // Constructors and deconstructors
-Logger::Logger(const dim dimin, const unsigned int niter) {
+Logger::Logger(const dim dimin, const unsigned int niter, const Verbose verb) {
     // Get the size and dimensions of the motion fields
     this->dimin = dimin;
     this->sizein = dimin.x * dimin.y;
@@ -16,6 +16,9 @@ Logger::Logger(const dim dimin, const unsigned int niter) {
     // Allocate memory for the error array
     this->niter = niter;
     this->error = new float[niter+1];
+
+    // Set verbosity option
+    this->verb = verb;
 }
 
 Logger::~Logger() {
@@ -39,7 +42,9 @@ void Logger::update_error(const Motion* motion) {
     *this->prev = *motion;
 
     // Show current error
-    this->Logger::show_error_at_current_iteration();
+    if (this->verb == Verbose::On) {
+        this->Logger::show_error_at_current_iteration();
+    }
 
     // Increment counter
     this->iter++;

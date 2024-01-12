@@ -13,7 +13,8 @@ class ImageRegistration {
         // Constructors and deconstructors
         ImageRegistration(const dim dimin, 
                           const int nscales, const int* niter, const int nrefine, 
-                          const Regularisation reg, const float* regparams, const unsigned int nparams);
+                          const Regularisation reg, const float* regparams, const unsigned int nparams,
+                          const Verbose verbose);
         ~ImageRegistration();
 
         // Getters and setters
@@ -52,6 +53,8 @@ class ImageRegistration {
         Image **Imov;
 
         Motion **motion;
+
+        Verbose verbose;
 };
 
 #endif

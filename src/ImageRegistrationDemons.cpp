@@ -61,13 +61,15 @@ ImageRegistrationDemons::ImageRegistrationDemons(const dim dimin,
     const int nrefine, 
     const Regularisation reg, 
     const float* regparams, 
-    const unsigned int nparams) : ImageRegistration(dimin,
+    const unsigned int nparams,
+    const Verbose verbose) : ImageRegistration(dimin,
         nscales,
         niter,
         nrefine,
         reg,
         regparams,
-        nparams) {
+        nparams,
+        verbose) {
     // Solver object
     this->ImageRegistrationDemons::set_solver(reg, regparams, nparams);
 }
@@ -99,7 +101,7 @@ void ImageRegistrationDemons::estimate_motion_at_current_resolution(Motion* moti
         Iaux->warp2d(*motion);
 
         // Create a Logger object
-        Logger log(dimin, niter);
+        Logger log(dimin, niter, this->verbose);
 
         // Iterate over resolution levels
         for (int iter = 0; iter < niter; iter++) {

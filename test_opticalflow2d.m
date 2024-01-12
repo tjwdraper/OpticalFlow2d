@@ -33,9 +33,15 @@ regularisation = 4; % Options:
                     % 3) Thirions demons
                     % 4) Log-Demons
 
+verbose = 0 % 0) off
+            % 1) on
+
 
 %% Load C++ object
-OpticalFlow2d([dimx, dimy], niter, nscales, regularisation, alpha, length(alpha), nrefine);
+OpticalFlow2d([dimx, dimy], ...
+  niter, nscales, regularisation, ...
+  alpha, length(alpha), nrefine, ...
+  verbose);
 
 %% Do the registration
 tic;

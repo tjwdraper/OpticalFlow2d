@@ -3,11 +3,12 @@
 
 #include <src/coord2d.h>
 #include <src/Motion.h>
+#include <src/SolverOptions.h>
 
 class Logger {
     public:
         // Constructors and deconstrucotrs
-        Logger(const dim dimin, const unsigned int niter);
+        Logger(const dim dimin, const unsigned int niter, const Verbose verb);
         ~Logger();
 
         // Update error array with new motion field
@@ -37,6 +38,9 @@ class Logger {
 
         // Counter to keep track at which iteration we are
         unsigned int iter = 0;
+
+        // Verbose 
+        Verbose verb;
 };
 
 #endif

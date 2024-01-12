@@ -14,7 +14,8 @@ class ImageRegistrationOpticalFlow : public ImageRegistration {
         // Constructors and deconstructors
         ImageRegistrationOpticalFlow(const dim dimin, 
                           const int nscales, const int* niter, const int nrefine, 
-                          const Regularisation reg, const float* regparams, const unsigned int nparams);
+                          const Regularisation reg, const float* regparams, const unsigned int nparams,
+                          const Verbose verbose);
         ~ImageRegistrationOpticalFlow();
 
     private:

@@ -74,13 +74,15 @@ ImageRegistrationOpticalFlow::ImageRegistrationOpticalFlow(const dim dimin,
     const int nrefine, 
     const Regularisation reg, 
     const float* regparams, 
-    const unsigned int nparams) : ImageRegistration(dimin,
+    const unsigned int nparams,
+    const Verbose verbose) : ImageRegistration(dimin,
         nscales,
         niter,
         nrefine,
         reg,
         regparams,
-        nparams) {
+        nparams,
+        verbose) {
     // Solver object
     this->ImageRegistrationOpticalFlow::set_solver(reg, regparams, nparams);
 }
@@ -112,7 +114,7 @@ void ImageRegistrationOpticalFlow::estimate_motion_at_current_resolution(Motion*
         Iaux->warp2d(*motion);
 
         // Create a Logger object
-        Logger log(dimin, niter);
+        Logger log(dimin, niter, this->verbose);
 
         // Calculating the image gradients only has to be done once
         solver->set_derivatives(Iref, Iaux);

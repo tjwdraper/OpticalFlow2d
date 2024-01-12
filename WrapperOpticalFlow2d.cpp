@@ -19,7 +19,7 @@ mexFunction (int nlhs, mxArray *plhs[],
              int nrhs, const mxArray *prhs[])
 {
     // Set registration parameters
-    if ((nlhs == 0) && (nrhs == 7) && (myImageRegistration == NULL)) {
+    if ((nlhs == 0) && (nrhs == 8) && (myImageRegistration == NULL)) {
         // Get the dimensions and the size of the images
         double *tmp;
         tmp = mxGetPr(prhs[0]);
@@ -49,15 +49,18 @@ mexFunction (int nlhs, mxArray *plhs[],
         tmp = mxGetPr(prhs[6]);
         int nrefine = (int) tmp[0];
 
+        tmp = mxGetPr(prhs[7]);
+        Verbose verb = static_cast<Verbose>( (int) tmp[0]);
+
         // Pass parameters to ImageRegistration object
         if ((reg == Regularisation::Diffusion) ||
             (reg == Regularisation::Curvature) ||
             (reg == Regularisation::Elastic)) {
-            myImageRegistration = new ImageRegistrationOpticalFlow(dimin, nscales, niter, nrefine, reg, regparams, nparams);
+            myImageRegistration = new ImageRegistrationOpticalFlow(dimin, nscales, niter, nrefine, reg, regparams, nparams, verb);
         }
         else if ((reg == Regularisation::ThirionsDemons) ||
                  (reg == Regularisation::DiffeomorphicDemons)) {
-            myImageRegistration = new ImageRegistrationDemons(dimin, nscales, niter, nrefine, reg, regparams, nparams);
+            myImageRegistration = new ImageRegistrationDemons(dimin, nscales, niter, nrefine, reg, regparams, nparams, verb);
         }
         else {
             mexErrMsgTxt("Error: invalid regularisation given\n");

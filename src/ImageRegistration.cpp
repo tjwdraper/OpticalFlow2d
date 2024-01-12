@@ -47,7 +47,8 @@ void ImageRegistration::display_registration_parameters(const Regularisation reg
 
 ImageRegistration::ImageRegistration(const dim dimin, 
     const int nscales, const int* niter, const int nrefine, 
-    const Regularisation reg, const float* regparams, const unsigned int nparams) {
+    const Regularisation reg, const float* regparams, const unsigned int nparams,
+    const Verbose verbose) {
     // Size and dimensions of the input image
     this->dimin = new dim[nscales + 1];
     this->sizein = new int[nscales + 1];
@@ -76,6 +77,9 @@ ImageRegistration::ImageRegistration(const dim dimin,
 
     // Display registration settings
     this->ImageRegistration::display_registration_parameters(reg, regparams, nparams);
+
+    // Set the verbose option
+    this->verbose = verbose;
 }
 
 ImageRegistration::~ImageRegistration() {
