@@ -1,11 +1,14 @@
-#include <src/regularization/opticalflow/OpticalFlowFluid.h>
+#include <src/regularization/OpticalFlow/OpticalFlowFluid.h>
 #include <src/Logger.h>
 #include <src/gradients.h>
 
+#define PI 3.14159265
+
 void OpticalFlowFluid::set_eigenvalues() {
     // Get regularisation parameters
-    const float& mu = this->alpha;
     const float& tau = this->tau;
+    const float mu = this->mu * tau;
+    const float lambda = this->lambda * tau;
 
     // Get the dimensions and step size etc.
     const dim& dimin = this->dimin;
@@ -14,15 +17,33 @@ void OpticalFlowFluid::set_eigenvalues() {
 
     // Iterate over the Fourier spectrum
     unsigned int idx;
+
+    float T1, T2;
+    float invsig1, invsig2;
+    float eig_laplacian;
+
     for (unsigned int p = 0; p < dimin.x; p++) {
         for (unsigned int q = 0; q < dimin.y; q++) {
             // Get the index in the eigenvalue matrix
             idx = p * step.x + q * step.y;
 
+            // Get the eigenvalue of the laplacian
+            eig_laplacian = -4 + 2*cos(PI*p/dimin.x) + 2*cos(PI*q/dimin.y);
+
+            // Get the components of the off-diagonal contribution
+            T1 = sin(PI*p/dimin.x);
+            T2 = sin(PI*q/dimin.y);
+
+            // Get the components of the diagonal matrix
+            invsig1 = 1 - (2*mu+lambda)*eig_laplacian - (mu+lambda)*T1;
+            invsig2 = 1 - (2*mu+lambda)*eig_laplacian - (mu+lambda)*T2;
+
+            float denom = 1.0f + (mu+lambda)*(invsig1 * T1 * T1 + invsig2 * T2 * T2);
+
             // Get the eigenvalue of the curvature operator
-            this->eigenvalues[idx + 0*sizein] = 0.0f;
-            this->eigenvalues[idx + 1*sizein] = 0.0f;
-            this->eigenvalues[idx + 2*sizein] = 0.0f;
+            this->eigenvalues[idx + 0*sizein] = invsig1 - (mu+lambda) * invsig1 * T1 * invsig1 * T1 / denom;
+            this->eigenvalues[idx + 1*sizein] = invsig2 - (mu+lambda) * invsig2 * T2 * invsig2 * T2 / denom;
+            this->eigenvalues[idx + 2*sizein] = -(mu+lambda) * invsig1 * T1 * invsig2 * T2;
         }
     }
 
@@ -30,7 +51,7 @@ void OpticalFlowFluid::set_eigenvalues() {
     return;
 }
 
-OpticalFlowFluid::OpticalFlowFluid(const dim dimin, const float mu, const float lambda) : OpticalFlow(dimin) {
+OpticalFlowFluid::OpticalFlowFluid(const dim dimin, const float mu, const float lambda, const float tau) : OpticalFlow(dimin) {
     // Set regularisation and model parameters
     this->mu = mu;
     this->lambda = lambda;
@@ -187,13 +208,13 @@ void OpticalFlowFluid::estimate_timestep() {
     this->timestep = this->dumax / this->increment->maxabs();
 }
 
-void OpticalFlowFluid::increment(Motion *motion) const {
+void OpticalFlowFluid::integrate(Motion *motion) const {
     // Get dimensions of images/motion fields
     const dim& dimin = this->dimin;
     const dim& step = this->step_cm;
 
     // Time step
-    float& timestep = this->timestep;
+    const float& timestep = this->timestep;
 
     // Get copy of pointer to the motion and force field data
     vector2d *u = motion->get_motion();
@@ -215,20 +236,20 @@ void OpticalFlowFluid::increment(Motion *motion) const {
 
 void OpticalFlowFluid::get_update(Motion* motion, const Image* Iref, const Image* Imov) {
     // Get the force
-    this->OpticaFlow::get_force(this->force, motion);
+    this->OpticalFlow::get_force(this->force, motion);
 
     // Get the velocity field
-    this->OpticalFlowCurvature::construct_rhs(this->velocity);
+    this->OpticalFlowFluid::construct_rhs(this->velocity);
 
     fftw_execute_r2r(this->pf_x, this->rhs_x, this->rhs_x);
     fftw_execute_r2r(this->pf_y, this->rhs_y, this->rhs_y);
 
-    this->OpticalFlowCurvature::multiply_eigenvalues();
+    this->OpticalFlowFluid::multiply_eigenvalues();
 
     fftw_execute_r2r(this->pb_x, this->rhs_x, this->rhs_x);
     fftw_execute_r2r(this->pb_y, this->rhs_y, this->rhs_y);
 
-    this->OpticalFlowCurvature::construct_motion(this->velocity);
+    this->OpticalFlowFluid::construct_motion(this->velocity);
 
     // Integrate the material derivative equation to get the next iteration of the motion field
     this->OpticalFlowFluid::get_increment(motion);
@@ -236,7 +257,4 @@ void OpticalFlowFluid::get_update(Motion* motion, const Image* Iref, const Image
     this->OpticalFlowFluid::estimate_timestep();
 
     this->OpticalFlowFluid::integrate(motion);
-
-    // Check for regridding ...
-    
 }

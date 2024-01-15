@@ -1,7 +1,7 @@
 #ifndef _OPTICAL_FLOW_FLUID_H_
 #define _OPTICAL_FLOW_FLUID_H_
 
-#include <src/regularization/opticalflow/OpticalFlow.h>
+#include <src/regularization/OpticalFlow/OpticalFlow.h>
 #include <src/Motion.h>
 #include <fftw3.h>
 
@@ -49,6 +49,7 @@ class OpticalFlowFluid : public OpticalFlow {
         
         // Adaptive timestep parameter
         float timestep;
+        const float dumax = 0.65;
 
         // Velocity field
         Motion *velocity;

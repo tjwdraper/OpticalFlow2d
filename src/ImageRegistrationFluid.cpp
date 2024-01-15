@@ -3,11 +3,11 @@
 #include <src/regularization/OpticalFlow/OpticalFlowFluid.h>
 
 bool ImageRegistrationFluid::valid_regularisation_parameters(const Regularisation reg, const unsigned int nparams) const {
-    return ((reg == Regularisation::Fluid) && (nparams => 2) && (nparams <= 3));
+    return ((reg == Regularisation::Fluid) && (nparams >= 2) && (nparams <= 3));
 }
 
 void ImageRegistrationFluid::set_solver(const Regularisation reg, const float* regparams, const unsigned int nparams) {
-    if (!this->ImageRegistrationOpticalFlow::valid_regularisation_parameters(reg, nparams)) {
+    if (!this->ImageRegistrationFluid::valid_regularisation_parameters(reg, nparams)) {
         throw std::invalid_argument("Invalid number of regularisation parameters for given regularisation method.\n");
     }
 
@@ -21,12 +21,12 @@ void ImageRegistrationFluid::set_solver(const Regularisation reg, const float* r
 
                 // Check if time-step parameter is passed
                 if (nparams != 3) {
-                    this->solver[s] = new OpticalFlowElastic(this->dimin[s], mu, lambda);
+                    this->solver[s] = new OpticalFlowFluid(this->dimin[s], mu, lambda);
                 }
                 else {
                     const float& tau = regparams[2];
 
-                    this->solver[s] = new OpticalFlowElastic(this->dimin[s], mu, lambda, tau);
+                    this->solver[s] = new OpticalFlowFluid(this->dimin[s], mu, lambda, tau);
                 }
                 
                 // Done
