@@ -7,20 +7,14 @@
 
 class OpticalFlowFluid : public OpticalFlow {
     public:
-        OpticalFlowFluid(const dim dimin, const float mu, const float lambda, const float tau = 1.0f);
+        OpticalFlowFluid(const dim dimin, const float mu, const float lambda, const float omega = 0.66);
         ~OpticalFlowFluid();
 
         // Overload method from base class
         void get_update(Motion* motion, const Image* Iref = NULL, const Image* Imov = NULL);
 
     private:
-        void set_eigenvalues();
-
-        void construct_rhs(const Motion *motion);
-
-        void construct_motion(Motion *motion) const;
-
-        void multiply_eigenvalues();
+        void SOR_iteration(Motion* motion) const;
 
         void get_increment(const Motion* motion);
 
@@ -28,28 +22,14 @@ class OpticalFlowFluid : public OpticalFlow {
 
         void integrate(Motion* motion) const;
 
-        // Image dimensions in row- and column-major ordering
-        dim step_rm;
-        dim step_cm;
-
-        // FFT plan for the forward and backward DCT
-        fftw_plan pf_x, pf_y;
-        fftw_plan pb_x, pb_y;
-
-        // Auxiliary fields
-        double *rhs_x, *rhs_y;
-
-        // Eigenvalue matrix of the biharmonic operator
-        double *eigenvalues;
-
         // Regularisation and relaxation parameters
         float mu;
         float lambda;
-        float tau;
+        float omega;
         
         // Adaptive timestep parameter
         float timestep;
-        const float dumax = 0.65;
+        const float dumax = 0.65f;
 
         // Velocity field
         Motion *velocity;

@@ -107,6 +107,7 @@ void ImageRegistrationFluid::estimate_motion_at_current_resolution(Motion* motio
             // Regridding
             jac->jacobian(*motion_est);
             if (jac->min() < 0.5) {
+                mexPrintf("Regridding on iteration: %d\tMin Jacobian: %.3f\n", iter, jac->min());
                 // Accumulate the motion field
                 motion->accumulate(*motion_est);
 
@@ -117,6 +118,9 @@ void ImageRegistrationFluid::estimate_motion_at_current_resolution(Motion* motio
                 *Iaux = *Imov;
 
                 Iaux->warp2d(*motion);
+
+                // Calculating the image gradients only has to be done once
+                solver->set_derivatives(Iref, Iaux);
             }
         }
 

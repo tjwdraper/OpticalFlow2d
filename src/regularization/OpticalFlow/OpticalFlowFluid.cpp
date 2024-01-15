@@ -4,46 +4,35 @@
 
 #define PI 3.14159265
 
-void OpticalFlowFluid::set_eigenvalues() {
-    // Get regularisation parameters
-    const float& tau = this->tau;
-    const float mu = this->mu * tau;
-    const float lambda = this->lambda * tau;
-
-    // Get the dimensions and step size etc.
+void OpticalFlowFluid::SOR_iteration(Motion* motion) const {
+    // Get the dimensions and step size of the motion field
     const dim& dimin = this->dimin;
-    const dim& step = this->step_rm;
-    const unsigned int sizein = this->sizein;
+    const dim& step = this->step;
 
-    // Iterate over the Fourier spectrum
+    // Get the overrelaxation and regularisation parameters
+    const float& omega  = this->omega;
+    const float& mu     = this->mu;
+    const float& lambda = this->lambda;
+
+    // Get a copy to the pointer of the vector fields
+    vector2d *x = motion->get_motion();
+    vector2d *b = this->force->get_motion();
+
+    // Iterate over voxels
     unsigned int idx;
+    for (unsigned int i = 1; i < dimin.x-1; i++) {
+        for (unsigned int j = 1; j < dimin.y-1; j++) {
+            idx = i * step.x + j * step.y;
 
-    float T1, T2;
-    float invsig1, invsig2;
-    float eig_laplacian;
+            x[idx].x = (1.0f-omega)*x[idx].x + omega / (-6*mu-2*lambda) * ( b[idx].x - 
+                mu * (x[idx + step.x].x + x[idx - step.x].x + x[idx + step.y].x + x[idx - step.y].x) -
+                (mu+lambda) * (x[idx + step.x].x + x[idx - step.x].x + 0.25f*(x[idx + step.x + step.y].y - x[idx - step.x + step.y].y - x[idx + step.x - step.y].y + x[idx - step.x - step.y].y))    
+            );
 
-    for (unsigned int p = 0; p < dimin.x; p++) {
-        for (unsigned int q = 0; q < dimin.y; q++) {
-            // Get the index in the eigenvalue matrix
-            idx = p * step.x + q * step.y;
-
-            // Get the eigenvalue of the laplacian
-            eig_laplacian = -4 + 2*cos(PI*p/dimin.x) + 2*cos(PI*q/dimin.y);
-
-            // Get the components of the off-diagonal contribution
-            T1 = sin(PI*p/dimin.x);
-            T2 = sin(PI*q/dimin.y);
-
-            // Get the components of the diagonal matrix
-            invsig1 = 1 - (2*mu+lambda)*eig_laplacian - (mu+lambda)*T1;
-            invsig2 = 1 - (2*mu+lambda)*eig_laplacian - (mu+lambda)*T2;
-
-            float denom = 1.0f + (mu+lambda)*(invsig1 * T1 * T1 + invsig2 * T2 * T2);
-
-            // Get the eigenvalue of the curvature operator
-            this->eigenvalues[idx + 0*sizein] = invsig1 - (mu+lambda) * invsig1 * T1 * invsig1 * T1 / denom;
-            this->eigenvalues[idx + 1*sizein] = invsig2 - (mu+lambda) * invsig2 * T2 * invsig2 * T2 / denom;
-            this->eigenvalues[idx + 2*sizein] = -(mu+lambda) * invsig1 * T1 * invsig2 * T2;
+            x[idx].y = (1.0f-omega)*x[idx].y + omega / (-6*mu-2*lambda) * ( b[idx].y - 
+                mu * (x[idx + step.x].y + x[idx - step.x].y + x[idx + step.y].y + x[idx - step.y].y) -
+                (mu+lambda) * (x[idx + step.x].y + x[idx - step.x].y + 0.25f*(x[idx + step.x + step.y].x - x[idx - step.x + step.y].x - x[idx + step.x - step.y].x + x[idx - step.x - step.y].x))    
+            );
         }
     }
 
@@ -51,30 +40,11 @@ void OpticalFlowFluid::set_eigenvalues() {
     return;
 }
 
-OpticalFlowFluid::OpticalFlowFluid(const dim dimin, const float mu, const float lambda, const float tau) : OpticalFlow(dimin) {
+OpticalFlowFluid::OpticalFlowFluid(const dim dimin, const float mu, const float lambda, const float omega) : OpticalFlow(dimin) {
     // Set regularisation and model parameters
     this->mu = mu;
     this->lambda = lambda;
-    this->tau = tau;
-
-    // Get the image dimensions
-    this->step_cm = dim(1, this->dimin.x);
-    this->step_rm = dim(this->dimin.y, 1);
-
-    // Allocate memory for the auxiliary fields
-    this->rhs_x = new double[this->sizein];
-    this->rhs_y = new double[this->sizein];
-
-    this->eigenvalues = new double[3*this->sizein];
-
-    // Set the eigenvalues
-    this->OpticalFlowFluid::set_eigenvalues();
-
-    // FFTW plans
-    this->pf_x = fftw_plan_r2r_2d(this->dimin.x, this->dimin.y, this->rhs_x, this->rhs_x, FFTW_REDFT10, FFTW_REDFT10, FFTW_MEASURE);
-    this->pf_y = fftw_plan_r2r_2d(this->dimin.x, this->dimin.y, this->rhs_y, this->rhs_y, FFTW_REDFT10, FFTW_REDFT10, FFTW_MEASURE);
-    this->pb_x = fftw_plan_r2r_2d(this->dimin.x, this->dimin.y, this->rhs_x, this->rhs_x, FFTW_REDFT01, FFTW_REDFT01, FFTW_MEASURE);
-    this->pb_y = fftw_plan_r2r_2d(this->dimin.x, this->dimin.y, this->rhs_y, this->rhs_y, FFTW_REDFT01, FFTW_REDFT01, FFTW_MEASURE);
+    this->omega = omega;
 
     // Allocate memory for the velocity field
     this->velocity = new Motion(this->dimin);
@@ -82,100 +52,15 @@ OpticalFlowFluid::OpticalFlowFluid(const dim dimin, const float mu, const float 
 }
 
 OpticalFlowFluid::~OpticalFlowFluid() {
-    delete[] this->rhs_x;
-    delete[] this->rhs_y;
-    delete[] this->eigenvalues;
-    
-    fftw_destroy_plan(this->pf_x);
-    fftw_destroy_plan(this->pf_y);
-    fftw_destroy_plan(this->pb_x);
-    fftw_destroy_plan(this->pb_y);
-
     delete this->velocity;
     delete this->increment;
 }
 
-void OpticalFlowFluid::construct_rhs(const Motion* motion) {
-    // Get dimensions of images/motion fields
-    const dim& dimin = this->dimin;
-    const dim& step_rm = this->step_rm;
-    const dim& step_cm = this->step_cm;
-
-    // Get regularisation parameters
-    const float& tau = this->tau;
-
-    // Get copy of pointer to the motion and force field data
-    vector2d *u = motion->get_motion();
-    vector2d *f = this->force->get_motion();
-
-    // Iterate over voxels
-    unsigned int idx_rm, idx_cm;
-    for (unsigned int i = 0; i < dimin.x; i++) {
-        for (unsigned int j = 0; j < dimin.y; j++) {
-            idx_rm = i * step_rm.x + j * step_rm.y;
-            idx_cm = i * step_cm.x + j * step_cm.y;
-
-            this->rhs_x[idx_rm] = u[idx_cm].x - tau * f[idx_cm].x;
-            this->rhs_y[idx_rm] = u[idx_cm].y - tau * f[idx_cm].y;
-        }
-    }
-
-    // Done
-    return;
-}
-
-void OpticalFlowFluid::construct_motion(Motion *motion) const {
-    // Get dimensions of images/motion fields
-    const dim& dimin = this->dimin;
-    const dim& step_rm = this->step_rm;
-    const dim& step_cm = this->step_cm;
-    const unsigned int& sizein = this->sizein;
-
-    // Get copy of pointer to the motion and force field data
-    vector2d *u = motion->get_motion();
-
-    // Iterate over voxels
-    unsigned int idx_rm, idx_cm;
-    for (unsigned int i = 0; i < dimin.x; i++) {
-        for (unsigned int j = 0; j < dimin.y; j++) {
-            idx_rm = i * step_rm.x + j * step_rm.y;
-            idx_cm = i * step_cm.x + j * step_cm.y;
-
-            u[idx_cm] = vector2d(this->rhs_x[idx_rm],
-                                 this->rhs_y[idx_rm]) / (4.0f*sizein);
-        }
-    }
-
-    // Done
-    return;
-}
-
-void OpticalFlowFluid::multiply_eigenvalues() {
-    // Get the number of voxels
-    const unsigned int& sizein = this->sizein;
-
-    // Iterate over all voxels
-    double Axx, Axy, Ayy, freq_p, freq_q;
-    for (unsigned int i = 0; i < sizein; i++) {
-        Axx = this->eigenvalues[i + 0 * sizein];
-        Axy = this->eigenvalues[i + 1 * sizein];
-        Ayy = this->eigenvalues[i + 2 * sizein];
-
-        freq_p = this->rhs_x[i];
-        freq_q = this->rhs_y[i];
-
-        this->rhs_x[i] = Axx * freq_p + Axy * freq_q;
-        this->rhs_y[i] = Axy * freq_p + Ayy * freq_q;
-    }
-
-    // Done
-    return;
-}
 
 void OpticalFlowFluid::get_increment(const Motion* motion) {
     // Get dimensions of images/motion fields
     const dim& dimin = this->dimin;
-    const dim& step = this->step_cm;
+    const dim& step = this->step;
 
     // Get copy of pointer to the motion and force field data
     vector2d *mo  = motion->get_motion();
@@ -206,12 +91,13 @@ void OpticalFlowFluid::get_increment(const Motion* motion) {
 
 void OpticalFlowFluid::estimate_timestep() {
     this->timestep = this->dumax / this->increment->maxabs();
+    mexPrintf("Dumax: %.3f\tMaxabs increment: %.3f\t Timestep: %.3f\n", this->dumax, this->increment->maxabs(), this->timestep);
 }
 
 void OpticalFlowFluid::integrate(Motion *motion) const {
     // Get dimensions of images/motion fields
     const dim& dimin = this->dimin;
-    const dim& step = this->step_cm;
+    const dim& step = this->step;
 
     // Time step
     const float& timestep = this->timestep;
@@ -239,22 +125,16 @@ void OpticalFlowFluid::get_update(Motion* motion, const Image* Iref, const Image
     this->OpticalFlow::get_force(this->force, motion);
 
     // Get the velocity field
-    this->OpticalFlowFluid::construct_rhs(this->velocity);
-
-    fftw_execute_r2r(this->pf_x, this->rhs_x, this->rhs_x);
-    fftw_execute_r2r(this->pf_y, this->rhs_y, this->rhs_y);
-
-    this->OpticalFlowFluid::multiply_eigenvalues();
-
-    fftw_execute_r2r(this->pb_x, this->rhs_x, this->rhs_x);
-    fftw_execute_r2r(this->pb_y, this->rhs_y, this->rhs_y);
-
-    this->OpticalFlowFluid::construct_motion(this->velocity);
+    this->OpticalFlowFluid::SOR_iteration(this->velocity);
 
     // Integrate the material derivative equation to get the next iteration of the motion field
     this->OpticalFlowFluid::get_increment(motion);
 
     this->OpticalFlowFluid::estimate_timestep();
+
+    if (this->timestep >= 65.0f) {
+        return;
+    }
 
     this->OpticalFlowFluid::integrate(motion);
 }

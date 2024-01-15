@@ -94,8 +94,8 @@ float Image::max() const {
 }
 
 float Image::min() const {
-    float min = 0.0f;
-    for (int i = 0; i < this->sizein; i++) {
+    float min = this->field[0];
+    for (int i = 1; i < this->sizein; i++) {
         if (this->field[i] < min) {
             min = this->field[i];
         }
