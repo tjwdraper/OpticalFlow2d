@@ -7,6 +7,7 @@
 #include <src/Motion.h>
 #include <src/ImageRegistrationOpticalFlow.h>
 #include <src/ImageRegistrationDemons.h>
+#include <src/ImageRegistrationFluid.h>
 #include <src/SolverOptions.h>
 
 static ImageRegistration *myImageRegistration = NULL;
@@ -61,6 +62,9 @@ mexFunction (int nlhs, mxArray *plhs[],
         else if ((reg == Regularisation::ThirionsDemons) ||
                  (reg == Regularisation::DiffeomorphicDemons)) {
             myImageRegistration = new ImageRegistrationDemons(dimin, nscales, niter, nrefine, reg, regparams, nparams, verb);
+        }
+        else if (reg == Regularisation::Fluid) {
+            myImageRegistration = new ImageRegistrationFluid(dimin, nscales, niter, nrefine, reg, regparams, nparams, verb);
         }
         else {
             mexErrMsgTxt("Error: invalid regularisation given\n");

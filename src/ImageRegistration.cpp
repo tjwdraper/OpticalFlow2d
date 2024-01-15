@@ -25,6 +25,7 @@ void ImageRegistration::display_registration_parameters(const Regularisation reg
         case Regularisation::Elastic:             mexPrintf("regularisation:\t\t\t\tElastic\n");              break;
         case Regularisation::ThirionsDemons:      mexPrintf("regularisation:\t\t\t\tThirions Demons\n");      break;
         case Regularisation::DiffeomorphicDemons: mexPrintf("regularisation:\t\t\t\tDiffeomorphic Demons\n"); break;
+        case Regularisation::Fluid:               mexPrintf("regularisation:\t\t\t\tFluid\n");                break;
     }
 
     // Regularization parameters

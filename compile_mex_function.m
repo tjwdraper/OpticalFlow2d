@@ -1,5 +1,5 @@
 clc;
-clear functions
+clear functions;
 
 if isfile("OpticalFlow2d.mex");
   delete("OpticalFlow2d.mex");
