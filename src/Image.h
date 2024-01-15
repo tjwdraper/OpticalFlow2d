@@ -37,6 +37,9 @@ class Image : public Field<float> {
         // Convolute with kernel
         void convolute(const Kernel& kernel);
 
+        // Jacobian of a motion field
+        void jacobian(const Motion& mo);
+
         // Overload operator=
         Image& operator=(const Image& im);
         

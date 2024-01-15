@@ -185,6 +185,37 @@ void Image::convolute(const Kernel& kernel) {
     return;
 }
 
+void Image::jacobian(const Motion& mo) {
+    // Check that input dimensions are OK
+    if (this->dimin != mo.get_dimensions()) {
+        throw std::invalid_argument("Error in Image::warp2d(const Motion& mo): input dimensions have to be the same as target");
+    }
+
+    // Get the dimensions of the image
+    const dim& dimin = this->dimin;
+    const dim& step = this->step;
+
+    // Get a copy the pointer of content
+    vector2d* u = mo.get_motion();
+
+    // Store the input in the object
+    unsigned int idx;
+    vector2d dudx, dudy;
+    for (unsigned int i = 0; i < dimin.x; i++) {
+        for (unsigned int j = 0; j < dimin.y; j++) {
+            idx = i * step.x + j * step.y;
+
+            dudx = gradients::partial_x(u, idx, i, dimin);
+            dudy = gradients::partial_y(u, idx, j, dimin);
+
+            this->field[idx] = (1.0f + dudx.x) * (1.0f + dudy.y) - dudx.y * dudy.x;
+        }
+    }
+
+    // Done
+    return;
+}
+
 // Overload operator=
 Image& Image::operator=(const Image& im) {
     if (this->dimin != im.get_dimensions()) {
