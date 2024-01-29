@@ -28,7 +28,6 @@ void DemonsThirions::get_update(Motion *motion, const Image* Iref, const Image* 
 
     // Smoothen the correpondence update
     this->correspondence->convolute(*this->kernel_fluid);
-    //this->Demons::convolute(this->correspondence, this->kernel_fluid);
 
     // Update the motion field (Additive demons or Composite demons)
     if (this->motion_accumulation_method == MotionAccumulation::Composition) {
@@ -40,5 +39,4 @@ void DemonsThirions::get_update(Motion *motion, const Image* Iref, const Image* 
 
     // Smoothen the motion field
     motion->convolute(*this->kernel_diffusion);
-    //this->Demons::convolute(motion, this->kernel_diffusion);
 }

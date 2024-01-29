@@ -30,7 +30,7 @@ void Motion::copy_motion_to_input(double* mo) const {
     for (unsigned int i = 0; i < dimin.x; i++) {
         for (unsigned int j = 0; j < dimin.y; j++) {
             mo[i*step.x + j*step.y + 0*sizein] = (double) this->field[i*step.x + j*step.y].x;
-            mo[i+step.x + j*step.y + 1*sizein] = (double) this->field[i*step.x + j*step.y].y;
+            mo[i*step.x + j*step.y + 1*sizein] = (double) this->field[i*step.x + j*step.y].y;
         }
     }
 

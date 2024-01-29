@@ -74,7 +74,7 @@ class coord2d {
             return *this;
         }
 
-        coord2d<T>& operator -=(const T& a) {
+        coord2d<T>& operator-=(const T& a) {
             this->x -= a;
             this->y -= a;
             return *this;
