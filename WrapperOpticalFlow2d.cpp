@@ -6,8 +6,6 @@
 #include <src/Image.h>
 #include <src/Motion.h>
 #include <src/ImageRegistrationOpticalFlow.h>
-#include <src/ImageRegistrationDemons.h>
-#include <src/ImageRegistrationFluid.h>
 #include <src/SolverOptions.h>
 
 static ImageRegistration *myImageRegistration = NULL;
@@ -20,7 +18,7 @@ mexFunction (int nlhs, mxArray *plhs[],
              int nrhs, const mxArray *prhs[])
 {
     // Set registration parameters
-    if ((nlhs == 0) && (nrhs == 8) && (myImageRegistration == NULL)) {
+    if ((nlhs == 0) && (nrhs == 6) && (myImageRegistration == NULL)) {
         // Get the dimensions and the size of the images
         double *tmp;
         tmp = mxGetPr(prhs[0]);
@@ -36,50 +34,26 @@ mexFunction (int nlhs, mxArray *plhs[],
         for (int s = 0; s < nscales + 1; s++) {
             niter[s] = (int) tmp[s];
         }
+
         tmp = mxGetPr(prhs[3]);
-        Regularisation reg = static_cast<Regularisation>( (int) tmp[0]);
+        double alpha = (double) tmp[0];
 
-        tmp = mxGetPr(prhs[5]);
-        unsigned int nparams = (unsigned int) tmp[0];
         tmp = mxGetPr(prhs[4]);
-        float *regparams = new float[nparams];
-        for (int p = 0; p < nparams; p++) {
-            regparams[p] = (float) tmp[p];
-        }
-
-        tmp = mxGetPr(prhs[6]);
         int nrefine = (int) tmp[0];
 
-        tmp = mxGetPr(prhs[7]);
+        tmp = mxGetPr(prhs[5]);
         Verbose verb = static_cast<Verbose>( (int) tmp[0]);
 
         // Pass parameters to ImageRegistration object
-        if ((reg == Regularisation::Diffusion) ||
-            (reg == Regularisation::Curvature) ||
-            (reg == Regularisation::Elastic)) {
-            myImageRegistration = new ImageRegistrationOpticalFlow(dimin, nscales, niter, nrefine, reg, regparams, nparams, verb);
-        }
-        else if ((reg == Regularisation::ThirionsDemons) ||
-                 (reg == Regularisation::DiffeomorphicDemons)) {
-            myImageRegistration = new ImageRegistrationDemons(dimin, nscales, niter, nrefine, reg, regparams, nparams, verb);
-        }
-        else if (reg == Regularisation::Fluid) {
-            myImageRegistration = new ImageRegistrationFluid(dimin, nscales, niter, nrefine, reg, regparams, nparams, verb);
-        }
-        else {
-            mexErrMsgTxt("Error: invalid regularisation given\n");
-        }
+        myImageRegistration = new ImageRegistrationOpticalFlow(dimin, nscales, niter, nrefine, alpha, verb);
 
 
         // Set the output dimension for image and motion field
-        dim_image_mw = new mwSize[2];
-        dim_image_mw[0] = dimx; dim_image_mw[1] = dimy;
-        dim_motion_mw = new mwSize[3];
-        dim_motion_mw[0] = dimx; dim_motion_mw[1] = dimy; dim_motion_mw[2] = 2;
+        dim_image_mw{dimx, dimy};
+        dim_motion_mw{dimx, dimy, 2};
 
-        // Free up the niter and regparams array
+        // Free up the niter array
         delete[] niter;
-        delete[] regparams;
     }
 
     // Load the images and estimate motion through image registration
