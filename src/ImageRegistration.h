@@ -13,7 +13,7 @@ class ImageRegistration {
         // Constructors and deconstructors
         ImageRegistration(const dim dimin, 
                           const int nscales, const int* niter, const int nrefine, 
-                          const Regularisation reg, const float* regparams, const unsigned int nparams,
+                          const double alpha,
                           const Verbose verbose);
         ~ImageRegistration();
 
@@ -29,17 +29,14 @@ class ImageRegistration {
         void estimate_motion();
 
     protected:
-        void display_registration_parameters(const Regularisation reg, const float* regparams, const unsigned int nparams) const;
+        void display_registration_parameters() const;
 
-        virtual bool valid_regularisation_parameters(const Regularisation reg, const unsigned int nparams) const {return true;};
-
-        virtual void set_solver(const Regularisation reg, const float* regparams, const unsigned int nparams) {};
-
-        virtual void estimate_motion_at_current_resolution(Motion* motion, 
-                                                           const Image *Iref, Image *Imov,
-                                                           IterativeSolver *solver, 
-                                                           const int niter,
-                                                           const dim dimin, const int sizein) {};
+        void estimate_motion_at_current_resolution(
+            Motion* motion, 
+            const Image *Iref, Image *Imov,
+            IterativeSolver *solver, 
+            const int niter,
+            const dim dimin, const int sizein);
 
         dim *dimin;
         int *sizein;
