@@ -6,14 +6,15 @@
 template <class T>
 class coord2d {
     public:
-        T x;
-        T y;
+        T x{};
+        T y{};
 
         // Constructors
-        coord2d() {
-            this->x = T(0);
-            this->y = T(0);
-        }
+        coord2d() = default;
+        // {
+        //     this->x = T(0);
+        //     this->y = T(0);
+        // }
 
         coord2d(const T x, const T y) {
             this->x = x;
@@ -26,26 +27,26 @@ class coord2d {
         }
 
         // Overload some operators
-        coord2d<T>& operator=(const coord2d<T>& c) {
-            this->x = c.x;
-            this->y = c.y;
-            return *this;
-        }
+        // coord2d<T>& operator=(const coord2d<T>& c) {
+        //     this->x = c.x;
+        //     this->y = c.y;
+        //     return *this;
+        // }
 
         coord2d<T>& operator=(const T& a) {
-            this->x = a;
-            this->y = a;
+            x = a;
+            y = a;
             return *this;
         }
 
-        // Addition
-        coord2d<T> operator+(const coord2d<T>& c) {
-            return coord2d<T>(this->x + c.x, this->y + c.y);
-        }
+        // Arithmatic operations
+        coord2d<T> operator+(const coord2d<T>& c) const { return coord2d<T>(this->x + c.x, this->y + c.y); }
+        coord2d<T> operator+(T a) const { return coord2d<T>(this->x + a, this->y + a); }
+        coord2d<T> operator-(const coord2d<T>& c) const { return coord2d<T>(this->x - c.x, this->y - c.y); }
+        coord2d<T> operator-(T a) const { return coord2d<T>(this->x - a, this->y - a); }
+        coord2d<T> operator*(T a) const { return coord2d<T>(this->x * a, this->y * a); }
 
-        coord2d<T> operator+(const T& a) {
-            return coord2d<T>(this->x + a, this->y + a);
-        }
+        friend coord2d<T> operator*(T a, const coord2d<T>& b) { return coord2d<T>(b.x * a, b.y * a); }
 
         coord2d<T>& operator+=(const coord2d<T>& c) {
             this->x += c.x;
@@ -53,19 +54,10 @@ class coord2d {
             return *this;
         }
 
-        coord2d<T>& operator+=(const T& a) {
+        coord2d<T>& operator+=(T a) {
             this->x += a;
             this->y += a;
             return *this;
-        }
-
-        // Subtraction
-        coord2d<T> operator-(const coord2d<T>& c) {
-            return coord2d<T>(this->x - c.x, this->y - c.y);
-        }
-
-        coord2d<T> operator-(const T& a) {
-            return coord2d<T>(this->x - a, this->y - a);
         }
 
         coord2d<T>& operator-=(const coord2d<T>& c) {
@@ -74,18 +66,13 @@ class coord2d {
             return *this;
         }
 
-        coord2d<T>& operator-=(const T& a) {
+        coord2d<T>& operator-=(T a) {
             this->x -= a;
             this->y -= a;
             return *this;
-        }
+        }        
 
-        // Multiplication
-        coord2d<T> operator*(const T& a) {
-            return coord2d<T>(this->x * a, this->y * a);
-        }
-
-        coord2d<T>& operator*=(const T& a) {
+        coord2d<T>& operator*=(T a) {
             this->x *= a;
             this->y *= a;
             return *this;
@@ -99,13 +86,13 @@ class coord2d {
             return coord2d<T>(this->x/a, this->y/a);
         }
 
-        template <class D>
-        coord2d<T> operator/(const coord2d<D>& a) const {
-            if ((a.x == 0) || (a.y == 0)) {
-                throw std::runtime_error("Divide by zero exception");
-            }
-            return coord2d<T>(this->x/a.x, this->y/a.y);
-        }
+        // template <class D>
+        // coord2d<T> operator/(const coord2d<D>& a) const {
+        //     if ((a.x == 0) || (a.y == 0)) {
+        //         throw std::runtime_error("Divide by zero exception");
+        //     }
+        //     return coord2d<T>(this->x/a.x, this->y/a.y);
+        // }
 
         coord2d<T>& operator/=(const T& a) {
             if (a == 0) {
@@ -116,15 +103,15 @@ class coord2d {
             return *this;
         }
 
-        template <class D>
-        coord2d<T>& operator/=(const coord2d<D>& a) {
-            if ((a.x == 0) || (a.y == 0)) {
-                throw std::runtime_error("Divide by zero exception");
-            }
-            this->x /= a.x;
-            this->y /= a.y;
-            return *this;
-        }
+        // template <class D>
+        // coord2d<T>& operator/=(const coord2d<D>& a) {
+        //     if ((a.x == 0) || (a.y == 0)) {
+        //         throw std::runtime_error("Divide by zero exception");
+        //     }
+        //     this->x /= a.x;
+        //     this->y /= a.y;
+        //     return *this;
+        // }
 
         // Boolean operators
         bool operator==(const T& a) {
