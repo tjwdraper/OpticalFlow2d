@@ -11,6 +11,9 @@ class IterativeSolver {
         IterativeSolver(const dim dimin, const double alpha);
         ~IterativeSolver();
 
+        // Getters and setters
+        double get_alpha() const;
+
         // Calculate image gradients
         void spatial_derivative(Motion* grad_image, const Image *image) const;
         void temporal_derivative(Image* It, const Image *Iref, const Image* Imov) const;

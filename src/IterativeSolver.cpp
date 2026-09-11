@@ -23,6 +23,10 @@ IterativeSolver::~IterativeSolver() {
     delete this->qdiffoperator;
 }
 
+double IterativeSolver::get_alpha() const {
+    return this->alpha;
+}
+
 // Image derivatives
 void IterativeSolver::spatial_derivative(Motion* grad_image, const Image* image) const {
     // Get the dimensions and the step size of the image
