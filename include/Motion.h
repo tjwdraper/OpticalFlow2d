@@ -1,8 +1,8 @@
 #ifndef _MOTION_H_
 #define _MOTION_H_
 
-#include <src/Field.h>
-#include <src/Kernel.h>
+#include <include/Field.h>
+#include <include/Kernel.h>
 
 class Motion : public Field<vector2d> {
     public:

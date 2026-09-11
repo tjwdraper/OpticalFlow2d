@@ -1,4 +1,4 @@
-#include <src/Motion.h>
+#include <include/Motion.h>
 
 #include <mex.h>
 #include <math.h>

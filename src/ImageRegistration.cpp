@@ -1,4 +1,4 @@
-#include <src/ImageRegistration.h>
+#include <include/ImageRegistration.h>
 
 #include <mex.h>
 #include <cstring>

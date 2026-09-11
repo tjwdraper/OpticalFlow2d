@@ -1,5 +1,5 @@
-#include <src/Image.h>
-#include <src/gradients.h>
+#include <include/Image.h>
+#include <include/gradients.h>
 
 #include <mex.h>
 #include <math.h>

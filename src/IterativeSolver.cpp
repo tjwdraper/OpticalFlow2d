@@ -1,5 +1,5 @@
-#include <src/regularization/IterativeSolver.h>
-#include <src/gradients.h>
+#include <include/regularization/IterativeSolver.h>
+#include <include/gradients.h>
 
 // Constructors and deconstructors
 IterativeSolver::IterativeSolver(const dim dimin, const double alpha) {

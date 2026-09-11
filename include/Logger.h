@@ -1,9 +1,9 @@
 #ifndef _LOGGER_H_
 #define _LOGGER_H_
 
-#include <src/coord2d.h>
-#include <src/Motion.h>
-#include <src/SolverOptions.h>
+#include <include/coord2d.h>
+#include <include/Motion.h>
+#include <include/SolverOptions.h>
 
 class Logger {
     public:

@@ -1,9 +1,9 @@
 #ifndef _ITERATIVE_SOLVER_H_
 #define _ITERATIVE_SOLVER_H_
 
-#include <src/coord2d.h>
-#include <src/Image.h>
-#include <src/Motion.h>
+#include <include/coord2d.h>
+#include <include/Image.h>
+#include <include/Motion.h>
 
 class IterativeSolver {
     public:

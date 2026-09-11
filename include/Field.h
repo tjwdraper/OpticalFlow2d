@@ -1,8 +1,8 @@
 #ifndef _FIELD_H_
 #define _FIELD_H_
 
-#include <src/coord2d.h>
-#include <src/Kernel.h>
+#include <include/coord2d.h>
+#include <include/Kernel.h>
 
 template <class T>
 class Field {

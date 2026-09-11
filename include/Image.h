@@ -1,9 +1,9 @@
 #ifndef _IMAGE_H_
 #define _IMAGE_H_
 
-#include <src/Field.h>
-#include <src/Motion.h>
-#include <src/Kernel.h>
+#include <include/Field.h>
+#include <include/Motion.h>
+#include <include/Kernel.h>
 
 class Image : public Field<float> {
     public:

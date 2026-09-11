@@ -1,4 +1,4 @@
-#include <src/Kernel.h>
+#include <include/Kernel.h>
 #include <math.h>
 
 // Constructors and deconstructors

@@ -2,11 +2,11 @@
 #include <stdexcept>
 #include <mex.h>
 
-#include <src/coord2d.h>
-#include <src/Image.h>
-#include <src/Motion.h>
-#include <src/ImageRegistrationOpticalFlow.h>
-#include <src/SolverOptions.h>
+#include <include/coord2d.h>
+#include <include/Image.h>
+#include <include/Motion.h>
+#include <include/ImageRegistrationOpticalFlow.h>
+#include <include/SolverOptions.h>
 
 static ImageRegistration *myImageRegistration = NULL;
 static mwSize *dim_image_mw;

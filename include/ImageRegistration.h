@@ -1,12 +1,12 @@
 #ifndef _IMAGE_REGISTRATION_H_
 #define _IMAGE_REGISTRATION_H_
 
-#include <src/coord2d.h>
-#include <src/Image.h>
-#include <src/Motion.h>
-#include <src/SolverOptions.h>
+#include <include/coord2d.h>
+#include <include/Image.h>
+#include <include/Motion.h>
+#include <include/SolverOptions.h>
 
-#include <src/regularization/IterativeSolver.h>
+#include <include/regularization/IterativeSolver.h>
 
 class ImageRegistration {
     public:
