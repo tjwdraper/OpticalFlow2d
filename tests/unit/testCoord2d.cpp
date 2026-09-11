@@ -266,7 +266,3 @@ TEST_F(Coord2dTest, Inf_check) {
     ASSERT_THROW(a / s, std::runtime_error);
 }
 
-int main(int argc, char** argv) {
-    testing::InitGoogleTest(&argc, argv);
-    RUN_ALL_TESTS();
-}
