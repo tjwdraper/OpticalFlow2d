@@ -1,6 +1,7 @@
 #ifndef _COORD2D_H_
 #define _COORD2D_H_
 
+#include <cmath>
 #include <stdexcept>
 
 template <class T>
@@ -11,27 +12,9 @@ class coord2d {
 
         // Constructors
         coord2d() = default;
-        // {
-        //     this->x = T(0);
-        //     this->y = T(0);
-        // }
-
-        coord2d(const T x, const T y) {
-            this->x = x;
-            this->y = y;
-        }
-
-        coord2d(const T a) {
-            this->x = a;
-            this->y = a;
-        }
-
-        // Overload some operators
-        // coord2d<T>& operator=(const coord2d<T>& c) {
-        //     this->x = c.x;
-        //     this->y = c.y;
-        //     return *this;
-        // }
+        coord2d(const coord2d<T>& a) : x(a.x), y(a.y) { isnan(x,y); isinf(x,y); }
+        coord2d(T x, T y) : x(x), y(y) { isnan(x,y); isinf(x,y); }
+        coord2d(T a) : x(a), y(a) { isnan(x,y); isinf(x,y); }
 
         coord2d<T>& operator=(const T& a) {
             x = a;
@@ -87,14 +70,6 @@ class coord2d {
             return coord2d<T>(this->x/a, this->y/a);
         }
 
-        // template <class D>
-        // coord2d<T> operator/(const coord2d<D>& a) const {
-        //     if ((a.x == 0) || (a.y == 0)) {
-        //         throw std::runtime_error("Divide by zero exception");
-        //     }
-        //     return coord2d<T>(this->x/a.x, this->y/a.y);
-        // }
-
         coord2d<T>& operator/=(const T& a) {
             if (a == 0) {
                 throw std::runtime_error("Divide by zero exception");
@@ -104,15 +79,12 @@ class coord2d {
             return *this;
         }
 
-        // template <class D>
-        // coord2d<T>& operator/=(const coord2d<D>& a) {
-        //     if ((a.x == 0) || (a.y == 0)) {
-        //         throw std::runtime_error("Divide by zero exception");
-        //     }
-        //     this->x /= a.x;
-        //     this->y /= a.y;
-        //     return *this;
-        // }
+        // Unary operations
+        coord2d<T>& operator-() {
+            this->x *= -1;
+            this->y *= -1;
+            return *this;
+        }
 
         // Boolean operators
         bool operator==(const T& a) {
@@ -131,9 +103,41 @@ class coord2d {
             return (this->x != c.x) || (this->y != c.y);
         }
 
+        // Stream
+        friend std::ostream& operator<<(std::ostream& os, const coord2d<T>& c) {
+            os << "(" << c.x << ", " << c.y << ")";
+            return os;
+        }
+
+    private:
+        void isnan(T x, T y) const {
+            if (std::isnan(x) || std::isnan(y)) {
+                throw std::runtime_error("Coord2d<T> is NaN");
+            }
+        }
+
+        void isinf(T x, T y) const {
+            if (std::isinf(x) || std::isinf(y))  {
+                throw std::runtime_error("Coord2d<T> is Inf");
+            }
+        }
+
 };
 
 typedef coord2d<unsigned int> dim;
-typedef coord2d<float> vector2d;
+typedef coord2d<double> vector2d;
+
+// Adding specific methods for vector2d
+double dot(vector2d a, vector2d b) {
+    return a.x * b.x + a.y * b.y;
+}
+
+double normsq(vector2d a) {
+    return dot(a, a);
+}
+
+double norm(vector2d a) {
+    return std::sqrt(normsq(a));
+}
 
 #endif

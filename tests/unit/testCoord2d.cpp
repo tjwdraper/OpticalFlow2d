@@ -178,6 +178,94 @@ TEST_F(Coord2dTest, division_eq_scalar) {
     ASSERT_DOUBLE_EQ(res.y, expected.y);
 }
 
+TEST_F(Coord2dTest, unary_negate) {
+    // Arange
+    coord2d<double> expected(-1.2, -5.9);
+
+    // Act
+    res = -a;
+
+    // Assert
+    ASSERT_DOUBLE_EQ(res.x, expected.x);
+    ASSERT_DOUBLE_EQ(res.y, expected.y);
+}
+
+TEST_F(Coord2dTest, inner_product) {
+    // Arange
+    double expected(12.73);
+
+    // Act
+    double d = dot(a,b);
+
+    // Assert
+    ASSERT_DOUBLE_EQ(d, expected);
+}
+
+TEST_F(Coord2dTest, normsq) {
+    // Arange
+    double expected(36.25);
+
+    // Act
+    double d = normsq(a);
+
+    // Assert
+    ASSERT_DOUBLE_EQ(d, expected);
+}
+
+TEST_F(Coord2dTest, norm) {
+    // Arange
+    double expected(6.0207972893961479);
+
+    // Act
+    double d = norm(a);
+
+    // Assert
+    ASSERT_DOUBLE_EQ(d, expected);
+}
+
+// Exception handling
+TEST_F(Coord2dTest, division_by_zero) {
+    // Arange
+    double z(0.0);
+
+    // Act
+
+
+    // Assert
+    ASSERT_THROW(a / z, std::runtime_error);
+}
+
+// Check for NaN
+TEST_F(Coord2dTest, NaN_check) {
+    // Arange
+
+    // Act
+    a.x = std::numeric_limits<double>::quiet_NaN();
+    s = std::numeric_limits<double>::quiet_NaN();
+
+    // Assert
+    ASSERT_THROW(coord2d<double>(1.0, std::numeric_limits<double>::quiet_NaN()), std::runtime_error);
+    ASSERT_THROW(a + b, std::runtime_error);
+    ASSERT_THROW(a - b, std::runtime_error);
+    ASSERT_THROW(a * s, std::runtime_error);
+    ASSERT_THROW(a / s, std::runtime_error);
+}
+
+TEST_F(Coord2dTest, Inf_check) {
+    // Arange
+
+    // Act
+    a.x = std::numeric_limits<double>::infinity();
+    s = std::numeric_limits<double>::infinity();
+
+    // Assert
+    ASSERT_THROW(coord2d<double>(1.0, std::numeric_limits<double>::infinity()), std::runtime_error);
+    ASSERT_THROW(a + b, std::runtime_error);
+    ASSERT_THROW(a - b, std::runtime_error);
+    ASSERT_THROW(a * s, std::runtime_error);
+    ASSERT_THROW(a / s, std::runtime_error);
+}
+
 int main(int argc, char** argv) {
     testing::InitGoogleTest(&argc, argv);
     RUN_ALL_TESTS();
