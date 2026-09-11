@@ -5,7 +5,7 @@
 #include <include/coord2d.h>
 #include <include/Image.h>
 #include <include/Motion.h>
-#include <include/ImageRegistrationOpticalFlow.h>
+#include <include/ImageRegistration.h>
 #include <include/SolverOptions.h>
 
 static ImageRegistration *myImageRegistration = NULL;
@@ -45,7 +45,7 @@ mexFunction (int nlhs, mxArray *plhs[],
         Verbose verb = static_cast<Verbose>( (int) tmp[0]);
 
         // Pass parameters to ImageRegistration object
-        myImageRegistration = new ImageRegistrationOpticalFlow(dimin, nscales, niter, nrefine, alpha, verb);
+        myImageRegistration = new ImageRegistration(dimin, nscales, niter, nrefine, alpha, verb);
 
 
         // Set the output dimension for image and motion field
