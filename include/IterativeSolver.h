@@ -20,9 +20,6 @@ class IterativeSolver {
         // Do one update in iterative scheme
         void get_update(Motion *motion, const Image* Iref = NULL, const Image* Imov = NULL);
 
-        // One iteration of the iterative scheme
-        void get_update(Motion *motion, const Image* Iref = NULL, const Image* Imov = NULL);
-
     private:
         dim dimin;
         dim step;

@@ -1,4 +1,4 @@
-#include <include/regularization/IterativeSolver.h>
+#include <include/IterativeSolver.h>
 #include <include/gradients.h>
 
 // Constructors and deconstructors
