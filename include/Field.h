@@ -1,7 +1,7 @@
 #ifndef _FIELD_H_
 #define _FIELD_H_
 
-#include <include/coord2d.h>
+#include <include/coord2d.hpp>
 #include <include/Kernel.h>
 
 template <class T>
