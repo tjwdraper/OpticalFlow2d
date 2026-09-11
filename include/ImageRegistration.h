@@ -6,7 +6,7 @@
 #include <include/Motion.h>
 #include <include/SolverOptions.h>
 
-#include <include/regularization/IterativeSolver.h>
+#include <include/IterativeSolver.h>
 
 class ImageRegistration {
     public:
