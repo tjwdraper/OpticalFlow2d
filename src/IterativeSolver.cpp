@@ -1,4 +1,4 @@
-#include <include/regularization/IterativeSolver.h>
+#include <include/IterativeSolver.h>
 #include <include/gradients.h>
 
 // Constructors and deconstructors
@@ -21,6 +21,10 @@ IterativeSolver::~IterativeSolver() {
     delete this->It;
     delete this->force;
     delete this->qdiffoperator;
+}
+
+double IterativeSolver::get_alpha() const {
+    return this->alpha;
 }
 
 // Image derivatives

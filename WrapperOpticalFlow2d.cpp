@@ -49,8 +49,12 @@ mexFunction (int nlhs, mxArray *plhs[],
 
 
         // Set the output dimension for image and motion field
-        dim_image_mw{dimx, dimy};
-        dim_motion_mw{dimx, dimy, 2};
+        dim_image_mw[0] = dimx;
+        dim_image_mw[1] = dimy;
+
+        dim_motion_mw[0] = dimx;
+        dim_motion_mw[1] = dimy;
+        dim_motion_mw[2] = 2;
 
         // Free up the niter array
         delete[] niter;
