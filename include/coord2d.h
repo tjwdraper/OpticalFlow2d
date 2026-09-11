@@ -46,6 +46,7 @@ class coord2d {
         coord2d<T> operator-(T a) const { return coord2d<T>(this->x - a, this->y - a); }
         coord2d<T> operator*(T a) const { return coord2d<T>(this->x * a, this->y * a); }
 
+        friend coord2d<T> operator+(T a, const coord2d<T>& b) { return coord2d<T>(b.x + a, b.y + a); }
         friend coord2d<T> operator*(T a, const coord2d<T>& b) { return coord2d<T>(b.x * a, b.y * a); }
 
         coord2d<T>& operator+=(const coord2d<T>& c) {
