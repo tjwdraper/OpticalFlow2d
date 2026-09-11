@@ -2,6 +2,7 @@
 
 #include <mex.h>
 #include <cstring>
+#include <include/Logger.h>
 
 void ImageRegistration::display_registration_parameters() const {
     mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
@@ -25,7 +26,7 @@ void ImageRegistration::display_registration_parameters() const {
     return;
 }
 
-void ImageRegistrationOpticalFlow::estimate_motion_at_current_resolution(Motion* motion, 
+void ImageRegistration::estimate_motion_at_current_resolution(Motion* motion, 
     const Image *Iref, Image *Imov,
     IterativeSolver *solver, 
     const int niter,
