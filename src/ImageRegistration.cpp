@@ -3,7 +3,7 @@
 #include <mex.h>
 #include <cstring>
 
-void ImageRegistration::display_registration_parameters(const Regularisation reg, const float* regparams, const unsigned int nparams) const {
+void ImageRegistration::display_registration_parameters() const {
     mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
     mexPrintf("Optical flow image registration started... (2D C++ implementation)...\n");
     mexPrintf("Registration parameters:\n");
@@ -17,28 +17,7 @@ void ImageRegistration::display_registration_parameters(const Regularisation reg
     mexPrintf(")\n");
     mexPrintf("nscales:\t\t\t\t%d\n", this->nscales);
     mexPrintf("nrefine:\t\t\t\t%d\n", this->nrefine);
-
-    // Regularisation method
-    switch(reg) {
-        case Regularisation::Diffusion:           mexPrintf("regularisation:\t\t\t\tDiffusion\n");            break;
-        case Regularisation::Curvature:           mexPrintf("regularisation:\t\t\t\tCurvature\n");            break;
-        case Regularisation::Elastic:             mexPrintf("regularisation:\t\t\t\tElastic\n");              break;
-        case Regularisation::ThirionsDemons:      mexPrintf("regularisation:\t\t\t\tThirions Demons\n");      break;
-        case Regularisation::DiffeomorphicDemons: mexPrintf("regularisation:\t\t\t\tDiffeomorphic Demons\n"); break;
-        case Regularisation::Fluid:               mexPrintf("regularisation:\t\t\t\tFluid\n");                break;
-    }
-
-    // Regularization parameters
-    if (nparams == 1) {
-        mexPrintf("reg. param:\t\t\t\t%.2f\n", regparams[0]);
-    }
-    else {
-        mexPrintf("reg. params:\t\t\t\t(%.2f", regparams[0]);
-        for (unsigned int p = 1; p < nparams; p++) {
-            mexPrintf(" %.2f", regparams[p]);
-        }
-        mexPrintf(")\n");
-    }
+    mexPrintf("alpha:\t\t\t\t%.3f\n", this->solver[0]->get_alpha());
 
     mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n");
 
@@ -46,15 +25,72 @@ void ImageRegistration::display_registration_parameters(const Regularisation reg
     return;
 }
 
-ImageRegistration::ImageRegistration(const dim dimin, 
+void ImageRegistrationOpticalFlow::estimate_motion_at_current_resolution(Motion* motion, 
+    const Image *Iref, Image *Imov,
+    IterativeSolver *solver, 
+    const int niter,
+    const dim dimin, const int sizein) {
+    
+    // Create auxiliary motion field
+    Image *Iaux = new Image(dimin);
+
+    // Create auxiliary motion field
+    Motion *motion_est = new Motion(dimin);
+
+    for (int refine = 0; refine < this->nrefine; refine++) {
+        // Reset Iaux to input image
+        *Iaux = *Imov;
+
+        // Warp moving image with accumulated motion field
+        Iaux->warp2d(*motion);
+
+        // Create a Logger object
+        Logger log(dimin, niter, this->verbose);
+
+        // Calculating the image gradients only has to be done once
+        solver->set_derivatives(Iref, Iaux);
+
+        // Iterate over resolution levels
+        for (int iter = 0; iter < niter; iter++) {
+            // Calculate the update step
+            solver->get_update(motion_est);
+
+            // Calculate the difference between iterations
+            log.update_error(motion_est);
+
+            // Converge check
+            if ((log.get_error_at_current_iteration() < 0.001f) &&
+                (iter > 1)) {
+                break;
+            }
+        }
+
+        // Accumulate motion field
+        motion->accumulate(*motion_est);
+
+        // Reset auxiliary field
+        motion_est->reset();
+
+    }
+
+    // Free up the mem
+    delete motion_est;
+    delete Iaux;
+    
+    // Done
+    return;
+}
+
+ImageRegistration::ImageRegistration(
+    const dim dimin, 
     const int nscales, const int* niter, const int nrefine, 
-    const Regularisation reg, const float* regparams, const unsigned int nparams,
+    const double alpha,
     const Verbose verbose) {
     // Size and dimensions of the input image
     this->dimin = new dim[nscales + 1];
     this->sizein = new int[nscales + 1];
     for (int s = nscales; s >= 0; s--) {
-        float scale = pow(2, s);
+        double scale = pow(2, s);
         this->dimin[s] = dim(dimin.x/scale,
                              dimin.y/scale);
         this->sizein[s] = this->dimin[s].x * this->dimin[s].y;
@@ -70,33 +106,40 @@ ImageRegistration::ImageRegistration(const dim dimin,
     this->Iref = new Image*[nscales + 1];
     this->Imov = new Image*[nscales + 1];
     this->motion = new Motion*[nscales + 1];
+    this->solver = new IterativeSolver*[nscales + 1];
     for (int s = nscales; s >= 0; s--) {
         this->Iref[s] = new Image(this->dimin[s]);
         this->Imov[s] = new Image(this->dimin[s]);
         this->motion[s] = new Motion(this->dimin[s]);
+        this->solver[s] = new IterativeSolver(this->dimin[s], alpha);
     }
-
-    // Display registration settings
-    this->ImageRegistration::display_registration_parameters(reg, regparams, nparams);
 
     // Set the verbose option
     this->verbose = verbose;
+
+    // Display registration settings
+    if (verbose == Verbose::On) {
+        ImageRegistration::display_registration_parameters();
+    }
+
 }
 
 ImageRegistration::~ImageRegistration() {
     delete[] this->dimin;
     delete[] this->sizein;
+    delete[] this->niter;
 
     for (int s = this->nscales; s >= 0; s--) {
+        delete this->solver[s];
         delete this->Iref[s];
         delete this->Imov[s];
         delete this->motion[s];
     }
+    delete[] this->solver;
     delete[] this->Iref;
     delete[] this->Imov;
     delete[] this->motion;
 
-    delete[] this->niter;
 }
 
 // Getters and setters
