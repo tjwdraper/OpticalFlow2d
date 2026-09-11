@@ -1,7 +1,7 @@
 #ifndef _GRADIENTS_H_
 #define _GRADIENTS_H_
 
-#include <include/coord2d.h>
+#include <include/coord2d.hpp>
 
 namespace gradients {
     template <typename T>

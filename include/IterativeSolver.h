@@ -1,7 +1,7 @@
 #ifndef _ITERATIVE_SOLVER_H_
 #define _ITERATIVE_SOLVER_H_
 
-#include <include/coord2d.h>
+#include <include/coord2d.hpp>
 #include <include/Image.h>
 #include <include/Motion.h>
 

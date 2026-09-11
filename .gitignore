@@ -6,3 +6,4 @@ fftw/
 .vscode/
 back-up and decrepated files/
 Makefile
+build/

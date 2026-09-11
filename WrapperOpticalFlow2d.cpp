@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <mex.h>
 
-#include <include/coord2d.h>
+#include <include/coord2d.hpp>
 #include <include/Image.h>
 #include <include/Motion.h>
 #include <include/ImageRegistration.h>

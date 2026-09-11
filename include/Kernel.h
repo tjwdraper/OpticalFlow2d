@@ -1,7 +1,7 @@
 #ifndef _KERNEL_H_
 #define _KERNEL_H_
 
-#include <include/coord2d.h>
+#include <include/coord2d.hpp>
 
 class Kernel {
     public:

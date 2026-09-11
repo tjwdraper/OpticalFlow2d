@@ -1,7 +1,7 @@
 #ifndef _LOGGER_H_
 #define _LOGGER_H_
 
-#include <include/coord2d.h>
+#include <include/coord2d.hpp>
 #include <include/Motion.h>
 #include <include/SolverOptions.h>
 
