@@ -128,15 +128,15 @@ typedef coord2d<unsigned int> dim;
 typedef coord2d<double> vector2d;
 
 // Adding specific methods for vector2d
-double dot(vector2d a, vector2d b) {
+__inline__ double dot(vector2d a, vector2d b) {
     return a.x * b.x + a.y * b.y;
 }
 
-double normsq(vector2d a) {
+__inline__ double normsq(vector2d a) {
     return dot(a, a);
 }
 
-double norm(vector2d a) {
+__inline__ double norm(vector2d a) {
     return std::sqrt(normsq(a));
 }
 
