@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cmath>
 #include <stdexcept>
 
 namespace opticalflow {
@@ -155,30 +156,30 @@ namespace opticalflow {
 
     namespace image {
         // TODO: change to mxArray* in future or separate from namespace
-        void mex_load_image(const double* vals, Image& image) {
+        inline void mex_load_image(const double* vals, Image& image) {
             std::copy(vals, vals + image.get_size(), image.get_field());
         }
 
         // TODO: change to mxArray* in future or separate from namespace
-        void mex_save_image(double* vals, const Image& image) {
+        inline void mex_save_image(double* vals, const Image& image) {
             std::copy(image.get_field(), image.get_field() + image.get_size(), vals);
         }
 
-        double norm(const Image& image) {
+        inline double norm(const Image& image) {
             double norm(0.0);
             for (std::size_t idx = 0; idx < image.get_size(); ++idx) 
                 norm += std::pow(image.get_val(idx), 2);
             return std::sqrt(norm);
         }
 
-        double sum(const Image& image) {
+        inline double sum(const Image& image) {
             double sum(0.0);
             for (std::size_t idx = 0; idx < image.get_size(); ++idx)
                 sum += image.get_val(idx);
             return sum;
         }
 
-        double max(const Image& image) {
+        inline double max(const Image& image) {
             double max(image.get_val(0));
             if (image.get_size() == 1)
                 return max;
@@ -189,7 +190,7 @@ namespace opticalflow {
             return max;
         }
 
-        double min(const Image& image) {
+        inline double min(const Image& image) {
             double min(image.get_val(0));
             if (image.get_size() == 1)
                 return min;
@@ -200,7 +201,7 @@ namespace opticalflow {
             return min;
         }
 
-        void normalize(Image& image) {
+        inline void normalize(Image& image) {
             double low = opticalflow::image::min(image);
             double high = opticalflow::image::max(image);
 
@@ -213,7 +214,7 @@ namespace opticalflow {
     }
 
     namespace motion {
-        void mex_save_motion(double* vals, const Motion& motion) {
+        inline void mex_save_motion(double* vals, const Motion& motion) {
             std::size_t N = motion.get_size();
             for (std::size_t idx = 0; idx < N; ++idx) {
                 const vector2d v = motion.get_val(idx);
@@ -222,14 +223,14 @@ namespace opticalflow {
             }
         }
 
-        double norm(const Motion& motion) {
+        inline double norm(const Motion& motion) {
             double norm(0.0);
             for (std::size_t idx = 0; idx < motion.get_size(); ++idx) 
                 norm += normsq(motion.get_val(idx));
             return std::sqrt(norm);
         }
 
-        vector2d max(const Motion& motion) {
+        inline vector2d max(const Motion& motion) {
             vector2d max(motion.get_val(0));
             if (motion.get_size() == 1)
                 return max;
@@ -240,7 +241,7 @@ namespace opticalflow {
             return max;
         }
 
-        vector2d min(const Motion& motion) {
+        inline vector2d min(const Motion& motion) {
             vector2d min(motion.get_val(0));
             if (motion.get_size() == 1)
                 return min;
