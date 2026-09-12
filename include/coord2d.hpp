@@ -86,21 +86,29 @@ class coord2d {
             return *this;
         }
 
-        // Boolean operators
-        bool operator==(const T& a) {
-            return (this->x == a) && (this->y == a);
-        }
-        
+        // Boolean operators        
         bool operator==(const coord2d<T>& c) const {
             return (this->x == c.x) && (this->y == c.y);
         }
 
-        bool operator!=(const T& a) {
-            return (this->x != a) || (this->y || a);
-        }
-
         bool operator!=(const coord2d<T>& c) const {
             return (this->x != c.x) || (this->y != c.y);
+        }
+
+        bool operator<(const coord2d<T>& c) const {
+            return normsq(*this) < normsq(c);
+        }
+
+        bool operator>(const coord2d<T>& c) const {
+            return normsq(*this) > normsq(c);
+        }
+
+        bool operator<=(const coord2d<T>& c) const {
+            return normsq(*this) <= normsq(c);
+        }
+
+        bool operator>=(const coord2d<T>& c) const {
+            return norsq(*this) >= normsq(c);
         }
 
         // Stream
