@@ -78,6 +78,7 @@ namespace gradients {
             return (field[idx - 1] + field[idx + 1] + field[idx - dimin.x] + field[idx + dimin.x])/4.0f;
         }
     }
+    void jacobian(const Motion& mo);
 }
 
 #endif
