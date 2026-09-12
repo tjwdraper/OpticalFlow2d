@@ -7,6 +7,8 @@
 #include <cstddef>
 #include <stdexcept>
 
+namespace opticalflow {
+
 template <class T>
 class Field {
     public:
@@ -14,12 +16,12 @@ class Field {
         Field(dim dimin) : dimin(dimin), 
                            step(1, dimin.x), 
                            size(dimin.x*dimin.y),
-                           field(new T[dimin.x*dimin.y]) {}
+                           field(new T[size]) {}
 
         Field(const Field<T>& fin) : dimin(fin.get_dimensions()), 
                                      step(fin.get_step()), 
                                      size(fin.get_size()),
-                                     field(new T[size]) {
+                                     field(new T[fin.get_size()]) {
             std::copy(fin.get_field(), fin.get_field() + size, field);
         }
         Field(Field<T>&& other) noexcept : dimin(other.get_dimensions()),
@@ -143,15 +145,19 @@ class Field {
                 throw std::runtime_error("In T Field::get_val(std::size_t) input indices out of bound.");
         }
 
-        T* field = nullptr;
         const dim dimin;
         const dim step;
         const std::size_t size;
+        T* field = nullptr;
 };
 
-typedef Field<double> Image;
-typedef Field<vector2d> Motion;
+using Image = Field<double>;
+using Motion = Field<vector2d>;
 
+// typedef Field<double> Image;
+// typedef Field<vector2d> Motion;
+
+}
 // #include <src/Field.tpp>
 
 #endif
