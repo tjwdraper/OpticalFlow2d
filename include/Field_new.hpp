@@ -154,6 +154,56 @@ class Field {
 using Image = Field<double>;
 using Motion = Field<vector2d>;
 
+namespace image {
+
+    // TODO: change to mxArray* in future or separate from namespace
+void mex_load_image(const double* vals, Image& image) {
+    std::copy(vals, vals + image.get_size(), image.get_field());
+}
+
+    // TODO: change to mxArray* in future or separate from namespace
+void mex_save_image(double* vals, const Image& image) {
+    std::copy(image.get_field(), image.get_field() + image.get_size(), vals);
+}
+
+double norm(const Image& image) {
+    double norm(0.0);
+    for (std::size_t idx = 0; idx < image.get_size(); ++idx) 
+        norm += std::pow(image.get_val(idx), 2);
+    return std::sqrt(norm);
+}
+
+double sum(const Image& image) {
+    double sum(0.0);
+    for (std::size_t idx = 0; idx < image.get_size(); ++idx)
+        sum += image.get_val(idx);
+    return sum;
+}
+
+double max(const Image& image) {
+    double max(image.get_val(0));
+    if (image.get_size() == 1)
+        return max;
+
+    for (std::size_t idx = 1; idx < image.get_size(); ++idx)
+        if (image.get_val(idx) > max)
+            max = image.get_val(idx);
+    return max;
+}
+
+double min(const Image& image) {
+    double min(image.get_val(0));
+    if (image.get_size() == 1)
+        return min;
+
+    for (std::size_t idx = 1; idx < image.get_size(); ++idx)
+        if (image.get_val(idx) < min)
+            min = image.get_val(idx);
+    return min;
+}
+
+}
+
 // typedef Field<double> Image;
 // typedef Field<vector2d> Motion;
 
