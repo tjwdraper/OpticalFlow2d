@@ -83,7 +83,7 @@ class conv2d {
                         if (ii < 0) {ii = 0;}
                         if (ii > dimin.x-1) {ii = dimin.x-1;}
 
-                        val += intermediate.get_val(static_cast<std::size_t>(ii)) * weights_i[ki];
+                        val += intermediate.get_val(static_cast<std::size_t>(ii), j) * weights_i[ki];
                     }
 
                     result.set_val(val, i, j);
