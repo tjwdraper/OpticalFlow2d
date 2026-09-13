@@ -4,6 +4,7 @@
 #include "include/Field.hpp"
 
 #include <cmath>
+#include <stdexcept>
 
 namespace interp2d {
     // Template for interpolation
@@ -49,23 +50,23 @@ namespace interp2d {
 
 
     // Warp image with deformation vector field
-    void warp2d(opticalflow::Image& image_out, const opticalflow::Image& image_in, const opticalflow::Motion& motion) {
+    inline void warp2d(opticalflow::Image& image_out, const opticalflow::Image& image_in, const opticalflow::Motion& motion) {
         interp2d::interp2d<double>(image_out, image_in, motion);
     }
 
     // Accumulate deformation vector fields, i.e. calculate the result of 1 + u_acc <- (1 + u) \circ (1 + u_interp)
-    void accumulate(opticalflow::Motion& motion_acc, const opticalflow::Motion& motion, const opticalflow::Motion& motion_interp) {
+    inline void accumulate(opticalflow::Motion& motion_acc, const opticalflow::Motion& motion, const opticalflow::Motion& motion_interp) {
         interp2d::interp2d<vector2d>(motion_acc, motion, motion_interp);
         motion_acc += motion_interp;
     }
-    void accumulate(opticalflow::Motion& motion, const opticalflow::Motion& motion_interp) {
+    inline void accumulate(opticalflow::Motion& motion, const opticalflow::Motion& motion_interp) {
         opticalflow::Motion motion_tmp(motion.get_dimensions());
         interp2d::accumulate(motion_tmp, motion, motion_interp);
         motion = std::move(motion_tmp);
     }
 
     // Invert the motion field (i.e. calculate v such that (1 + u) \circ (1 + v) = (1 + v) \circ (1 + u) = 1)
-    void invert(opticalflow::Motion& motion_inv, const opticalflow::Motion& motion, const std::size_t niter = 1, const double omega = 1.0) {
+    inline void invert(opticalflow::Motion& motion_inv, const opticalflow::Motion& motion, const std::size_t niter = 1, const double omega = 1.0) {
         if (omega < 0.0 || omega > 1.0)
             throw std::runtime_error("In interp2d::inver(Motion&, const Motion&. const std::size_t, const double), omega has to be between 0 and 1.");
 
@@ -81,14 +82,14 @@ namespace interp2d {
             // TODO: some convergence check.
         }
     }
-    void invert(opticalflow::Motion& motion, const std::size_t niter, const double omega) {
+    inline void invert(opticalflow::Motion& motion, const std::size_t niter, const double omega) {
         opticalflow::Motion motion_tmp(motion.get_dimensions());
         interp2d::invert(motion_tmp, motion, niter, omega);
         motion = std::move(motion_tmp);
     }
 
     // Resize
-    void resize(opticalflow::Image& image_out, const opticalflow::Image& image_in) {
+    inline void resize(opticalflow::Image& image_out, const opticalflow::Image& image_in) {
         const dim dim_out = image_out.get_dimensions();
         const dim dim_in = image_in.get_dimensions();
 
@@ -111,7 +112,7 @@ namespace interp2d {
             }
         }
     }
-    void resize(opticalflow::Motion& motion_out, const opticalflow::Motion& motion_in) {
+    inline void resize(opticalflow::Motion& motion_out, const opticalflow::Motion& motion_in) {
         const dim dim_out = motion_out.get_dimensions();
         const dim dim_in = motion_in.get_dimensions();
 

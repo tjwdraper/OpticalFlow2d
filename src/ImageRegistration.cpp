@@ -1,198 +1,175 @@
-#include <include/ImageRegistration.h>
+#include "include/ImageRegistration.h"
+#include "include/interp2d.hpp"
 
 #include <mex.h>
 #include <cstring>
-#include <include/Logger.h>
+// #include <include/Logger.h>
 
-void ImageRegistration::display_registration_parameters() const {
-    mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
-    mexPrintf("Optical flow image registration started... (2D C++ implementation)...\n");
-    mexPrintf("Registration parameters:\n");
+// void ImageRegistration::display_registration_parameters() const {
+//     mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
+//     mexPrintf("Optical flow image registration started... (2D C++ implementation)...\n");
+//     mexPrintf("Registration parameters:\n");
 
-    // Image dimensions and multiresolution parameters
-    mexPrintf("dimensions:\t\t\t\t(%d %d)\n", this->dimin[0].x, this->dimin[0].y);
-    mexPrintf("niter:\t\t\t\t\t(%d", this->niter[0]);
-    for (int s = 1; s < this->nscales+1; s++) {
-        mexPrintf(" %d", this->niter[s]);
-    }
-    mexPrintf(")\n");
-    mexPrintf("nscales:\t\t\t\t%d\n", this->nscales);
-    mexPrintf("nrefine:\t\t\t\t%d\n", this->nrefine);
-    mexPrintf("alpha:\t\t\t\t%.3f\n", this->solver[0]->get_alpha());
+//     // Image dimensions and multiresolution parameters
+//     mexPrintf("dimensions:\t\t\t\t(%d %d)\n", _dimin[0].x, _dimin[0].y);
+//     mexPrintf("niter:\t\t\t\t\t(%d", _niter[0]);
+//     for (int s = 1; s < _nscales+1; s++) {
+//         mexPrintf(" %d", _niter[s]);
+//     }
+//     mexPrintf(")\n");
+//     mexPrintf("nscales:\t\t\t\t%d\n", _nscales);
+//     mexPrintf("nrefine:\t\t\t\t%d\n", _nrefine);
+//     mexPrintf("alpha:\t\t\t\t%.3f\n", _solver[0]->get_alpha());
 
-    mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n");
+//     mexPrintf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n");
 
-    // Done
-    return;
-}
+//     // Done
+//     return;
+// }
 
-void ImageRegistration::estimate_motion_at_current_resolution(Motion* motion, 
-    const Image *Iref, Image *Imov,
-    IterativeSolver *solver, 
-    const int niter,
-    const dim dimin, const int sizein) {
+// void ImageRegistration::estimate_motion_at_current_resolution(
+//     Motion& motion, 
+//     const Image& Iref, 
+//     const Image& Imov,
+//     IterativeSolver& solver) {
     
-    // Create auxiliary motion field
-    Image *Iaux = new Image(dimin);
+//     // Create auxiliary motion field
+//     Image *Iaux = new Image(dimin);
 
-    // Create auxiliary motion field
-    Motion *motion_est = new Motion(dimin);
+//     // Create auxiliary motion field
+//     Motion *motion_est = new Motion(dimin);
 
-    for (int refine = 0; refine < this->nrefine; refine++) {
-        // Reset Iaux to input image
-        *Iaux = *Imov;
+//     for (int refine = 0; refine < _nrefine; refine++) {
+//         // Reset Iaux to input image
+//         *Iaux = *Imov;
 
-        // Warp moving image with accumulated motion field
-        Iaux->warp2d(*motion);
+//         // Warp moving image with accumulated motion field
+//         Iaux->warp2d(*motion);
 
-        // Create a Logger object
-        Logger log(dimin, niter, this->verbose);
+//         // Create a Logger object
+//         Logger log(dimin, niter, _verbose);
 
-        // Calculating the image gradients only has to be done once
-        solver->set_derivatives(Iref, Iaux);
+//         // Calculating the image gradients only has to be done once
+//         solver->set_derivatives(Iref, Iaux);
 
-        // Iterate over resolution levels
-        for (int iter = 0; iter < niter; iter++) {
-            // Calculate the update step
-            solver->get_update(motion_est);
+//         // Iterate over resolution levels
+//         for (int iter = 0; iter < niter; iter++) {
+//             // Calculate the update step
+//             solver->get_update(motion_est);
 
-            // Calculate the difference between iterations
-            log.update_error(motion_est);
+//             // Calculate the difference between iterations
+//             log.update_error(motion_est);
 
-            // Converge check
-            if ((log.get_error_at_current_iteration() < 0.001f) &&
-                (iter > 1)) {
-                break;
-            }
-        }
+//             // Converge check
+//             if ((log.get_error_at_current_iteration() < 0.001f) &&
+//                 (iter > 1)) {
+//                 break;
+//             }
+//         }
 
-        // Accumulate motion field
-        motion->accumulate(*motion_est);
+//         // Accumulate motion field
+//         motion->accumulate(*motion_est);
 
-        // Reset auxiliary field
-        motion_est->reset();
+//         // Reset auxiliary field
+//         motion_est->reset();
 
-    }
+//     }
 
-    // Free up the mem
-    delete motion_est;
-    delete Iaux;
+//     // Free up the mem
+//     delete motion_est;
+//     delete Iaux;
     
-    // Done
-    return;
-}
+//     // Done
+//     return;
+// }
 
 ImageRegistration::ImageRegistration(
     const dim dimin, 
-    const int nscales, const int* niter, const int nrefine, 
-    const double alpha,
-    const Verbose verbose) {
-    // Size and dimensions of the input image
-    this->dimin = new dim[nscales + 1];
-    this->sizein = new int[nscales + 1];
-    for (int s = nscales; s >= 0; s--) {
-        double scale = pow(2, s);
-        this->dimin[s] = dim(dimin.x/scale,
-                             dimin.y/scale);
-        this->sizein[s] = this->dimin[s].x * this->dimin[s].y;
-    }
-
+    const std::size_t nscales, 
+    const std::size_t* niter,
+    const double alpha) {
     // Registration parameters
-    this->nrefine = nrefine;
-    this->nscales = nscales;
-    this->niter = new int[nscales + 1];
-    memcpy(this->niter, niter, (nscales+1)*sizeof(int));
+    _nscales = nscales;
 
     // Allocate image and motion 
-    this->Iref = new Image*[nscales + 1];
-    this->Imov = new Image*[nscales + 1];
-    this->motion = new Motion*[nscales + 1];
-    this->solver = new IterativeSolver*[nscales + 1];
-    for (int s = nscales; s >= 0; s--) {
-        this->Iref[s] = new Image(this->dimin[s]);
-        this->Imov[s] = new Image(this->dimin[s]);
-        this->motion[s] = new Motion(this->dimin[s]);
-        this->solver[s] = new IterativeSolver(this->dimin[s], alpha);
-    }
+    _Iref = new opticalflow::Image*[nscales + 1];
+    _Imov = new opticalflow::Image*[nscales + 1];
+    _motion = new opticalflow::Motion*[nscales + 1];
+    _solver = new IterativeSolver*[nscales + 1];
+    for (int s = static_cast<int>(nscales); s >= 0; s--) {
+        double scale = pow(2.0, s);
+        const dim dim_s = dim(
+            static_cast<std::size_t> (dimin.x/scale),
+            static_cast<std::size_t> (dimin.y/scale)
+        );
 
-    // Set the verbose option
-    this->verbose = verbose;
+        _Iref[s] = new opticalflow::Image(dim_s);
+        _Imov[s] = new opticalflow::Image(dim_s);
+        _motion[s] = new opticalflow::Motion(dim_s);
+        _solver[s] = new IterativeSolver(dim_s, alpha, niter[s]);
+    }
 
     // Display registration settings
-    if (verbose == Verbose::On) {
-        ImageRegistration::display_registration_parameters();
-    }
+    // ImageRegistration::display_registration_parameters();
 
 }
 
 ImageRegistration::~ImageRegistration() {
-    delete[] this->dimin;
-    delete[] this->sizein;
-    delete[] this->niter;
-
-    for (int s = this->nscales; s >= 0; s--) {
-        delete this->solver[s];
-        delete this->Iref[s];
-        delete this->Imov[s];
-        delete this->motion[s];
+    for (int s = static_cast<int>(_nscales); s>=0; s--) {
+        delete _Iref[s];
+        delete _Imov[s];
+        delete _motion[s];
+        delete _solver[s];
     }
-    delete[] this->solver;
-    delete[] this->Iref;
-    delete[] this->Imov;
-    delete[] this->motion;
-
+    delete[] _solver;
+    delete[] _Iref;
+    delete[] _Imov;
+    delete[] _motion;
 }
 
 // Getters and setters
-void ImageRegistration::set_reference_image(const Image& im) {
+void ImageRegistration::set_reference_image(const opticalflow::Image& image) {
     // Set the image at the largest resolution level
-    *(this->Iref[0]) = im;
+    *_Iref[0] = image;
 
     // For the other levels, downsample:
-    for (int s = this->nscales; s >= 1; s--) {
-        this->Iref[s]->downSample(*this->Iref[0]);
-    }
+    for (int s = static_cast<int>(_nscales); s >= 1; --s)
+        interp2d::resize(*_Iref[s], image);
 }
 
-void ImageRegistration::set_moving_image(const Image& im) {
+void ImageRegistration::set_moving_image(const opticalflow::Image& image) {
     // Set the image at the largest resolution level
-    *(this->Imov[0]) = im;
+    *_Imov[0] = image;
 
     // For the other levels, downsample:
-    for (int s = this->nscales; s >= 1; s--) {
-        this->Imov[s]->downSample(*this->Imov[0]);
-    }
+    for (int s = static_cast<int>(_nscales); s >= 1; --s)
+        interp2d::resize(*_Imov[s], image);
 }
 
-Motion* ImageRegistration::get_estimated_motion() const {
-    return this->motion[0];
-}
-
-// Copy the estimated motion 
-void ImageRegistration::copy_estimated_motion(Motion& mo) const {
-    mo = *this->motion[0];
+const opticalflow::Motion& ImageRegistration::get_estimated_motion() const {
+    return *_motion[0];
 }
 
 // Estimate motion
-void ImageRegistration::estimate_motion() {    
+void ImageRegistration::estimate_optical_flow() {    
     // Multiresolution pyramid
-    for (int s = this->nscales; s >= 0; s--) {
-        // Downsample motion
-        if ((s > 0) && (s < this->nscales)) {
-            this->motion[s]->downSample(*this->motion[0]);
-        }
+    for (int s = static_cast<int>(_nscales); s >= 0; s--) {
+        // Dereference variables at current level
+        opticalflow::Motion& motion_s = *_motion[s];
+        const opticalflow::Image& Iref_s = *_Iref[s];
+        const opticalflow::Image& Imov_s = *_Imov[s];
+        IterativeSolver& solver_s = *_solver[s];
+
+        // Upsample from previous resolution
+        if (s < _nscales)
+            interp2d::resize(motion_s, *_motion[s+1]); // Resample estimated DVF from previous resolution level
 
         // Estimate motion at current resolution level
-        this->estimate_motion_at_current_resolution(this->motion[s],
-                                                    this->Iref[s], this->Imov[s],
-                                                    this->solver[s],
-                                                    this->niter[s],
-                                                    this->dimin[s], this->sizein[s]);
-
-        // Upscale to next level in the pyramid
-        if (s > 0) {
-            this->motion[0]->upSample(*this->motion[s]);
-        }
+        solver_s.estimate_optical_flow(
+            motion_s,
+            Iref_s, 
+            Imov_s
+        );
     }
 
     // Done

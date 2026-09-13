@@ -1,48 +1,51 @@
 #ifndef _ITERATIVE_SOLVER_H_
 #define _ITERATIVE_SOLVER_H_
 
-#include <include/coord2d.hpp>
-#include <include/Image.h>
-#include <include/Motion.h>
+#include "include/coord2d.hpp"
+#include "include/Field.hpp"
 
 class IterativeSolver {
     public:
         // Constructors and deconstructors
-        IterativeSolver(const dim dimin, const double alpha);
+        IterativeSolver(const dim dimin, const double alpha, const std::size_t niter);
         ~IterativeSolver();
 
         // Getters and setters
         double get_alpha() const;
 
-        // Calculate image gradients
-        void spatial_derivative(Motion* grad_image, const Image *image) const;
-        void temporal_derivative(Image* It, const Image *Iref, const Image* Imov) const;
-        void set_derivatives(const Image* Iref, const Image* Imov) const;
-        void get_force(Motion* force, const Motion* motion) const;
-        
-        // Do one update in iterative scheme
-        void get_update(Motion *motion, const Image* Iref = NULL, const Image* Imov = NULL);
+        // Estimate motion from Horn-Schunck model
+        void estimate_optical_flow(opticalflow::Motion& motion, const opticalflow::Image& Iref, const opticalflow::Image& Imov);
 
     private:
-        dim dimin;
-        dim step;
-        unsigned int sizein;
 
-        Motion *gradI;
-        Image *It;
-        Motion* force;
+        // Calculate image gradients
+        // void spatial_derivative(Motion* grad_image, const Image *image) const;
+        // void temporal_derivative(Image* It, const Image *Iref, const Image* Imov) const;
+        // void set_derivatives(const Image* Iref, const Image* Imov) const;
+        // void get_force(Motion* force, const Motion* motion) const;
         
-        // Do one iteration of the Horn-Schunck method (= Optical Flow Diffusion)
-        void optical_flow_iteration(Motion* motion);
+        dim _dimin;
+        dim _step;
+        std::size_t _sizein;
 
-        // Get the FD approximation of the motion, wwithout the "central" contribution
-        void get_quasi_differential_operator(const Motion* motion);
+        opticalflow::Motion* _horn_schunck_average;
 
-        // Quasi differential operator
-        Motion *qdiffoperator;
+        opticalflow::Motion *_spatial_gradient_image;
+        opticalflow::Image *_temporal_derivative_image;
+        // opticalflow::Motion* force;
+        
+        // // Do one iteration of the Horn-Schunck method (= Optical Flow Diffusion)
+        // void optical_flow_iteration(opticalflow::Motion* motion);
+
+        // // Get the FD approximation of the motion, wwithout the "central" contribution
+        // void get_quasi_differential_operator(const opticalflow::Motion* motion);
+
+        // // Quasi differential operator
+        // opticalflow::Motion *qdiffoperator;
 
         // Regularisation parameters
-        double alpha;
+        double _alpha;
+        std::size_t _niter;
 };
 
 #endif

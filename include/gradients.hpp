@@ -111,29 +111,62 @@ namespace gradients {
         return val / 4.0;
 
     }
-    
-    void jacobian(opticalflow::Image& image, const opticalflow::Motion& motion) {
+
+    void horn_schunck_average(opticalflow::Motion& motion_avg, const opticalflow::Motion& motion) {
         // Check that input dimensions are OK
-        if (image.get_dimensions() != motion.get_dimensions())
-            throw std::runtime_error("Error in Image::warp2d(const Motion& mo): input dimensions have to be the same as target");
+        if (motion_avg.get_dimensions() != motion.get_dimensions())
+            throw std::runtime_error("Error in gradients::horn_schunck_average(opticalflow::Motion&, const opticalflow::Motion&, const opticalflow::Image&): input dimensions have to be the same as target");
+
+        // Get the dimensions of the image
+        const dim dimin = motion.get_dimensions();
+
+        for (std::size_t i = 0; i < dimin.x; i++) {
+            for (std::size_t j = 0; j < dimin.y; j++) {
+                motion_avg.set_val(
+                    gradients::horn_schunck_average(motion, i, j),
+                    i,j
+                );
+            }
+        }
+    }
+    
+    void gradient(opticalflow::Motion& dI, const opticalflow::Image& image) {
+        // Check that input dimensions are OK
+        if (image.get_dimensions() != dI.get_dimensions())
+            throw std::runtime_error("Error in gradients::gradient(opticalflow::Motion&, const opticalflow::Image&, const opticalflow::Image&): input dimensions have to be the same as target");
 
         // Get the dimensions of the image
         const dim dimin = image.get_dimensions();
-        const dim step = image.get_step();
+
+        for (std::size_t i = 0; i < dimin.x; i++) {
+            for (std::size_t j = 0; j < dimin.y; j++) {
+                dI.set_val(
+                    vector2d(gradients::partial_x(image, i, j),
+                             gradients::partial_y(image, i, j)),
+                    i,j
+                );
+            }
+        }
+    }
+
+    void jacobian(opticalflow::Image& image, const opticalflow::Motion& motion) {
+        // Check that input dimensions are OK
+        if (image.get_dimensions() != motion.get_dimensions())
+            throw std::runtime_error("Error in gradients::jacobian(Image&, const opticalflow::Motion&): input dimensions have to be the same as target");
+
+        // Get the dimensions of the image
+        const dim dimin = image.get_dimensions();
 
         // Store the input in the object
-        std::size_t idx;
         vector2d dudx, dudy;
         for (std::size_t i = 0; i < dimin.x; i++) {
             for (std::size_t j = 0; j < dimin.y; j++) {
-                idx = i * step.x + j * step.y;
-
-                dudx = gradients::partial_x<vector2d>(motion, idx, i);
-                dudy = gradients::partial_y<vector2d>(motion, idx, j);
+                dudx = gradients::partial_x<vector2d>(motion, i, j);
+                dudy = gradients::partial_y<vector2d>(motion, i, j);
 
                 image.set_val(
                     (1.0 + dudx.x) * (1.0 + dudy.y) - dudx.y * dudy.x,
-                    idx
+                    i, j
                 );
             }
         }
