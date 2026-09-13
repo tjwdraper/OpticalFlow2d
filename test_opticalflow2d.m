@@ -5,8 +5,8 @@ close all;
 pkg load image; % GNU Octave only
 
 %% Load images
-Iref = imread("img/dirlab5_ref.tiff");
-Imov = imread("img/dirlab5_mov.tiff");
+Iref = imread("img/eval-gray-twoframes/eval-data-gray/Mequon/frame10.png");
+Imov = imread("img/eval-gray-twoframes/eval-data-gray/Mequon/frame11.png");
 
 Iref = double(squeeze(Iref));
 Imov = double(squeeze(Imov));
@@ -14,35 +14,15 @@ Imov = double(squeeze(Imov));
 Iref = (Iref - min(Iref(:))) / (max(Iref(:)) - min(Iref(:)));
 Imov = (Imov - min(Imov(:))) / (max(Imov(:)) - min(Imov(:)));
 
-Iref = padarray(Iref, [11 0], "replicate");
-Imov = padarray(Imov, [11 0], "replicate");
-
 [dimx, dimy] = size(Iref);
 
 %% Registration paramters
-niter = [25 25 1000 1000];
-nscales = 1;
-nrefine = 1;
-##alpha = [1.0, 0.25, 2.0, 2.0, 5, 0];
-alpha = [0.25 0.0];
-
-regularisation = 5; % Options:
-                    % 0) Diffusion
-                    % 1) Curvature
-                    % 2) Elastic
-                    % 3) Thirions demons
-                    % 4) Log-Demons
-                    % 5) Fluid
-
-verbose = 0; % 0) off
-             % 1) on
-
+niter = [200 200 200 200];
+nscales = 3;
+alpha = 0.2;
 
 %% Load C++ object
-OpticalFlow2d([dimx, dimy], ...
-  niter, nscales, regularisation, ...
-  alpha, length(alpha), nrefine, ...
-  verbose);
+OpticalFlow2d([dimx, dimy], niter, nscales, alpha);
 
 %% Do the registration
 tic;
@@ -57,12 +37,6 @@ Ireg = OpticalFlow2d(Imov);
 
 %% Close the C++ object
 OpticalFlow2d();
-
-%% Unpad images and motion field
-Iref = Iref(1+11:end-11, 1+11:end-11);
-Imov = Imov(1+11:end-11, 1+11:end-11);
-Ireg = Ireg(1+11:end-11, 1+11:end-11);
-motion = motion(1+11:end-11, 1+11:end-11, :);
 
 %% Show some info
 fprintf("Distribution: %.3f +/ %.3f\n", mean(motion(:)), std(motion(:)));

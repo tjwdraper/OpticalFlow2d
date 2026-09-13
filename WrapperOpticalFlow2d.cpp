@@ -7,12 +7,13 @@
 #include "include/ImageRegistration.h"
 #include "include/interp2d.hpp"
 
+
 static ImageRegistration *myImageRegistration = nullptr;
 static mwSize *dim_image_mw;
 static mwSize *dim_motion_mw;
 static dim dimin;
 
-void mexFunction (std::size_t nlhs, mxArray *plhs[], std::size_t nrhs, const mxArray *prhs[]) {
+void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // Set registration parameters
     if ((nlhs == 0) && (nrhs == 4) && (myImageRegistration == nullptr)) {
         // Get the dimensions and the size of the images
@@ -38,9 +39,11 @@ void mexFunction (std::size_t nlhs, mxArray *plhs[], std::size_t nrhs, const mxA
         myImageRegistration = new ImageRegistration(dimin, nscales, niter, alpha);
 
         // Set the output dimension for image and motion field
+        dim_image_mw = new mwSize[2];
         dim_image_mw[0] = dimx;
         dim_image_mw[1] = dimy;
 
+        dim_motion_mw = new mwSize[3];
         dim_motion_mw[0] = dimx;
         dim_motion_mw[1] = dimy;
         dim_motion_mw[2] = 2;

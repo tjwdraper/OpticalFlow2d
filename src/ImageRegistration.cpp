@@ -85,7 +85,8 @@
 
 ImageRegistration::ImageRegistration(
     const dim dimin, 
-    const std::size_t nscales, const std::size_t* niter,
+    const std::size_t nscales, 
+    const std::size_t* niter,
     const double alpha) {
     // Registration parameters
     _nscales = nscales;
@@ -95,7 +96,7 @@ ImageRegistration::ImageRegistration(
     _Imov = new opticalflow::Image*[nscales + 1];
     _motion = new opticalflow::Motion*[nscales + 1];
     _solver = new IterativeSolver*[nscales + 1];
-    for (std::size_t s = nscales; s >= 0; s--) {
+    for (int s = static_cast<int>(nscales); s >= 0; s--) {
         double scale = pow(2.0, s);
         const dim dim_s = dim(
             static_cast<std::size_t> (dimin.x/scale),
@@ -114,7 +115,7 @@ ImageRegistration::ImageRegistration(
 }
 
 ImageRegistration::~ImageRegistration() {
-    for (std::size_t s = _nscales; s>=0; s--) {
+    for (int s = static_cast<int>(_nscales); s>=0; s--) {
         delete _Iref[s];
         delete _Imov[s];
         delete _motion[s];
@@ -132,7 +133,7 @@ void ImageRegistration::set_reference_image(const opticalflow::Image& image) {
     *_Iref[0] = image;
 
     // For the other levels, downsample:
-    for (std::size_t s = _nscales; s >= 1; --s)
+    for (int s = static_cast<int>(_nscales); s >= 1; --s)
         interp2d::resize(*_Iref[s], image);
 }
 
@@ -141,7 +142,7 @@ void ImageRegistration::set_moving_image(const opticalflow::Image& image) {
     *_Imov[0] = image;
 
     // For the other levels, downsample:
-    for (std::size_t s = _nscales; s >= 1; --s)
+    for (int s = static_cast<int>(_nscales); s >= 1; --s)
         interp2d::resize(*_Imov[s], image);
 }
 
@@ -152,7 +153,7 @@ const opticalflow::Motion& ImageRegistration::get_estimated_motion() const {
 // Estimate motion
 void ImageRegistration::estimate_optical_flow() {    
     // Multiresolution pyramid
-    for (std::size_t s = _nscales; s >= 0; s--) {
+    for (int s = static_cast<int>(_nscales); s >= 0; s--) {
         // Dereference variables at current level
         opticalflow::Motion& motion_s = *_motion[s];
         const opticalflow::Image& Iref_s = *_Iref[s];

@@ -14,7 +14,7 @@ class IterativeSolver {
         double get_alpha() const;
 
         // Estimate motion from Horn-Schunck model
-        void estimate_optical_flow(opticalflow::Motion& motion, const opticalflow::Image Iref, const opticalflow::Image Imov);
+        void estimate_optical_flow(opticalflow::Motion& motion, const opticalflow::Image& Iref, const opticalflow::Image& Imov);
 
     private:
 

@@ -29,8 +29,8 @@ double IterativeSolver::get_alpha() const {
 // Estimate motion from Horn-Schunck model
 void IterativeSolver::estimate_optical_flow(
     opticalflow::Motion& motion, 
-    const opticalflow::Image Iref, 
-    const opticalflow::Image Imov) {
+    const opticalflow::Image& Iref, 
+    const opticalflow::Image& Imov) {
 
     // Dereference some variables
     opticalflow::Motion& horn_schunck_average = *_horn_schunck_average;
