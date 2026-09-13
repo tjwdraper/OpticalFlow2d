@@ -2,7 +2,7 @@
 #define _GRADIENTS_H_
 
 #include "include/coord2d.hpp"
-#include "include/Field_new.hpp"
+#include "include/Field.hpp"
 
 namespace gradients {
     template <typename T>
