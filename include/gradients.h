@@ -1,7 +1,8 @@
 #ifndef _GRADIENTS_H_
 #define _GRADIENTS_H_
 
-#include <include/coord2d.hpp>
+#include "include/coord2d.hpp"
+#include "include/Field_new.hpp"
 
 namespace gradients {
     template <typename T>
@@ -77,6 +78,36 @@ namespace gradients {
         else {
             return (field[idx - 1] + field[idx + 1] + field[idx - dimin.x] + field[idx + dimin.x])/4.0f;
         }
+    }
+    void jacobian(opticalflow::Image& image, const opticalflow::Motion& motion) {
+        // Check that input dimensions are OK
+        if (image.get_dimensions() != motion.get_dimensions())
+            throw std::runtime_error("Error in Image::warp2d(const Motion& mo): input dimensions have to be the same as target");
+
+        // Get the dimensions of the image
+        const dim dimin = image.get_dimensions();
+        const dim step = image.get_step();
+
+        // Store the input in the object
+        std::size_t idx;
+        vector2d dudx, dudy;
+        for (std::size_t i = 0; i < dimin.x; i++) {
+            for (std::size_t j = 0; j < dimin.y; j++) {
+                idx = i * step.x + j * step.y;
+
+                dudx = gradients::partial_x(motion.get_field(), idx, i, dimin);
+                dudy = gradients::partial_y(motion.get_field(), idx, j, dimin);
+
+                image.set_val(
+                    (1.0 + dudx.x) * (1.0 + dudy.y) - dudx.y * dudy.x,
+                    idx
+                );
+            }
+        }
+
+        // Done
+        return;
+
     }
 }
 

@@ -16,7 +16,7 @@ class Coord2dTest : public testing::Test {
         coord2d<double> res;
 };
 
-TEST_F(Coord2dTest, equal) {
+TEST_F(Coord2dTest, assignment) {
     // Arange
     coord2d<double> expected(1.2, 5.9);
 
