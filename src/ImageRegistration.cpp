@@ -1,4 +1,5 @@
 #include "include/ImageRegistration.h"
+#include "include/conv2d.hpp"
 #include "include/interp2d.hpp"
 
 #include <mex.h>
@@ -129,21 +130,45 @@ ImageRegistration::~ImageRegistration() {
 
 // Getters and setters
 void ImageRegistration::set_reference_image(const opticalflow::Image& image) {
-    // Set the image at the largest resolution level
+    // Set finest pyramid level
     *_Iref[0] = image;
 
-    // For the other levels, downsample:
-    for (int s = static_cast<int>(_nscales); s >= 1; --s)
-        interp2d::resize(*_Iref[s], image);
+    // Smooth finest level
+    gaussian_conv2d filter(0.8);
+    filter.convolute(*_Iref[0]);
+
+    // Anti-aliasing filter for downsampling
+    const double sigma_aa = 0.6 * std::sqrt(1.0 / (0.5 * 0.5) - 1.0);
+    gaussian_conv2d filter_aa(sigma_aa);
+
+    // Build Gaussian pyramid
+    for (std::size_t s = 1; s <= _nscales; ++s) {
+        opticalflow::Image I_aa(*_Iref[s - 1]);
+
+        filter_aa.convolute(I_aa);
+        interp2d::resize(*_Iref[s], I_aa);
+    }
 }
 
 void ImageRegistration::set_moving_image(const opticalflow::Image& image) {
-    // Set the image at the largest resolution level
+    // Set finest pyramid level
     *_Imov[0] = image;
 
-    // For the other levels, downsample:
-    for (int s = static_cast<int>(_nscales); s >= 1; --s)
-        interp2d::resize(*_Imov[s], image);
+    // Smooth finest level
+    gaussian_conv2d filter(0.8);
+    filter.convolute(*_Imov[0]);
+
+    // Anti-aliasing filter for downsampling
+    const double sigma_aa = 0.6 * std::sqrt(1.0 / (0.5 * 0.5) - 1.0);
+    gaussian_conv2d filter_aa(sigma_aa);
+
+    // Build Gaussian pyramid
+    for (std::size_t s = 1; s <= _nscales; ++s) {
+        opticalflow::Image I_aa(*_Imov[s - 1]);
+
+        filter_aa.convolute(I_aa);
+        interp2d::resize(*_Imov[s], I_aa);
+    }
 }
 
 const opticalflow::Motion& ImageRegistration::get_estimated_motion() const {
