@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <stdexcept>
+#include <iostream>
 
 template <class T>
 class coord2d {
@@ -86,21 +87,29 @@ class coord2d {
             return *this;
         }
 
-        // Boolean operators
-        bool operator==(const T& a) {
-            return (this->x == a) && (this->y == a);
-        }
-        
+        // Boolean operators        
         bool operator==(const coord2d<T>& c) const {
             return (this->x == c.x) && (this->y == c.y);
         }
 
-        bool operator!=(const T& a) {
-            return (this->x != a) || (this->y || a);
-        }
-
         bool operator!=(const coord2d<T>& c) const {
             return (this->x != c.x) || (this->y != c.y);
+        }
+
+        bool operator<(const coord2d<T>& c) const {
+            return normsq(*this) < normsq(c);
+        }
+
+        bool operator>(const coord2d<T>& c) const {
+            return normsq(*this) > normsq(c);
+        }
+
+        bool operator<=(const coord2d<T>& c) const {
+            return normsq(*this) <= normsq(c);
+        }
+
+        bool operator>=(const coord2d<T>& c) const {
+            return norsq(*this) >= normsq(c);
         }
 
         // Stream
@@ -128,15 +137,15 @@ typedef coord2d<unsigned int> dim;
 typedef coord2d<double> vector2d;
 
 // Adding specific methods for vector2d
-double dot(vector2d a, vector2d b) {
+inline double dot(vector2d a, vector2d b) {
     return a.x * b.x + a.y * b.y;
 }
 
-double normsq(vector2d a) {
+inline double normsq(vector2d a) {
     return dot(a, a);
 }
 
-double norm(vector2d a) {
+inline double norm(vector2d a) {
     return std::sqrt(normsq(a));
 }
 
