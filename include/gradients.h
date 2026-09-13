@@ -7,7 +7,7 @@
 namespace gradients {
     // First order partial derivatives
     template <typename T>
-    inline T partial_x(const Field<T>& field, const std::size_t i, const std::size_t j) {
+    inline T partial_x(const opticalflow::Field<T>& field, const std::size_t i, const std::size_t j) {
         const dim dimin = field.get_dimensions();
         if (dimin.x < 2)
             throw std::runtime_error("In T gradients::partial_x(const Field<T>&, const std::size_t, const std::size_t), x-dimension must be at least 2.");
@@ -21,7 +21,7 @@ namespace gradients {
     }
 
     template <typename T>
-    inline T partial_y(const Field<T>& field, const std::size_t i, const std::size_t j) {
+    inline T partial_y(const opticalflow::Field<T>& field, const std::size_t i, const std::size_t j) {
         const dim dimin = field.get_dimensions();
         if (dimin.y < 2)
             throw std::runtime_error("In T gradients::partial_y(const Field<T>&, const std::size_t, const std::size_t), y-dimension must be at least 2.");
@@ -35,10 +35,10 @@ namespace gradients {
     }
 
     template <typename T>
-    inline T partial_xx(const Field<T>& field, const std::size_t i, const std::size_t j) {
+    inline T partial_xx(const opticalflow::Field<T>& field, const std::size_t i, const std::size_t j) {
         const dim dimin = field.get_dimensions();
         if (dimin.x < 4)
-            throw std::runtime_error("In T gradients::partial_xx(const Field<T>&, const std::size_t, const std::size_t), x-dimension must be at least 4")
+            throw std::runtime_error("In T gradients::partial_xx(const Field<T>&, const std::size_t, const std::size_t), x-dimension must be at least 4");
 
         if (i == 0)
             return 2.0*field.get_val(i,j) - 5.0*field.get_val(i+1,j) + 4.0*field.get_val(i+2,j) - field.get_val(i+3,j);
@@ -49,7 +49,7 @@ namespace gradients {
     }
 
     template <typename T>
-    inline T partial_yy(const Field<T>& field, const std::size_t i, const std::size_t j) {
+    inline T partial_yy(const opticalflow::Field<T>& field, const std::size_t i, const std::size_t j) {
         const dim dimin = field.get_dimensions();
         if (dimin.y < 4)
             throw std::runtime_error("In T gradients::partial_yy(const Field<T>&, const std::size_t, const std::size_t), y-dimension must be at least 4");
@@ -63,7 +63,7 @@ namespace gradients {
     }
 
     template <typename T>
-    inline T partial_xy(const Field<T>& field, const std::size_t i, const std::size_t j) {
+    inline T partial_xy(const opticalflow::Field<T>& field, const std::size_t i, const std::size_t j) {
         const dim dimin = field.get_dimensions();
         if (dimin.x < 1 || dimin.y < 1)
             throw std::runtime_error("In T gradients::partial_xy(const Field<T>&, const std::size_t, const std::size_t), x and y dimensions must be at least 1");
@@ -75,7 +75,7 @@ namespace gradients {
     }
 
     template <typename T>
-    inline T horn_schunck_average(const Field<T>& field, const std::size_t i, const std::size_t j) {
+    inline T horn_schunck_average(const opticalflow::Field<T>& field, const std::size_t i, const std::size_t j) {
         const dim dimin = field.get_dimensions();
         if (dimin.x < 2 || dimin.y < 2)
             throw  std::runtime_error("In T gradients::horn_schunck_average(const Field<T>&, const std::size_t, const std::size_t), field dimensions must be at least 2x2.");
@@ -128,8 +128,8 @@ namespace gradients {
             for (std::size_t j = 0; j < dimin.y; j++) {
                 idx = i * step.x + j * step.y;
 
-                dudx = gradients::partial_x(motion, idx, i, dimin);
-                dudy = gradients::partial_y(motion, idx, j, dimin);
+                dudx = gradients::partial_x<vector2d>(motion, idx, i);
+                dudy = gradients::partial_y<vector2d>(motion, idx, j);
 
                 image.set_val(
                     (1.0 + dudx.x) * (1.0 + dudy.y) - dudx.y * dudy.x,
