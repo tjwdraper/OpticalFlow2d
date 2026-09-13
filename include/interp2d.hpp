@@ -5,60 +5,44 @@
 
 #include <cmath>
 
-enum InterpolationMethod {Bilinear = 0, Nearest = 1};
-
 namespace interp2d {
     // Template for interpolation
     template <typename T>
-    T clamp_at_boundary(const T* field, long posx, long posy, const dim dim_field, const dim step_field) {
+    T clamp_at_boundary(const opticalflow::Field<T>& field, long posx, long posy, const dim dim_field) {
         if (posx < 0) {posx = 0;}
         if (posy < 0) {posy = 0;}
         if (posx > dim_field.x-1) {posx = dim_field.x-1;}
         if (posy > dim_field.y-1) {posy = dim_field.y-1;}
-        return field[posx * step_field.x + posy * step_field.y];
+        return field.get_val(posx, posy);
     }
 
     template <typename T>
-    T interpolate_at_value(const T* field, const vector2d pos, const dim dim_field, const dim step_field) {
+    T interpolate_at_value(const opticalflow::Field<T>& field, const vector2d pos, const dim dim_field) {
         const double px = pos.x; const long dx = static_cast<long>(std::floor(px)); const double fx = px - static_cast<double>(dx);
         const double py = pos.y; const long dy = static_cast<long>(std::floor(py)); const double fy = py - static_cast<double>(dy);
 
         T val{};
 
-        val += clamp_at_boundary(field, dx, dy, dim_field, step_field)*(1.0-fx)*(1.0-fy);
-        val += clamp_at_boundary(field, dx+1, dy, dim_field, step_field)*fx*(1.0-fy);
-        val += clamp_at_boundary(field, dx, dy+1, dim_field, step_field)*(1.0-fx)*fy;
-        val += clamp_at_boundary(field, dx+1, dy+1, dim_field, step_field)*fx*fy;
+        val += clamp_at_boundary(field, dx, dy, dim_field)*(1.0-fx)*(1.0-fy);
+        val += clamp_at_boundary(field, dx+1, dy, dim_field)*fx*(1.0-fy);
+        val += clamp_at_boundary(field, dx, dy+1, dim_field)*(1.0-fx)*fy;
+        val += clamp_at_boundary(field, dx+1, dy+1, dim_field)*fx*fy;
 
         return val;
     }
 
     template <typename T>
-    void interp2d(opticalflow::Field<T>& field_out, const opticalflow::Field<T>& field_in, const opticalflow::Motion& motion, const InterpolationMethod interp = Bilinear) {
+    void interp2d(opticalflow::Field<T>& field_out, const opticalflow::Field<T>& field_in, const opticalflow::Motion& motion) {
         const dim dim_out = field_out.get_dimensions();
         const dim dim_in = field_in.get_dimensions();
 
-        if (interp == Bilinear) {
-            for (std::size_t i = 0; i < dim_out.x; ++i) {
-                for (std::size_t j = 0; j < dim_out.y; ++j) {
-                    const vector2d p = vector2d(static_cast<double>(i), static_cast<double>(j)) + motion.get_val(i,j);
+        for (std::size_t i = 0; i < dim_out.x; ++i) {
+            for (std::size_t j = 0; j < dim_out.y; ++j) {
+                const vector2d p = vector2d(static_cast<double>(i), static_cast<double>(j)) + motion.get_val(i,j);
 
-                    T val = interpolate_at_value<T>(field_in, p, dim_in, field_in.get_step());
+                T val = interpolate_at_value<T>(field_in, p, dim_in);
 
-                    field_out.set_val(val, i, j);
-                }
-            }
-        }
-        else if (interp == Nearest) {
-            for (std::size_t i = 0; i < dim_out.x; ++i) {
-                for (std::size_t j = 0; j < dim_out.y; ++j) {
-                    const vector2d p = vector2d(static_cast<double>(i), static_cast<double>(j)) + motion.get_val(i,j);
-
-                    const long px = static_cast<long>(std::round(p.x));
-                    const long py = static_cast<long>(std::round(p.y));
-
-                    field_out.set_val(clamp_at_boundary(field_in, px, py, dim_in, field_in.get_step()), i, j);
-                }
+                field_out.set_val(val, i, j);
             }
         }
     }
@@ -104,7 +88,7 @@ namespace interp2d {
     }
 
     // Resize
-    void resize(opticalflow::Image& image_out, const opticalflow::Image& image_in, const InterpolationMethod interp = Bilinear) {
+    void resize(opticalflow::Image& image_out, const opticalflow::Image& image_in) {
         const dim dim_out = image_out.get_dimensions();
         const dim dim_in = image_in.get_dimensions();
 
@@ -121,13 +105,13 @@ namespace interp2d {
                 );
 
                 image_out.set_val(
-                    interpolate_at_value<double>(image_in.get_field(), pos, dim_in, image_in.get_step()),
+                    interpolate_at_value<double>(image_in, pos, dim_in),
                     i, j
                 );
             }
         }
     }
-    void resize(opticalflow::Motion& motion_out, const opticalflow::Motion& motion_in, const InterpolationMethod interp = Bilinear) {
+    void resize(opticalflow::Motion& motion_out, const opticalflow::Motion& motion_in) {
         const dim dim_out = motion_out.get_dimensions();
         const dim dim_in = motion_in.get_dimensions();
 
@@ -143,7 +127,7 @@ namespace interp2d {
                     (static_cast<double>(j) + 0.5) * factor.y - 0.5
                 );
 
-                vector2d val = interpolate_at_value<vector2d>(motion_in.get_field(), pos, dim_in, motion_in.get_step());
+                vector2d val = interpolate_at_value<vector2d>(motion_in, pos, dim_in);
 
                 motion_out.set_val(vector2d(val.x / factor.x, val.y / factor.y), i, j);
             }

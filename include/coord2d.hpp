@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <stdexcept>
+#include <iostream>
 
 template <class T>
 class coord2d {
