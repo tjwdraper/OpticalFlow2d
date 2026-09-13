@@ -168,6 +168,10 @@ class gaussian_conv2d : public conv2d {
 
             normalize_weights();
         }
+
+        gaussian_conv2d(const vector2d sigma) : gaussian_conv2d(dim(2*static_cast<std::size_t>(std::ceil(2.0 * sigma.x)) + 1,
+                                                                    2*static_cast<std::size_t>(std::ceil(2.0 * sigma.y)) + 1),
+                                                                    sigma) {}
 };
 
 #endif
