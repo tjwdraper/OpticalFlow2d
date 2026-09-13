@@ -1,160 +1,64 @@
-#include <include/IterativeSolver.h>
-#include <include/gradients.h>
+#include "include/IterativeSolver.h"
+#include "include/gradients.hpp"
 
 // Constructors and deconstructors
-IterativeSolver::IterativeSolver(const dim dimin, const double alpha) {
+IterativeSolver::IterativeSolver(const dim dimin, const double alpha, const std::size_t niter) {
     // Get the dimensions and size of the images
-    this->dimin  = dimin;
-    this->sizein = this->dimin.x * this->dimin.y;
-    this->step   = dim(1, this->dimin.x);
+    _dimin  = dimin;
+    _step   = dim(1, dimin.x);
+    _sizein = dimin.x * dimin.y;
 
     // Allocate memory for image gradients
-    this->gradI = new Motion(this->dimin);
-    this->It = new Image(this->dimin);
-    this->force = new Motion(this->dimin);
-    this->qdiffoperator = new Motion(this->dimin);
-    this->alpha = alpha;
+    _spatial_gradient_image = new opticalflow::Motion(_dimin);
+    _temporal_derivative_image = new opticalflow::Image(_dimin);
+    _horn_schunck_average = new opticalflow::Motion(dimin);
+    _alpha = alpha;
+    _niter = niter;
 }
 
 IterativeSolver::~IterativeSolver() {
-    delete this->gradI;
-    delete this->It;
-    delete this->force;
-    delete this->qdiffoperator;
+    delete _horn_schunck_average;
+    delete _spatial_gradient_image;
+    delete _temporal_derivative_image;
 }
 
 double IterativeSolver::get_alpha() const {
-    return this->alpha;
+    return _alpha;
 }
 
-// Image derivatives
-void IterativeSolver::spatial_derivative(Motion* grad_image, const Image* image) const {
-    // Get the dimensions and the step size of the image
-    const dim& dimin = this->dimin;
-    const dim& step = this->step;
+// Estimate motion from Horn-Schunck model
+void IterativeSolver::estimate_optical_flow(
+    opticalflow::Motion& motion, 
+    const opticalflow::Image Iref, 
+    const opticalflow::Image Imov) {
 
-    // Get a copy of the pointer to the data of the vector fields
-    float *I     = image->get_image();
-    vector2d *dI = grad_image->get_motion();
+    // Dereference some variables
+    opticalflow::Motion& horn_schunck_average = *_horn_schunck_average;
+    opticalflow::Motion& spatial_gradient_image = *_spatial_gradient_image;
+    opticalflow::Image& temporal_derivative_image = *_temporal_derivative_image;
 
-    // Iterate over voxels
-    unsigned int idx;
-    for (unsigned int i = 0; i < dimin.x; i++) {
-        for (unsigned int j = 0; j < dimin.y; j++) {
-            idx = i * step.x + j * step.y;
+    // Calculate spatial and temporal derivative
+    gradients::gradient(spatial_gradient_image, Imov);
+    temporal_derivative_image = Imov - Iref;
 
-            dI[idx] = vector2d(gradients::partial_x(I, idx, i, dimin),
-                               gradients::partial_y(I, idx, j, dimin));
+    // Regularization parameters
+    double alphasq = _alpha * _alpha;
+
+    for (std::size_t iter = 0; iter < _niter; ++iter) {
+        gradients::horn_schunck_average(horn_schunck_average, motion);
+
+        for (std::size_t idx = 0; idx < motion.get_size(); ++idx) {
+            // Get values
+            vector2d hs_avg = horn_schunck_average.get_val(idx);
+            vector2d dI = spatial_gradient_image.get_val(idx);
+            double It = temporal_derivative_image.get_val(idx);
+
+            // Calculate prefactor
+            double s = (dot(hs_avg, dI) + It) / (alphasq + normsq(dI));
+
+            // Horn-Schunck iteration
+            motion.set_val(hs_avg - s * dI, idx);
         }
     }
-
-    // Done
-    return;
 }
 
-void IterativeSolver::temporal_derivative(Image* It, const Image* Iref, const Image* Imov) const {
-    *It = *Imov - *Iref;
-
-    // Done
-    return;
-}
-
-void IterativeSolver::set_derivatives(const Image* Iref, const Image* Imov) const {
-    this->IterativeSolver::spatial_derivative(this->gradI, Imov);
-    this->IterativeSolver::temporal_derivative(this->It, Iref, Imov);
-}
-
-// Construct the force from the image gradients and motion estimate
-void IterativeSolver::get_force(Motion* force, const Motion* motion) const {
-    // Get the dimensions and the step size of the image
-    const dim& dimin = this->dimin;
-    const dim& step = this->step;
-
-    // Get a copy of the pointer to the data of the vector fields
-    vector2d *f     = force->get_motion();
-    vector2d *u     = motion->get_motion();
-    vector2d *dI = this->gradI->get_motion();
-    float *It    = this->It->get_image();
-
-
-    // Iterate over voxels
-    unsigned int idx;
-    for (unsigned int i = 0; i < dimin.x; i++) {
-        for (unsigned int j = 0; j < dimin.y; j++) {
-            idx = i * step.x + j * step.y;
-
-            f[idx] = dI[idx] * (It[idx] + u[idx].x * dI[idx].x + u[idx].y * dI[idx].y) ;
-        }
-    }
-
-    // Done
-    return;
-}
-
-// Define the quasi differential operator of this method
-void IterativeSolver::get_quasi_differential_operator(const Motion* motion) {
-    // Get the dimensions and step size of the motion field
-    const dim& dimin = this->dimin;
-    const dim& step = this->step;
-
-    // Get a copy of the pointer to the data of the vector fields
-    vector2d *qlap  = this->qdiffoperator->get_motion();
-    vector2d *mo    = motion->get_motion();
-
-    // Iterate over voxels
-    unsigned int idx;
-    for (unsigned int i = 0; i < dimin.x; i++) {
-        for (unsigned int j = 0; j < dimin.y; j++) {
-            idx = i * step.x + j * step.y;
-
-            qlap[idx] = gradients::qlaplacian(mo, idx, i, j, dimin);
-        }
-    }
-
-    // Done
-    return;
-}
-
-// Get the update using the iterative method
-void IterativeSolver::get_update(Motion *motion, const Image* Iref, const Image* Imov) {
-    // Get the laplacian map (without the central contribution)
-    this->get_quasi_differential_operator(motion);
-
-    // Get the force using the quasi-laplacian
-    this->get_force(this->force, this->qdiffoperator);
-
-    // Use this map, the images and the motion field to get the next iteration
-    this->optical_flow_iteration(motion);
-
-    // Done
-    return;
-}
-
-void IterativeSolver::optical_flow_iteration(Motion *motion) {
-    // Get the dimensions and step size of the motion field
-    const dim& dimin = this->dimin;
-    const dim& step = this->step;
-
-    // Get a copy of the pointer to the data of the vector fields
-    vector2d *u     = motion->get_motion();
-    vector2d *qdiff = this->qdiffoperator->get_motion();
-    vector2d *dI    = this->gradI->get_motion();
-    float *It       = this->It->get_image();
-    vector2d *f     = this->force->get_motion();
-
-    // Get the regularisation parameter
-    const float alphasq = alpha * alpha;
-
-    // Iterate over voxels
-    unsigned int idx;
-    for (unsigned int i = 0; i < dimin.x; i++) {
-        for (unsigned int j = 0; j < dimin.y; j++) {
-            idx = i * step.x + j * step.y;
-
-            u[idx] = qdiff[idx] - f[idx] / (alphasq + dI[idx].x*dI[idx].x + dI[idx].y*dI[idx].y);
-        }
-    }
-
-    // Done
-    return;
-}

@@ -1,57 +1,39 @@
 #ifndef _IMAGE_REGISTRATION_H_
 #define _IMAGE_REGISTRATION_H_
 
-#include <include/coord2d.hpp>
-#include <include/Image.h>
-#include <include/Motion.h>
-#include <include/SolverOptions.h>
+#include "include/coord2d.hpp"
+#include "include/Field.hpp"
+// #include "include/SolverOptions.h"
 
-#include <include/IterativeSolver.h>
+#include "include/IterativeSolver.h"
 
 class ImageRegistration {
     public:
         // Constructors and deconstructors
         ImageRegistration(const dim dimin, 
-                          const int nscales, const int* niter, const int nrefine, 
-                          const double alpha,
-                          const Verbose verbose);
+                          const std::size_t nscales, 
+                          const std::size_t* niter,
+                          const double alpha);
         ~ImageRegistration();
 
         // Getters and setters
-        void set_reference_image(const Image& im);
-        void set_moving_image(const Image& im);
-        Motion* get_estimated_motion() const;
-
-        // Copy the estimated motion
-        void copy_estimated_motion(Motion& mo) const;
+        void set_reference_image(const opticalflow::Image& im);
+        void set_moving_image(const opticalflow::Image& im);
+        const opticalflow::Motion& get_estimated_motion() const;
 
         // Estimate motion
-        void estimate_motion();
+        void estimate_optical_flow();
 
-    protected:
-        void display_registration_parameters() const;
+    private:
+        // void display_registration_parameters() const;
 
-        void estimate_motion_at_current_resolution(
-            Motion* motion, 
-            const Image *Iref, Image *Imov,
-            IterativeSolver *solver, 
-            const int niter,
-            const dim dimin, const int sizein);
+        std::size_t _nscales;
+        IterativeSolver** _solver;
 
-        dim *dimin;
-        int *sizein;
-        int nscales;
-        int *niter;
-        int nrefine;
+        opticalflow::Image** _Iref;
+        opticalflow::Image** _Imov;
 
-        IterativeSolver **solver;
-
-        Image **Iref;
-        Image **Imov;
-
-        Motion **motion;
-
-        Verbose verbose;
+        opticalflow::Motion** _motion;
 };
 
 #endif
