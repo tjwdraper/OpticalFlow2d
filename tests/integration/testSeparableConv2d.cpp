@@ -4,7 +4,7 @@
 
 #include <cmath>
 
-TEST(Conv2dIntegrationTest, AverageFilter3x3)
+TEST(SeparableConv2dIntegrationTest, AverageFilter3x3)
 {
     // Input:
     //
@@ -60,7 +60,7 @@ TEST(Conv2dIntegrationTest, AverageFilter3x3)
 }
 
 
-TEST(Conv2dIntegrationTest, AverageFilterPreservesConstantImage)
+TEST(SeparableConv2dIntegrationTest, AverageFilterPreservesConstantImage)
 {
     dim dimin(5, 5);
     opticalflow::Image image(dimin);
@@ -80,7 +80,7 @@ TEST(Conv2dIntegrationTest, AverageFilterPreservesConstantImage)
 }
 
 
-TEST(Conv2dIntegrationTest, GaussianFilterIsNormalized)
+TEST(SeparableConv2dIntegrationTest, GaussianFilterIsNormalized)
 {
     dim dimin(5, 5);
     vector2d sigma(1.0, 1.0);
@@ -122,7 +122,7 @@ TEST(Conv2dIntegrationTest, GaussianFilterIsNormalized)
 }
 
 
-TEST(Conv2dIntegrationTest, GaussianFilterPreservesConstantImage)
+TEST(SeparableConv2dIntegrationTest, GaussianFilterPreservesConstantImage)
 {
     dim dimin(7, 7);
     opticalflow::Image image(dimin);
