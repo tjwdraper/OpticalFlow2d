@@ -40,6 +40,7 @@ Ireg = OpticalFlow2d(Imov);
 OpticalFlow2d();
 
 %% Show some info
+fprintf("Time: %.3f\n", time);
 fprintf("Distribution: %.3f +/ %.3f\n", mean(motion(:)), std(motion(:)));
 fprintf("Maxabs: %.3f\n", max(abs(motion(:))));
 

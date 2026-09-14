@@ -41,7 +41,7 @@ void IterativeSolver::estimate_optical_flow(
     opticalflow::Image& temporal_derivative_image = *_temporal_derivative_image;
 
     // Calculate spatial and temporal derivative
-    gradients::gradient(spatial_gradient_image, Imov);
+    gradients::gradient(spatial_gradient_image, 0.5*(Iref+Imov)); // Symmetric gradient
     temporal_derivative_image = Imov - Iref;
 
     // Regularization parameters
