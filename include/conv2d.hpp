@@ -85,6 +85,27 @@ class conv2d {
         double* weights;        
 };
 
+inline conv2d create_horn_schunck_laplacian_conv2d() {
+    conv2d kernel(dim(3,3));
+
+    constexpr double corner = 1/12.0;
+    constexpr double edge = 1/6.0;
+
+    kernel.set_weight(corner, 0, 0);
+    kernel.set_weight(edge,   0, 1);
+    kernel.set_weight(corner, 0, 2);
+
+    kernel.set_weight(edge,   1, 0);
+    kernel.set_weight(0.0,    1, 1);
+    kernel.set_weight(edge,   1, 2);
+
+    kernel.set_weight(corner, 2, 0);
+    kernel.set_weight(edge,   2, 1);
+    kernel.set_weight(corner, 2, 2);
+
+    return kernel;
+}
+
 class separable_conv2d {
     public:
         // Constructors and deconstructors

@@ -5,8 +5,8 @@ close all;
 pkg load image; % GNU Octave only
 
 %% Load images
-Iref = imread("img/other-color-twoframes/other-data/RubberWhale/frame10.png");
-Imov = imread("img/other-color-twoframes/other-data/RubberWhale/frame11.png");
+Iref = imread("img/other-color-twoframes/other-data/Venus/frame10.png");
+Imov = imread("img/other-color-twoframes/other-data/Venus/frame11.png");
 
 Iref = double(squeeze(Iref));
 Imov = double(squeeze(Imov));
