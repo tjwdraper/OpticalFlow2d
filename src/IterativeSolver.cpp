@@ -31,6 +31,11 @@ void IterativeSolver::estimate_optical_flow(
     opticalflow::Motion& motion, 
     const opticalflow::Image& Iref, 
     const opticalflow::Image& Imov) {
+    // Convergence criterion
+    double eps = 1e-3;
+
+    // Auxiliary variable
+    opticalflow::Motion motion_new(motion.get_dimensions());
 
     // Dereference some variables
     opticalflow::Motion& horn_schunck_average = *_horn_schunck_average;
@@ -57,8 +62,16 @@ void IterativeSolver::estimate_optical_flow(
             double s = (dot(hs_avg, dI) + It) / (alphasq + normsq(dI));
 
             // Horn-Schunck iteration
-            motion.set_val(hs_avg - s * dI, idx);
+            motion_new.set_val(hs_avg - s * dI, idx);
         }
+
+        // Convergence criteria
+        if (opticalflow::motion::norm(motion-motion_new) < eps)
+            break;
+
+        // Move
+        motion = std::move(motion_new);
+
     }
 }
 
