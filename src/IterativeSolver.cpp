@@ -1,5 +1,6 @@
 #include "include/IterativeSolver.h"
 #include "include/gradients.hpp"
+#include "include/conv2d.hpp"
 
 // Constructors and deconstructors
 IterativeSolver::IterativeSolver(const dim dimin, const double alpha, const std::size_t niter, const double eps) {
@@ -43,6 +44,9 @@ void IterativeSolver::estimate_optical_flow(
     // Calculate spatial and temporal derivative
     gradients::gradient(spatial_gradient_image, 0.5*(Iref+Imov)); // Symmetric gradient
     temporal_derivative_image = Imov - Iref;
+
+    average_conv2d filter(dim(3,3));
+    filter.convolute(temporal_derivative_image);
 
     // Regularization parameters
     double alphasq = _alpha * _alpha;
