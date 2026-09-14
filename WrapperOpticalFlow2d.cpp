@@ -15,7 +15,7 @@ static dim dimin;
 
 void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // Set registration parameters
-    if ((nlhs == 0) && (nrhs == 5) && (myImageRegistration == nullptr)) {
+    if ((nlhs == 0) && (nrhs == 6) && (myImageRegistration == nullptr)) {
         // Get the dimensions and the size of the images
         double *tmp;
         tmp = mxGetPr(prhs[0]);
@@ -38,8 +38,11 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         tmp = mxGetPr(prhs[4]);
         double eps = (double) tmp[0];
 
+        tmp = mxGetPr(prhs[5]);
+        std::size_t nrefine = (std::size_t) tmp[0];
+
         // Pass parameters to ImageRegistration object
-        myImageRegistration = new ImageRegistration(dimin, nscales, niter, alpha, eps);
+        myImageRegistration = new ImageRegistration(dimin, nscales, niter, alpha, eps, nrefine);
 
         // Set the output dimension for image and motion field
         dim_image_mw = new mwSize[2];

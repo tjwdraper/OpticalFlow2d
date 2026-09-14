@@ -59,6 +59,11 @@ namespace opticalflow {
                 _field[i * _step.x + j * _step.y] = val;
             }
 
+            void fill(T val) {
+                for (std::size_t idx; idx < _size; ++idx)
+                    _field[idx] = val;
+            }
+
             // Operator overloading
             Field<T>& operator=(const Field<T>& fin) {
                 if (_dimin != fin.get_dimensions())

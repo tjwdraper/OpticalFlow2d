@@ -89,9 +89,11 @@ ImageRegistration::ImageRegistration(
     const std::size_t nscales, 
     const std::size_t* niter,
     const double alpha,
-    const double eps) {
+    const double eps,
+    const std::size_t nrefine) {
     // Registration parameters
     _nscales = nscales;
+    _nrefine = nrefine;
 
     // Allocate image and motion 
     _Iref = new opticalflow::Image*[nscales + 1];
@@ -196,6 +198,27 @@ void ImageRegistration::estimate_optical_flow() {
             Iref_s, 
             Imov_s
         );
+
+        // Refinement
+        for (std::size_t r = 0; r < _nrefine; ++r) {
+            // Initialize auxiliary variables
+            opticalflow::Image Imov_aux_s(Imov_s.get_dimensions());
+            opticalflow::Motion motion_aux_s(Imov_s.get_dimensions());
+            motion_aux_s.fill(vector2d(0.0));
+
+            // Warp the moving image with the so-far estimated motion field (which warps Imov -> Imov_aux \approx Iref)...
+            interp2d::warp2d(Imov_aux_s, Imov_s, motion_s);
+
+            // ...use deformed image to estimate an deformation field from Imov_aux -> Iref...
+            solver_s.estimate_optical_flow(
+                motion_aux_s,
+                Iref_s,
+                Imov_aux_s
+            );
+
+            // ...accumulate (= motion field composition) to get the estimated deformation field from Imov to Iref
+            interp2d::accumulate(motion_s, motion_aux_s);
+        }
     }
 
     // Done

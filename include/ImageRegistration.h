@@ -14,7 +14,8 @@ class ImageRegistration {
                           const std::size_t nscales, 
                           const std::size_t* niter,
                           const double alpha,
-                          const double eps);
+                          const double eps,
+                          const std::size_t nrefine);
         ~ImageRegistration();
 
         // Getters and setters
@@ -28,6 +29,7 @@ class ImageRegistration {
     private:
         // void display_registration_parameters() const;
         std::size_t _nscales;
+        std::size_t _nrefine;
         IterativeSolver** _solver;
 
         opticalflow::Image** _Iref;

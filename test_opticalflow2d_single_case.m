@@ -29,11 +29,12 @@ Imov = (Imov - min(Imov(:))) / (max(Imov(:)) - min(Imov(:)));
 %% Registration parameters
 niter = [200 200 200 200];
 nscales = 3;
-alpha = 0.4;
+alpha = 0.7;
 eps = 0.001;
+nrefine = 2;
 
 %% Load C++ object
-OpticalFlow2d([dimx, dimy], niter, nscales, alpha, eps);
+OpticalFlow2d([dimx, dimy], niter, nscales, alpha, eps, nrefine);
 
 %% Do the registration
 tic;
