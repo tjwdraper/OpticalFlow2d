@@ -7,35 +7,38 @@
 #include <cstddef>
 #include <stdexcept>
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Non-separable 2d convolution
+///////////////////////////////////////////////////////////////////////////////////////////////////
 class conv2d {
     public:
         // Constructors and deconstructors
-        conv2d(const dim dimconv) : dimconv(dimconv),
-                                    stepconv(1, dimconv.x),
-                                    sizeconv(dimconv.x*dimconv.y),
-                                    weights(new double[dimconv.x*dimconv.y]) {
+        conv2d(const dim dimconv) : _dimconv(dimconv),
+                                    _stepconv(1, dimconv.x),
+                                    _sizeconv(dimconv.x*dimconv.y),
+                                    _weights(new double[dimconv.x*dimconv.y]) {
             if (dimconv.x == 0 || dimconv.y == 0)
                 throw std::runtime_error("In conv2d(const dim), convolution dimensions must be non-zero.");
 
             if (dimconv.x % 2 == 0 || dimconv.y % 2 == 0)
                 throw std::runtime_error("In conv2d(const dim), convolution dimensions must be odd.");
         }
-        ~conv2d() {delete[] weights;}
+        ~conv2d() {delete[] _weights;}
 
         // Getters and setters
-        dim get_dimensions() const {return dimconv;}
-        dim get_step() const {return stepconv;}
-        std::size_t get_size() const {return sizeconv;}
+        dim get_dimensions() const {return _dimconv;}
+        dim get_step() const {return _stepconv;}
+        std::size_t get_size() const {return _sizeconv;}
         double get_weight(std::size_t i, std::size_t j) const {
-            if (i >= dimconv.x || j >= dimconv.y)
+            if (i >= _dimconv.x || j >= _dimconv.y)
                 throw std::runtime_error("In double conv2d::get_weigh(std::size_t, std::size_t) index out of bounds");
-            return weights[i * stepconv.x + j * stepconv.y];
+            return _weights[i * _stepconv.x + j * _stepconv.y];
         }
 
         void set_weight(double val, std::size_t i, std::size_t j) {
-            if (i >= dimconv.x || j >= dimconv.y)
+            if (i >= _dimconv.x || j >= _dimconv.y)
                 throw std::runtime_error("In double conv2d::set_weigh(std::size_t, std::size_t) index out of bounds");
-            weights[i * stepconv.x + j * stepconv.y] = val;
+            _weights[i * _stepconv.x + j * _stepconv.y] = val;
         }
 
         // Apply convolution
@@ -44,8 +47,8 @@ class conv2d {
             const dim dimin = fin.get_dimensions();
 
             // Convolution centers
-            const std::size_t center_i = dimconv.x / 2;
-            const std::size_t center_j = dimconv.y / 2;
+            const std::size_t center_i = _dimconv.x / 2;
+            const std::size_t center_j = _dimconv.y / 2;
 
             // Apply convolution in y-direction
             opticalflow::Field<T> intermediate(dimin);
@@ -53,8 +56,8 @@ class conv2d {
                 for (std::size_t j = 0; j < dimin.y; ++j) {
                     T val{};
 
-                    for  (std::size_t ki = 0; ki < dimconv.x; ++ki) {
-                        for (std::size_t kj = 0; kj < dimconv.y; ++kj) {
+                    for  (std::size_t ki = 0; ki < _dimconv.x; ++ki) {
+                        for (std::size_t kj = 0; kj < _dimconv.y; ++kj) {
                             long ii = static_cast<long>(i) + static_cast<long>(ki) - static_cast<long>(center_i);
                             long jj = static_cast<long>(j) + static_cast<long>(kj) - static_cast<long>(center_j);
 
@@ -66,7 +69,7 @@ class conv2d {
 
                             val += fin.get_val(
                                 static_cast<std::size_t>(ii),
-                                static_cast<std::size_t>(jj) ) * weights[ki * stepconv.x + kj * stepconv.y];
+                                static_cast<std::size_t>(jj) ) * _weights[ki * _stepconv.x + kj * _stepconv.y];
                         }
                     }
 
@@ -78,11 +81,11 @@ class conv2d {
         }
 
     protected:
-        dim dimconv;
-        dim stepconv;
-        std::size_t sizeconv;
+        dim _dimconv;
+        dim _stepconv;
+        std::size_t _sizeconv;
 
-        double* weights;        
+        double* _weights;        
 };
 
 inline conv2d create_horn_schunck_laplacian_conv2d() {
@@ -106,14 +109,18 @@ inline conv2d create_horn_schunck_laplacian_conv2d() {
     return kernel;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Separable 2d convolution
+///////////////////////////////////////////////////////////////////////////////////////////////////
 class separable_conv2d {
     public:
         // Constructors and deconstructors
-        separable_conv2d(const dim dimconv) : dimconv(dimconv),
-                                    stepconv(1, dimconv.x),
-                                    sizeconv(dimconv.x*dimconv.y),
-                                    weights_i(new double[dimconv.x]),
-                                    weights_j(new double[dimconv.y]) {
+        separable_conv2d(const dim dimconv) : _dimconv(dimconv),
+                                              _stepconv(1, dimconv.x),
+                                              _sizeconv(dimconv.x*dimconv.y),
+                                              _weights_i(new double[dimconv.x]),
+                                              _weights_j(new double[dimconv.y]) {
             if (dimconv.x == 0 || dimconv.y == 0)
                 throw std::runtime_error("In separable_conv2d(const dim), convolution dimensions must be non-zero.");
 
@@ -121,23 +128,23 @@ class separable_conv2d {
                 throw std::runtime_error("In separable_conv2d(const dim), convolution dimensions must be odd.");
         }
         virtual ~separable_conv2d() {
-            delete[] weights_i;
-            delete[] weights_j;
+            delete[] _weights_i;
+            delete[] _weights_j;
         }
 
         // Getters and setters
-        dim get_dimensions() const {return dimconv;}
-        dim get_step() const {return stepconv;}
-        std::size_t get_size() const {return sizeconv;}
+        dim get_dimensions() const {return _dimconv;}
+        dim get_step() const {return _stepconv;}
+        std::size_t get_size() const {return _sizeconv;}
         double get_weight_i(std::size_t i) const {
-            if (i >= dimconv.x)
+            if (i >= _dimconv.x)
                 throw std::runtime_error("In double separable_conv2d::get_weigh_i(std::size_t) index out of bounds");
-            return weights_i[i];
+            return _weights_i[i];
         }
         double get_weight_j(std::size_t j) const {
-            if (j >= dimconv.x)
+            if (j >= _dimconv.x)
                 throw std::runtime_error("In double separable_conv2d::get_weigh_j(std::size_t) index out of bounds");
-            return weights_j[j];
+            return _weights_j[j];
         }
 
         // Apply convolution
@@ -146,8 +153,8 @@ class separable_conv2d {
             const dim dimin = fin.get_dimensions();
 
             // Convolution centers
-            const std::size_t center_i = dimconv.x / 2;
-            const std::size_t center_j = dimconv.y / 2;
+            const std::size_t center_i = _dimconv.x / 2;
+            const std::size_t center_j = _dimconv.y / 2;
 
             // Apply convolution in y-direction
             opticalflow::Field<T> intermediate(dimin);
@@ -155,14 +162,14 @@ class separable_conv2d {
                 for (std::size_t j = 0; j < dimin.y; ++j) {
                     T val{};
 
-                    for (std::size_t kj = 0; kj < dimconv.y; ++kj) {
+                    for (std::size_t kj = 0; kj < _dimconv.y; ++kj) {
                         long jj = static_cast<long>(j) + static_cast<long>(kj) - static_cast<long>(center_j);
 
                         // Clip to boundary
                         if (jj < 0) {jj = 0;}
                         if (jj > dimin.y-1) {jj = dimin.y-1;}
 
-                        val += fin.get_val(i, static_cast<std::size_t>(jj)) * weights_j[kj];
+                        val += fin.get_val(i, static_cast<std::size_t>(jj)) * _weights_j[kj];
                     }
 
                     intermediate.set_val(val, i, j);
@@ -175,14 +182,14 @@ class separable_conv2d {
                 for (std::size_t j = 0; j < dimin.y; ++j) {
                     T val{};
 
-                    for (std::size_t ki = 0; ki < dimconv.x; ++ki) {
+                    for (std::size_t ki = 0; ki < _dimconv.x; ++ki) {
                         long ii = static_cast<long>(i) + static_cast<long>(ki) - static_cast<long>(center_i);
 
                         // Clip to boundary
                         if (ii < 0) {ii = 0;}
                         if (ii > dimin.x-1) {ii = dimin.x-1;}
 
-                        val += intermediate.get_val(static_cast<std::size_t>(ii), j) * weights_i[ki];
+                        val += intermediate.get_val(static_cast<std::size_t>(ii), j) * _weights_i[ki];
                     }
 
                     result.set_val(val, i, j);
@@ -196,41 +203,41 @@ class separable_conv2d {
 
     protected:
         void set_weight_i(double val, std::size_t i) {
-            if (i >= dimconv.x)
+            if (i >= _dimconv.x)
                 throw std::runtime_error("In separable_conv2d::set_weight_i(double, std::size_t), index out of bounds");
-            weights_i[i] = val;
+            _weights_i[i] = val;
         }
 
         void set_weight_j(double val, std::size_t j) {
-            if (j >= dimconv.y)
+            if (j >= _dimconv.y)
                 throw std::runtime_error("In separable_conv2d::set_weight_j(double, std::size_t), index out of bounds");
-            weights_j[j] = val;
+            _weights_j[j] = val;
         }
 
         void normalize_weights() {
             double sum_i(0.0);
             double sum_j(0.0);
 
-            for (std::size_t i = 0; i < dimconv.x; ++i)
-                sum_i += weights_i[i];
-            for (std::size_t j = 0; j < dimconv.y; ++j)
-                sum_j += weights_j[j];
+            for (std::size_t i = 0; i < _dimconv.x; ++i)
+                sum_i += _weights_i[i];
+            for (std::size_t j = 0; j < _dimconv.y; ++j)
+                sum_j += _weights_j[j];
 
             if (sum_i == 0.0 || sum_j == 0.0)
                 throw std::runtime_error("In separable_conv2d::normalize_weights, sum of weights is zero.");
 
-            for (std::size_t i = 0; i < dimconv.x; ++i)
-                weights_i[i] /= sum_i;
-            for (std::size_t j = 0; j < dimconv.y; ++j)
-                weights_j[j] /= sum_j;
+            for (std::size_t i = 0; i < _dimconv.x; ++i)
+                _weights_i[i] /= sum_i;
+            for (std::size_t j = 0; j < _dimconv.y; ++j)
+                _weights_j[j] /= sum_j;
         }
 
-        dim dimconv;
-        dim stepconv;
-        std::size_t sizeconv;
+        dim _dimconv;
+        dim _stepconv;
+        std::size_t _sizeconv;
 
-        double* weights_i;
-        double* weights_j;
+        double* _weights_i;
+        double* _weights_j;
 };
 
 class average_conv2d : public separable_conv2d {
@@ -248,10 +255,13 @@ class average_conv2d : public separable_conv2d {
 
 class gaussian_conv2d : public separable_conv2d {
     public:
+        // Constructors and deconstructors
         gaussian_conv2d(const dim dimconv, const vector2d sigma) : separable_conv2d(dimconv) {
             if (sigma.x <= 0.0 || sigma.y <= 0.0)
                 throw std::runtime_error("In gaussian_conv2d(const dim, const vector2d), sigma must be positive.");
             
+            _sigma = sigma;
+
             const double center_i = static_cast<double>(dimconv.x-1)/2.0;
             const double center_j = static_cast<double>(dimconv.y-1)/2.0;
 
@@ -267,10 +277,16 @@ class gaussian_conv2d : public separable_conv2d {
 
             normalize_weights();
         }
-
         gaussian_conv2d(const vector2d sigma) : gaussian_conv2d(dim(2.0*static_cast<std::size_t>(std::ceil(3.0 * sigma.x)) + 1,
                                                                     2.0*static_cast<std::size_t>(std::ceil(3.0 * sigma.y)) + 1),
                                                                     sigma) {}
+        virtual ~gaussian_conv2d() {}
+
+        //  Getters and setters
+        vector2d get_sigma() const {return _sigma;}
+
+    private:
+        vector2d _sigma;
 };
 
 #endif

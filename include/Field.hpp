@@ -13,58 +13,58 @@ namespace opticalflow {
     class Field {
         public:
             // Constructors and deconstructors
-            Field(dim dimin) : dimin(dimin), 
-                            step(1, dimin.x), 
-                            size(dimin.x*dimin.y),
-                            field(new T[size]) {}
+            Field(dim dimin) : _dimin(dimin), 
+                            _step(1, dimin.x), 
+                            _size(dimin.x*dimin.y),
+                            _field(new T[_size]) {}
 
-            Field(const Field<T>& fin) : dimin(fin.get_dimensions()), 
-                                        step(fin.get_step()), 
-                                        size(fin.get_size()),
-                                        field(new T[fin.get_size()]) {
-                std::copy(fin.get_field(), fin.get_field() + size, field);
+            Field(const Field<T>& fin) : _dimin(fin.get_dimensions()), 
+                                        _step(fin.get_step()), 
+                                        _size(fin.get_size()),
+                                        _field(new T[fin.get_size()]) {
+                std::copy(fin.get_field(), fin.get_field() + _size, _field);
             }
-            Field(Field<T>&& other) noexcept : dimin(other.get_dimensions()),
-                                            step(other.get_step()),
-                                            size(other.get_size()),
-                                            field(other.get_field()) {
-                other.field = nullptr;
+            Field(Field<T>&& other) noexcept : _dimin(other.get_dimensions()),
+                                            _step(other.get_step()),
+                                            _size(other.get_size()),
+                                            _field(other.get_field()) {
+                other._field = nullptr;
             }
-            ~Field() { delete[] field; }
+            ~Field() { delete[] _field; }
 
             // Getters and setters
-            T* get_field() { return field; }
-            const T* get_field() const { return field; }
-            dim get_dimensions() const { return dimin; }
-            dim get_step() const { return step; }
-            std::size_t get_size() const { return size; }
+            T* get_field() { return _field; }
+            const T* get_field() const { return _field; }
+            dim get_dimensions() const { return _dimin; }
+            dim get_step() const { return _step; }
+            std::size_t get_size() const { return _size; }
 
             T get_val(std::size_t idx) const {
                 Field::check_idx(idx);
-                return field[idx];
+                return _field[idx];
             }
 
             T get_val(std::size_t i, std::size_t j) const {
                 Field::check_idx(i, j);
-                return field[i * step.x + j * step.y];
+                return _field[i * _step.x + j * _step.y];
             }
 
             void set_val(T val, std::size_t idx) {
                 Field::check_idx(idx);
-                field[idx] = val;
+                _field[idx] = val;
             }
 
             void set_val(T val, std::size_t i, std::size_t j) {
                 Field::check_idx(i, j);
-                field[i * step.x + j * step.y] = val;
+                _field[i * _step.x + j * _step.y] = val;
             }
 
             // Operator overloading
             Field<T>& operator=(const Field<T>& fin) {
-                if (dimin != fin.get_dimensions())
+                if (_dimin != fin.get_dimensions())
                     throw std::runtime_error("In Field<T>& operator=(const Field<T>&) dimensions of input and target do not match.");
 
-                std::copy(fin.get_field(), fin.get_field() + size, field);
+                std::copy(fin.get_field(), fin.get_field() + _size, _field);
                 return *this;
             }
 
@@ -81,22 +81,20 @@ namespace opticalflow {
             }
 
             Field<T>& operator+=(const Field<T>& fin) {
-                if (dimin != fin.get_dimensions())
+                if (_dimin != fin.get_dimensions())
                     throw std::runtime_error("In Field<T>& operator+=(const Field<T>&) dimensions of input and target do not match.");
 
-                const T* finv = fin.get_field();
-                for (std::size_t idx = 0; idx < size; ++idx) 
-                    field[idx] += finv[idx];
+                for (std::size_t idx = 0; idx < _size; ++idx) 
+                    _field[idx] += fin.get_val(idx);
                 return *this;
             }
 
             Field<T>& operator-=(const Field<T>& fin) {
-                if (dimin != fin.get_dimensions())
+                if (_dimin != fin.get_dimensions())
                     throw std::runtime_error("In Field<T>& operator-=(const Field<T>&) dimensions of input and target do not match.");
 
-                const T* finv = fin.get_field();
-                for (std::size_t idx = 0; idx < size; ++idx) 
-                    field[idx] -= finv[idx];
+                for (std::size_t idx = 0; idx < _size; ++idx) 
+                    _field[idx] -= fin.get_val(idx);
                 return *this;
             }
 
@@ -107,8 +105,8 @@ namespace opticalflow {
             }
 
             Field<T>& operator*=(double val) {
-                for (std::size_t idx = 0; idx < size; ++idx)
-                    field[idx] *= val;
+                for (std::size_t idx = 0; idx < _size; ++idx)
+                    _field[idx] *= val;
                 return *this;
             }
 
@@ -125,8 +123,8 @@ namespace opticalflow {
                 if (val == 0.0)
                     throw std::runtime_error("In Field<T>& operator/=(double ), division by zero.");
 
-                for (std::size_t idx = 0; idx < size; ++idx)
-                    field[idx] /= val;
+                for (std::size_t idx = 0; idx < _size; ++idx)
+                    _field[idx] /= val;
                 return *this;
             }
 
@@ -136,19 +134,19 @@ namespace opticalflow {
 
         private:
             void check_idx(std::size_t i, std::size_t j) const {
-                if (i >= dimin.x || j >= dimin.y)
+                if (i >= _dimin.x || j >= _dimin.y)
                     throw std::runtime_error("In T Field::get_val(std::size_t, std::size_t) input indices out of bound.");
             }
 
             void check_idx(std::size_t idx) const {
-                if (idx >= size)
+                if (idx >= _size)
                     throw std::runtime_error("In T Field::get_val(std::size_t) input indices out of bound.");
             }
 
-            const dim dimin;
-            const dim step;
-            const std::size_t size;
-            T* field = nullptr;
+            const dim _dimin;
+            const dim _step;
+            const std::size_t _size;
+            T* _field = nullptr;
     };
 
     using Image = Field<double>;
