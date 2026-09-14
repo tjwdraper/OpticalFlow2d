@@ -2,7 +2,7 @@
 #include "include/gradients.hpp"
 
 // Constructors and deconstructors
-IterativeSolver::IterativeSolver(const dim dimin, const double alpha, const std::size_t niter) {
+IterativeSolver::IterativeSolver(const dim dimin, const double alpha, const std::size_t niter, const double eps) {
     // Get the dimensions and size of the images
     _dimin  = dimin;
     _step   = dim(1, dimin.x);
@@ -13,6 +13,7 @@ IterativeSolver::IterativeSolver(const dim dimin, const double alpha, const std:
     _temporal_derivative_image = new opticalflow::Image(_dimin);
     _horn_schunck_average = new opticalflow::Motion(dimin);
     _alpha = alpha;
+    _eps = eps;
     _niter = niter;
 }
 
@@ -31,9 +32,6 @@ void IterativeSolver::estimate_optical_flow(
     opticalflow::Motion& motion, 
     const opticalflow::Image& Iref, 
     const opticalflow::Image& Imov) {
-    // Convergence criterion
-    double eps = 1e-3;
-
     // Auxiliary variable
     opticalflow::Motion motion_new(motion.get_dimensions());
 
@@ -68,7 +66,7 @@ void IterativeSolver::estimate_optical_flow(
         // Convergence criteria
         double du = opticalflow::motion::norm(motion - motion_new);
         double m = opticalflow::motion::norm(motion_new);
-        if (du < eps * std::max(1.0, m))
+        if (du < _eps * std::max(1.0, m))
             break;
 
         // Move

@@ -7,7 +7,7 @@
 class IterativeSolver {
     public:
         // Constructors and deconstructors
-        IterativeSolver(const dim dimin, const double alpha, const std::size_t niter);
+        IterativeSolver(const dim dimin, const double alpha, const std::size_t niter, const double eps);
         ~IterativeSolver();
 
         // Getters and setters
@@ -45,6 +45,7 @@ class IterativeSolver {
 
         // Regularisation parameters
         double _alpha;
+        double _eps;
         std::size_t _niter;
 };
 

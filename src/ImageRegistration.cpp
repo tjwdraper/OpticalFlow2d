@@ -88,7 +88,8 @@ ImageRegistration::ImageRegistration(
     const dim dimin, 
     const std::size_t nscales, 
     const std::size_t* niter,
-    const double alpha) {
+    const double alpha,
+    const double eps) {
     // Registration parameters
     _nscales = nscales;
 
@@ -107,7 +108,7 @@ ImageRegistration::ImageRegistration(
         _Iref[s] = new opticalflow::Image(dim_s);
         _Imov[s] = new opticalflow::Image(dim_s);
         _motion[s] = new opticalflow::Motion(dim_s);
-        _solver[s] = new IterativeSolver(dim_s, alpha, niter[s]);
+        _solver[s] = new IterativeSolver(dim_s, alpha, niter[s], eps);
     }
 
     // Display registration settings

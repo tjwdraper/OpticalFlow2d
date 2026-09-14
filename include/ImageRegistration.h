@@ -13,7 +13,8 @@ class ImageRegistration {
         ImageRegistration(const dim dimin, 
                           const std::size_t nscales, 
                           const std::size_t* niter,
-                          const double alpha);
+                          const double alpha,
+                          const double eps);
         ~ImageRegistration();
 
         // Getters and setters
@@ -26,7 +27,6 @@ class ImageRegistration {
 
     private:
         // void display_registration_parameters() const;
-
         std::size_t _nscales;
         IterativeSolver** _solver;
 
