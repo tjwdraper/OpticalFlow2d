@@ -66,7 +66,9 @@ void IterativeSolver::estimate_optical_flow(
         }
 
         // Convergence criteria
-        if (opticalflow::motion::norm(motion-motion_new) < eps)
+        double du = opticalflow::motion::norm(motion - motion_new);
+        double m = opticalflow::motion::norm(motion_new);
+        if (du < eps * std::max(1.0, m))
             break;
 
         // Move
