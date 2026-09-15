@@ -18,7 +18,7 @@ class ImageRegistration {
                           const double alpha,
                           const double eps,
                           const std::size_t nrefine);
-        ImageRegistration(const mxArray* config);
+        // ImageRegistration(const mxArray* config);
         ~ImageRegistration();
 
         // Getters and setters

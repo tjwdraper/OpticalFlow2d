@@ -18,7 +18,24 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // Set registration parameters
     if ((nlhs == 0) && (nrhs == 1) && (myImageRegistration == nullptr)) {
         mxParser::parse_size_image(dimin, prhs[0]);
-        myImageRegistration = new ImageRegistration(prhs[0]);
+
+
+        // Registration parameters
+        std::size_t nscales, nrefine;
+        mxParser::parse_nscales(nscales, prhs[0]);
+        mxParser::parse_nrefine(nrefine, prhs[0]);
+
+        double alpha;
+        mxParser::parse_alpha(alpha, prhs[0]);
+
+        std::size_t* niter = new size_t[nscales+1];
+        mxParser::parse_niter(niter, prhs[0]);
+
+        double eps;
+        mxParser::parse_convergence_threshold(eps, prhs[0]);
+
+
+        myImageRegistration = new ImageRegistration(dimin, nscales, niter, alpha, eps, nrefine);
 
 
         // // Get the dimensions and the size of the images
@@ -58,6 +75,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         dim_motion_mw[0] = dimin.x;
         dim_motion_mw[1] = dimin.y;
         dim_motion_mw[2] = 2;
+
+        // Free memory
+        delete[] niter;
     }
 
     // Load the images and estimate motion through image registration
