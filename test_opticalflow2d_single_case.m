@@ -12,7 +12,6 @@ Iref = double(squeeze(Iref));
 Imov = double(squeeze(Imov));
 
 %% Convert RGB -> grayscale
-
 if (ndims(Iref) == 3)
     Iref = rgb2gray(Iref);
 endif
@@ -21,25 +20,26 @@ if (ndims(Imov) == 3)
     Imov = rgb2gray(Imov);
 endif
 
+% Normalize
 Iref = (Iref - min(Iref(:))) / (max(Iref(:)) - min(Iref(:)));
 Imov = (Imov - min(Imov(:))) / (max(Imov(:)) - min(Imov(:)));
 
-[dimx, dimy] = size(Iref);
-
 %% Registration parameters
-niter = [200 200 200 200];
-nscales = 3;
-alpha = 0.7;
-eps = 0.001;
-nrefine = 2;
+config = struct();
+config.size_image   = int32(size(Iref));
+config.niter        = int32([200, 200, 200, 200]);
+config.alpha        = 0.7;
+config.eps          = 1e-3;
+config.nrefine      = 2;
 
-%% Load C++ object
-OpticalFlow2d([dimx, dimy], niter, nscales, alpha, eps, nrefine);
+%% Configure OpticalFlow object
+OpticalFlow2d(config);
 
-%% Do the registration
+%% Register images
 tic;
 OpticalFlow2d(Iref, Imov);
 time = toc;
+fprintf("Registration time (s): %.3f\n", time);
 
 %% Get the motion field
 motion = OpticalFlow2d();
@@ -47,15 +47,10 @@ motion = OpticalFlow2d();
 %% Get the registered image
 Ireg = OpticalFlow2d(Imov);
 
-%% Close the C++ object
+%% Close the OpticalFlow object
 OpticalFlow2d();
 
-%% Show some info
-fprintf("Time: %.3f\n", time);
-fprintf("Distribution: %.3f +/ %.3f\n", mean(motion(:)), std(motion(:)));
-fprintf("Maxabs: %.3f\n", max(abs(motion(:))));
-
-%% Show some images
+%% Show image alignment
 figure();
 subplot(231); imagesc(Iref); colormap gray; title("Reference image", "fontsize", 20); axis off;
 subplot(232); imagesc(Imov); colormap gray; title("Moving image", "fontsize", 20); axis off;
