@@ -6,6 +6,7 @@
 #include "include/Field.hpp"
 #include "include/ImageRegistration.h"
 #include "include/interp2d.hpp"
+#include "include/mxParser.hpp"
 
 
 static ImageRegistration *myImageRegistration = nullptr;
@@ -15,47 +16,48 @@ static dim dimin;
 
 void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // Set registration parameters
-    if ((nlhs == 0) && (nrhs == 6) && (myImageRegistration == nullptr)) {
-        // Get the dimensions and the size of the images
-        double *tmp;
-        tmp = mxGetPr(prhs[0]);
-        std::size_t dimx = (std::size_t) tmp[0];
-        std::size_t dimy = (std::size_t) tmp[1];
-        dimin = dim(dimx, dimy);
+    if ((nlhs == 0) && (nrhs == 1) && (myImageRegistration == nullptr)) {
+        mxParser::parse_size_image(dimin, prhs[0]);
+        myImageRegistration = new ImageRegistration(prhs[0]);
 
-        // Get the registration parameters
-        tmp = mxGetPr(prhs[2]);
-        std::size_t nscales = (std::size_t) tmp[0];
-        tmp = mxGetPr(prhs[1]);
-        std::size_t *niter = new std::size_t[nscales + 1];
-        for (std::size_t s = 0; s < nscales + 1; s++) {
-            niter[s] = (std::size_t) tmp[s];
-        }
 
-        tmp = mxGetPr(prhs[3]);
-        double alpha = (double) tmp[0];
+        // // Get the dimensions and the size of the images
+        // double *tmp;
+        // tmp = mxGetPr(prhs[0]);
+        // std::size_t dimx = (std::size_t) tmp[0];
+        // std::size_t dimy = (std::size_t) tmp[1];
+        // dimin = dim(dimx, dimy);
 
-        tmp = mxGetPr(prhs[4]);
-        double eps = (double) tmp[0];
+        // // Get the registration parameters
+        // tmp = mxGetPr(prhs[2]);
+        // std::size_t nscales = (std::size_t) tmp[0];
+        // tmp = mxGetPr(prhs[1]);
+        // std::size_t *niter = new std::size_t[nscales + 1];
+        // for (std::size_t s = 0; s < nscales + 1; s++) {
+        //     niter[s] = (std::size_t) tmp[s];
+        // }
 
-        tmp = mxGetPr(prhs[5]);
-        std::size_t nrefine = (std::size_t) tmp[0];
+        // tmp = mxGetPr(prhs[3]);
+        // double alpha = (double) tmp[0];
 
-        // Pass parameters to ImageRegistration object
-        myImageRegistration = new ImageRegistration(dimin, nscales, niter, alpha, eps, nrefine);
+        // tmp = mxGetPr(prhs[4]);
+        // double eps = (double) tmp[0];
+
+        // tmp = mxGetPr(prhs[5]);
+        // std::size_t nrefine = (std::size_t) tmp[0];
+
+        // // Pass parameters to ImageRegistration object
+        // myImageRegistration = new ImageRegistration(dimin, nscales, niter, alpha, eps, nrefine);
 
         // Set the output dimension for image and motion field
         dim_image_mw = new mwSize[2];
-        dim_image_mw[0] = dimx;
-        dim_image_mw[1] = dimy;
+        dim_image_mw[0] = dimin.x;
+        dim_image_mw[1] = dimin.y;
 
         dim_motion_mw = new mwSize[3];
-        dim_motion_mw[0] = dimx;
-        dim_motion_mw[1] = dimy;
+        dim_motion_mw[0] = dimin.x;
+        dim_motion_mw[1] = dimin.y;
         dim_motion_mw[2] = 2;
-
-        // Free up the niter array
-        delete[] niter;
     }
 
     // Load the images and estimate motion through image registration

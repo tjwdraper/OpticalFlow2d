@@ -1,6 +1,7 @@
 #include "include/ImageRegistration.h"
 #include "include/conv2d.hpp"
 #include "include/interp2d.hpp"
+#include "include/mxParser.hpp"
 
 #include <mex.h>
 #include <cstring>
@@ -110,12 +111,51 @@ ImageRegistration::ImageRegistration(
         _Iref[s] = new opticalflow::Image(dim_s);
         _Imov[s] = new opticalflow::Image(dim_s);
         _motion[s] = new opticalflow::Motion(dim_s);
-        _solver[s] = new IterativeSolver(dim_s, alpha, niter[s], eps);
+        _solver[s] = new IterativeSolver(dim_s, s, alpha, niter[s], eps);
     }
 
     // Display registration settings
     // ImageRegistration::display_registration_parameters();
 
+}
+
+ImageRegistration::ImageRegistration(const mxArray *config) {
+    // Registration parameters
+    mxParser::parse_nscales(_nscales, config);
+    mxParser::parse_nrefine(_nrefine, config);
+    
+    dim dimin;
+    mxParser::parse_size_image(dimin, config);
+
+    double alpha;
+    mxParser::parse_alpha(alpha, config);
+
+    std::size_t* niter = new size_t[_nscales+1];
+    mxParser::parse_niter(niter, config);
+
+    double eps;
+    mxParser::parse_convergence_threshold(eps, config);
+
+    // Allocate images, motion field and solver
+    _Iref = new opticalflow::Image*[_nscales+1];
+    _Imov = new opticalflow::Image*[_nscales+1];
+    _motion = new opticalflow::Motion*[_nscales+1];
+    _solver = new IterativeSolver*[_nscales+1];
+    for (int s = static_cast<int>(_nscales); s >= 0; s--) {
+        double scale = pow(2.0, s);
+        const dim dim_s = dim(
+            static_cast<std::size_t> (dimin.x/scale),
+            static_cast<std::size_t> (dimin.y/scale)
+        );
+
+        _Iref[s] = new opticalflow::Image(dim_s);
+        _Imov[s] = new opticalflow::Image(dim_s);
+        _motion[s] = new opticalflow::Motion(dim_s);
+        _solver[s] = new IterativeSolver(dim_s, s, alpha, niter[s], eps);
+    }
+
+    // Free memory
+    delete[] niter;
 }
 
 ImageRegistration::~ImageRegistration() {

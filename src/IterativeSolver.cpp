@@ -3,7 +3,7 @@
 #include "include/conv2d.hpp"
 
 // Constructors and deconstructors
-IterativeSolver::IterativeSolver(const dim dimin, const double alpha, const std::size_t niter, const double eps) {
+IterativeSolver::IterativeSolver(const dim dimin, const std::size_t resolution_level, const double alpha, const std::size_t niter, const double eps) {
     // Get the dimensions and size of the images
     _dimin  = dimin;
     _step   = dim(1, dimin.x);
@@ -12,10 +12,13 @@ IterativeSolver::IterativeSolver(const dim dimin, const double alpha, const std:
     // Allocate memory for image gradients
     _spatial_gradient_image = new opticalflow::Motion(_dimin);
     _temporal_derivative_image = new opticalflow::Image(_dimin);
-    _horn_schunck_average = new opticalflow::Motion(dimin);
+    _horn_schunck_average = new opticalflow::Motion(_dimin);
+
+    // Model parameters
     _alpha = alpha;
     _eps = eps;
     _niter = niter;
+    _resolution_level = resolution_level;
 }
 
 IterativeSolver::~IterativeSolver() {

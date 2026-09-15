@@ -4,10 +4,12 @@
 #include "include/coord2d.hpp"
 #include "include/Field.hpp"
 
+#include <mex.h>
+
 class IterativeSolver {
     public:
         // Constructors and deconstructors
-        IterativeSolver(const dim dimin, const double alpha, const std::size_t niter, const double eps);
+        IterativeSolver(const dim dimin, const std::size_t resolution_level, const double alpha, const std::size_t niter, const double eps);
         ~IterativeSolver();
 
         // Getters and setters
@@ -43,10 +45,11 @@ class IterativeSolver {
         // // Quasi differential operator
         // opticalflow::Motion *qdiffoperator;
 
-        // Regularisation parameters
+        // Model parameters
         double _alpha;
         double _eps;
         std::size_t _niter;
+        std::size_t _resolution_level;
 };
 
 #endif
