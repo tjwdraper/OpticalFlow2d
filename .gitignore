@@ -7,3 +7,4 @@ fftw/
 back-up and decrepated files/
 Makefile
 build/
+include/CImg.h
