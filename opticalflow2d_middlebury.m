@@ -8,9 +8,20 @@ pkg load image;
 % Optical Flow Registration Analysis
 % =============================================================
 
+fid = fopen("config_middlebury.json", "r");
+
+if fid == -1
+    error("Could not open config.json");
+end
+
+raw = char(fread(fid, Inf)');
+fclose(fid);
+
+config_json = jsondecode(raw);
+
 %% Paths
 
-data_path = "img/other-color-twoframes/other-data";
+%data_path = "img/other-color-twoframes/other-data";
 gt_path   = "img/other-gt-flow";
 
 % Path containing readFlowFile.m and flowToColor.m
@@ -29,29 +40,19 @@ save_figure = true;
 % Output files
 figure_path  = "middlebury_results.png";
 
-%% ============================================================
-% File names
-% =============================================================
-
-filename_ref = fullfile( ...
-    data_path, name, "frame10.png");
-
-filename_mov = fullfile( ...
-    data_path, name, "frame11.png");
-
-filename_gt = fullfile( ...
-    gt_path, name, "flow10.flo");
+% Flow file
+filename_gt = fullfile(gt_path, name, "flow10.flo");
 
 %% ============================================================
 % Check files
 % =============================================================
 
-if (!exist(filename_ref, "file"))
-    error("Reference image not found: %s", filename_ref);
+if (!exist(config_json.reference_image, "file"))
+    error("Reference image not found: %s", config_json.reference_image);
 endif
 
-if (!exist(filename_mov, "file"))
-    error("Moving image not found: %s", filename_mov);
+if (!exist(config_json.moving_image, "file"))
+    error("Moving image not found: %s", config_json.moving_image);
 endif
 
 if (!exist(filename_gt, "file"))
@@ -69,14 +70,11 @@ fprintf("============================================================\n");
 
 fprintf("Loading images...\n");
 
-Iref = imread(filename_ref);
-Imov = imread(filename_mov);
+Iref = imread(config_json.reference_image);
+Imov = imread(config_json.moving_image);
 
-fprintf("Reference image: %d x %d\n", ...
-        size(Iref,1), size(Iref,2));
-
-fprintf("Moving image:    %d x %d\n", ...
-        size(Imov,1), size(Imov,2));
+fprintf("Reference image: %d x %d\n", size(Iref,1), size(Iref,2));
+fprintf("Moving image:    %d x %d\n", size(Imov,1), size(Imov,2));
 
 %% ============================================================
 % Convert RGB -> grayscale
@@ -127,10 +125,10 @@ endif
 
 config = struct();
 config.size_image   = int32(size(Iref));
-config.niter        = int32([200, 200, 200, 200]);
-config.alpha        = 0.4;
-config.eps          = 1e-4;
-config.nrefine      = 2;
+config.niter        = int32(config_json.registration.niter);
+config.alpha        = config_json.registration.alpha;
+config.eps          = config_json.registration.eps;
+config.nrefine      = config_json.registration.nrefine;
 
 %% ============================================================
 % Initialize C++ optical-flow object
