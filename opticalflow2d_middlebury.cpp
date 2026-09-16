@@ -1,0 +1,149 @@
+#define cimg_display 0 // Remove if making use of plot functions from cimg_library. If so, add -lX11 to compilation flags.
+
+#include "include/CImg.h"
+
+#include "include/coord2d.hpp"
+#include "include/Field.hpp"
+#include "include/interp2d.hpp"
+#include "include/ImageRegistration.h"
+#include "include/json.hpp"
+
+#include <fstream>
+#include <string>
+#include <stdexcept>
+#include <chrono>
+#include <vector>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Read json configuration file and store in structure
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct json_config {
+    std::string path_reference_image;
+    std::string path_moving_image;
+
+    std::size_t nscales;
+    std::size_t nrefine;
+    std::vector<std::size_t> niter;
+
+    double alpha;
+    double eps;
+};
+
+json_config load_config(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file.is_open())
+        throw std::runtime_error("Could not open json configuration file: " + filename);
+
+    nlohmann::json json;
+    file >> json;
+
+    json_config config;
+
+    config.path_reference_image = json.at("reference_image").get<std::string>();
+    config.path_moving_image = json.at("moving_image").get<std::string>();
+
+    const auto& registration = json.at("registration");
+    config.nrefine = registration.at("nrefine").get<std::size_t>();
+
+    config.niter = registration.at("niter").get<std::vector<std::size_t>>();
+    if (config.niter.empty())
+        throw std::runtime_error("niter must contain at least one value.");
+    config.nscales = config.niter.size() + 1;
+
+    config.alpha = registration.at("alpha").get<double>();
+    config.eps = registration.at("eps").get<double>();
+
+    return config;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Read images using the cimg_library and convert to opticalflow::Image type from Field.hpp,
+// which is the input for this ImageRegistration class implementation
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void convert_cimg_to_opticalflow(opticalflow::Image& image, cimg_library::CImg<double>& cimage) {
+    const dim dimin(cimage.width(), cimage.height());
+    const std::size_t size = dimin.x * dimin.y;
+
+    if (image.get_dimensions() != dimin)
+        throw std::runtime_error("In convert_cimg_to_opticalflow(Image&, cimg_library::CImg<double>&), dimensions of input and target have to equal");
+
+    // Convert cimage to grayscale, raw image. Average over 3 color channels
+    double* image_gs = new double[size];
+    double* cimage_rgb = cimage.data();
+
+    for (std::size_t idx = 0; idx < size; ++idx) {
+        image_gs[idx] = (cimage_rgb[idx] + cimage_rgb[idx + size] + cimage_rgb[idx + 2*size]) / 3.0;
+    }
+
+    // Set data from opticalflow::Image target to raw data values
+    opticalflow::image::mex_load_image(image_gs, image);
+
+    // Normalize intensities between zero and one
+    opticalflow::image::normalize(image);
+
+    // Free memory
+    delete[] image_gs;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Main function
+///////////////////////////////////////////////////////////////////////////////////////////////////
+int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        std::cerr << "Usage: " << argv[0] << " config.json\n";
+        return 1;
+    }
+    json_config config = load_config(argv[1]);
+
+    // Load images
+    std::cout << "Loading images...";
+    cimg_library::CImg<double> Iref_rgb(config.path_reference_image.c_str());
+    cimg_library::CImg<double> Imov_rgb(config.path_moving_image.c_str());
+    std::cout << "Images loaded: " << Iref_rgb.width() << "x" << Iref_rgb.height() << std::endl;
+
+    // Convert to opticalflow type
+    std::cout << "Convert to opticalflow type...";
+    const dim dimin(Iref_rgb.width(), Iref_rgb.height());
+
+    opticalflow::Image Iref(dimin);
+    opticalflow::Image Imov(dimin);
+
+    convert_cimg_to_opticalflow(Iref, Iref_rgb);
+    convert_cimg_to_opticalflow(Imov, Imov_rgb);
+    std::cout << "Complete!" << std::endl;
+
+    // Initialize registration class
+    std::cout << "Initialize ImageRegistration class...";
+    ImageRegistration myImageRegistration(dimin, config.nscales, config.niter.data(), config.alpha, config.eps, config.nrefine);
+    std::cout << "Complete!" << std::endl;
+
+    // Set images
+    std::cout << "Set reference and moving image to ImageRegistration class...";
+    myImageRegistration.set_reference_image(Iref);
+    myImageRegistration.set_moving_image(Imov);
+    std::cout << "Complete!" << std::endl;
+
+    // Register
+    std::cout << "Estimate optical flow...";
+    
+    auto start = std::chrono::steady_clock::now();
+    myImageRegistration.estimate_optical_flow();
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+
+    std::cout << "Completed in " << elapsed.count() << "s" << std::endl;
+
+    // Get the motion field
+    const opticalflow::Motion& motion = myImageRegistration.get_estimated_motion();
+
+    // Get the registered image
+    opticalflow::Image Ireg(dimin);
+    interp2d::warp2d(Ireg, Imov, motion);
+
+    // Report on MSE
+    double mse_initial = opticalflow::image::mse(Iref, Imov);
+    double mse_final = opticalflow::image::mse(Iref, Ireg);
+
+    std::cout << "MSE (initial): " << mse_initial << std::endl;
+    std::cout << "MSE (final): " << mse_final << std::endl;
+}
