@@ -64,6 +64,11 @@ To close the registration library:
 OpticalFlow2d();
 ```
 
+# Results: proof-of-principle
+As a proof-of-princple, the Middlebury _flow_ dataset was used for validation of the estimated deformation fields. 
+
+![alt text](middlebury_results.png)
+
 # Code testing
 
 The tests directory contains unit, integration and system tests for the OpticalFlow2D codebase. Tests have been written using the Google's gtest testing framework. Tests can be compiled and run (on Linux) through
