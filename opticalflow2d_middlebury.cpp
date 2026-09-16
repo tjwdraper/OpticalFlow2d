@@ -1,3 +1,5 @@
+#define cimg_display 0 // Remove if making use of plot functions from cimg_library. If so, add -lX11 to compilation flags.
+
 #include "include/CImg.h"
 
 #include "include/coord2d.hpp"
