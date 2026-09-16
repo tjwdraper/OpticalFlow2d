@@ -82,16 +82,16 @@ fprintf("Moving image:    %d x %d\n", ...
 % Convert RGB -> grayscale
 % =============================================================
 
+Iref = double(Iref);
+Imov = double(Imov);
+
 if (ndims(Iref) == 3)
-    Iref = rgb2gray(Iref);
+    Iref = (Iref(:,:,1) + Iref(:,:,2) + Iref(:,:,3))/3.0;
 endif
 
 if (ndims(Imov) == 3)
-    Imov = rgb2gray(Imov);
+    Imov = (Imov(:,:,1) + Imov(:,:,2) + Imov(:,:,3))/3.0;
 endif
-
-Iref = double(Iref);
-Imov = double(Imov);
 
 Iref = (Iref - min(Iref(:))) / (max(Iref(:)) - min(Iref(:)));
 Imov = (Imov - min(Imov(:))) / (max(Imov(:)) - min(Imov(:)));
@@ -103,17 +103,7 @@ dimy = size(Iref,2);
 % Load ground-truth flow
 % =============================================================
 
-fprintf("Loading ground-truth flow...\n");
-
 flow_gt = readFlowFile(filename_gt);
-
-% Middlebury .flo convention:
-%
-% flow(:,:,1) = horizontal component
-% flow(:,:,2) = vertical component
-%
-% Your implementation uses the opposite ordering, therefore
-% swap them here.
 
 u_gt = flow_gt(:,:,2);
 v_gt = flow_gt(:,:,1);
@@ -146,21 +136,15 @@ config.nrefine      = 2;
 % Initialize C++ optical-flow object
 % =============================================================
 
-fprintf("Initializing optical-flow object...\n");
-
 OpticalFlow2d(config);
 
 %% ============================================================
 % Estimate optical flow
 % =============================================================
 
-fprintf("Estimating optical flow...\n");
-
 tic;
 OpticalFlow2d(Iref, Imov);
 time = toc;
-
-fprintf("Optical-flow time: %.3f s\n", time);
 
 %% ============================================================
 % Get estimated flow
@@ -174,8 +158,6 @@ v = motion(:,:,2);
 %% ============================================================
 % Warp moving image
 % =============================================================
-
-fprintf("Warping moving image...\n");
 
 Ireg = OpticalFlow2d(Imov);
 
@@ -234,8 +216,8 @@ max_motion  = max(magnitude(:));
 difference_before = Iref - Imov;
 difference_after  = Iref - Ireg;
 
-mae_before = mean(abs(difference_before(:)));
-mae_after  = mean(abs(difference_after(:)));
+mse_before = mean(difference_before(:).^2);
+mse_after  = mean(difference_after(:).^2);
 
 %% ============================================================
 % Jacobian determinant
@@ -284,8 +266,8 @@ fprintf("\n");
 fprintf("Registration\n");
 fprintf("-----------------------------\n");
 fprintf("Time:              %.3f s\n", time);
-fprintf("MAE before:        %.6f\n", mae_before);
-fprintf("MAE after:         %.6f\n", mae_after);
+fprintf("MSE before:        %.6f\n", mse_before);
+fprintf("MSE after:         %.6f\n", mse_after);
 
 fprintf("\n");
 fprintf("Endpoint error\n");

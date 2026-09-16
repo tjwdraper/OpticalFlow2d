@@ -214,6 +214,16 @@ namespace opticalflow {
             for (std::size_t idx = 0; idx < image.get_size(); ++idx) 
                 image.set_val((image.get_val(idx)-low)/(high-low), idx);
         }
+
+        inline double mse(const Image& image_a, const Image& image_b) {
+            if (image_a.get_dimensions() != image_b.get_dimensions())
+                throw std::runtime_error("In opticalflow::image::mse(const Image&, const Image&), input images don't share the same dimensions.");
+
+            double val(0.0);
+            for (std::size_t idx = 0; idx < image_a.get_size(); ++idx) 
+                val += std::pow(image_a.get_val(idx) - image_b.get_val(idx), 2.0);
+            return val / image_a.get_size();
+        }
     }
 
     namespace motion {

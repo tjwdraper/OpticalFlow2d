@@ -37,8 +37,8 @@ void convert_cimg_to_opticalflow(opticalflow::Image& image, cimg_library::CImg<d
 int main() {
     // Load images
     std::cout << "Loading images...";
-    cimg_library::CImg<double> Iref_rgb("img/other-color-twoframes/other-data/Beanbags/frame10.png");
-    cimg_library::CImg<double> Imov_rgb("img/other-color-twoframes/other-data/Beanbags/frame11.png");
+    cimg_library::CImg<double> Iref_rgb("img/other-color-twoframes/other-data/RubberWhale/frame10.png");
+    cimg_library::CImg<double> Imov_rgb("img/other-color-twoframes/other-data/RubberWhale/frame11.png");
     std::cout << "Images loaded: " << Iref_rgb.width() << "x" << Iref_rgb.height() << std::endl;
 
     // Convert to opticalflow type
@@ -57,7 +57,7 @@ int main() {
     std::size_t nscales = 3;
     std::size_t nrefine = 2;
     std::size_t niter[4] = {200, 200, 200, 200};
-    double alpha = 0.3;
+    double alpha = 0.4;
     double eps = 1e-4;
 
     ImageRegistration myImageRegistration(dimin, nscales, niter, alpha, eps, nrefine);
@@ -87,8 +87,8 @@ int main() {
     interp2d::warp2d(Ireg, Imov, motion);
 
     // Report on MSE
-    double mse_initial = opticalflow::image::norm(Iref - Imov);
-    double mse_final = opticalflow::image::norm(Iref - Ireg);
+    double mse_initial = opticalflow::image::mse(Iref, Imov);
+    double mse_final = opticalflow::image::mse(Iref, Ireg);
 
     std::cout << "MSE (initial): " << mse_initial << std::endl;
     std::cout << "MSE (final): " << mse_final << std::endl;
