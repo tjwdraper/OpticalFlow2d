@@ -125,7 +125,7 @@ TEST_F(ImageTest, MexLoadImage)
 
     opticalflow::Image loaded(dim(3, 2));
 
-    opticalflow::image::mex_load_image(vals, loaded);
+    opticalflow::image::load_image(vals, loaded);
 
     for (std::size_t idx = 0; idx < loaded.get_size(); ++idx)
         EXPECT_DOUBLE_EQ(loaded.get_val(idx), vals[idx]);
@@ -136,7 +136,7 @@ TEST_F(ImageTest, MexSaveImage)
 {
     double vals[6] = {};
 
-    opticalflow::image::mex_save_image(vals, image);
+    opticalflow::image::save_image(vals, image);
 
     for (std::size_t idx = 0; idx < image.get_size(); ++idx)
         EXPECT_DOUBLE_EQ(vals[idx], image.get_val(idx));
@@ -154,8 +154,8 @@ TEST_F(ImageTest, MexLoadAndSaveImage)
 
     opticalflow::Image loaded(dim(3, 2));
 
-    opticalflow::image::mex_load_image(input, loaded);
-    opticalflow::image::mex_save_image(output, loaded);
+    opticalflow::image::load_image(input, loaded);
+    opticalflow::image::save_image(output, loaded);
 
     for (std::size_t idx = 0; idx < 6; ++idx)
         EXPECT_DOUBLE_EQ(output[idx], input[idx]);

@@ -55,9 +55,9 @@ TEST_F(MotionTest, MinSingleValue) {
 TEST_F(MotionTest, MexSaveMotion) {
     double vals[12] = {};
 
-    opticalflow::motion::mex_save_motion(vals, motion);
+    opticalflow::motion::save_motion(vals, motion);
 
-    // mex_save_motion stores all x components first,
+    // save_motion stores all x components first,
     // followed by all y components.
     //
     // vals:
@@ -82,7 +82,7 @@ TEST_F(MotionTest, MexSaveMotionSingleValue) {
 
     double vals[2] = {};
 
-    opticalflow::motion::mex_save_motion(vals, single);
+    opticalflow::motion::save_motion(vals, single);
 
     EXPECT_DOUBLE_EQ(vals[0], 42.0);
     EXPECT_DOUBLE_EQ(vals[1], 24.0);
@@ -91,7 +91,7 @@ TEST_F(MotionTest, MexSaveMotionSingleValue) {
 TEST_F(MotionTest, MexSaveMotionPreservesComponents) {
     double vals[12] = {};
 
-    opticalflow::motion::mex_save_motion(vals, motion);
+    opticalflow::motion::save_motion(vals, motion);
 
     const std::size_t N = motion.get_size();
 

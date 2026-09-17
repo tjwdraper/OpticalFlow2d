@@ -19,8 +19,10 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     if ((nlhs == 0) && (nrhs == 1) && (myImageRegistration == nullptr)) {
         mxParser::parse_size_image(dimin, prhs[0]);
 
-
         // Registration parameters
+        ModelOption option;
+        mxParser::parse_opticalflow_option(option, prhs[0]);
+
         std::size_t nscales, nrefine;
         mxParser::parse_nscales(nscales, prhs[0]);
         mxParser::parse_nrefine(nrefine, prhs[0]);
@@ -28,43 +30,17 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         double alpha;
         mxParser::parse_alpha(alpha, prhs[0]);
 
+
+        double beta;
+        mxParser::parse_beta(beta, prhs[0]);
+
         std::size_t* niter = new size_t[nscales+1];
         mxParser::parse_niter(niter, prhs[0]);
 
         double eps;
         mxParser::parse_convergence_threshold(eps, prhs[0]);
 
-
-        myImageRegistration = new ImageRegistration(dimin, nscales, niter, alpha, eps, nrefine);
-
-
-        // // Get the dimensions and the size of the images
-        // double *tmp;
-        // tmp = mxGetPr(prhs[0]);
-        // std::size_t dimx = (std::size_t) tmp[0];
-        // std::size_t dimy = (std::size_t) tmp[1];
-        // dimin = dim(dimx, dimy);
-
-        // // Get the registration parameters
-        // tmp = mxGetPr(prhs[2]);
-        // std::size_t nscales = (std::size_t) tmp[0];
-        // tmp = mxGetPr(prhs[1]);
-        // std::size_t *niter = new std::size_t[nscales + 1];
-        // for (std::size_t s = 0; s < nscales + 1; s++) {
-        //     niter[s] = (std::size_t) tmp[s];
-        // }
-
-        // tmp = mxGetPr(prhs[3]);
-        // double alpha = (double) tmp[0];
-
-        // tmp = mxGetPr(prhs[4]);
-        // double eps = (double) tmp[0];
-
-        // tmp = mxGetPr(prhs[5]);
-        // std::size_t nrefine = (std::size_t) tmp[0];
-
-        // // Pass parameters to ImageRegistration object
-        // myImageRegistration = new ImageRegistration(dimin, nscales, niter, alpha, eps, nrefine);
+        myImageRegistration = new ImageRegistration(dimin, option, nscales, niter, alpha, beta, eps, nrefine);
 
         // Set the output dimension for image and motion field
         dim_image_mw = new mwSize[2];
@@ -88,11 +64,11 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         double *tmp;
         // Load the reference and moving image
         tmp = mxGetPr(prhs[0]);
-        opticalflow::image::mex_load_image(tmp, Iref);
+        opticalflow::image::load_image(tmp, Iref);
         myImageRegistration->set_reference_image(Iref);
 
         tmp = mxGetPr(prhs[1]);
-        opticalflow::image::mex_load_image(tmp, Imov);
+        opticalflow::image::load_image(tmp, Imov);
         myImageRegistration->set_moving_image(Imov);
 
         // Do the registration
@@ -103,12 +79,26 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     else if ((nlhs == 1) && (nrhs == 0) && (myImageRegistration != nullptr)) {
         const opticalflow::Motion& motion = myImageRegistration->get_estimated_motion();
 
-        // Create output array and postd::size_ter to data
+        // Create output array and pointer to data
         plhs[0] = mxCreateNumericArray(3, dim_motion_mw, mxDOUBLE_CLASS, mxREAL);
         double *tmp = mxGetPr(plhs[0]);
 
         // Fill the data with the motion field
-        opticalflow::motion::mex_save_motion(tmp, motion);
+        opticalflow::motion::save_motion(tmp, motion);
+    }
+
+    else if ((nlhs == 2) && (nrhs == 0) && (myImageRegistration != nullptr)) {
+        const opticalflow::Motion& motion = myImageRegistration->get_estimated_motion();
+        const opticalflow::Image& c = myImageRegistration->get_estimated_c();
+
+        // Create output array and pointer to data
+        plhs[0] = mxCreateNumericArray(3, dim_motion_mw, mxDOUBLE_CLASS, mxREAL);
+        plhs[1] = mxCreateNumericArray(2, dim_image_mw, mxDOUBLE_CLASS, mxREAL);
+
+        double *tmp = mxGetPr(plhs[0]);
+        opticalflow::motion::save_motion(tmp, motion);
+        tmp = mxGetPr(plhs[1]);
+        opticalflow::image::save_image(tmp, c);
     }
 
     // Warp the input image with the estimated motion
@@ -120,7 +110,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         double *tmp;
         // Load the moving image
         tmp = mxGetPr(prhs[0]);
-        opticalflow::image::mex_load_image(tmp, Imov);
+        opticalflow::image::load_image(tmp, Imov);
 
         // Warp the image with the motion field
         interp2d::warp2d(Ireg, Imov, motion);
@@ -130,7 +120,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         tmp = mxGetPr(plhs[0]);
 
         // Fill the data with the registered image
-        opticalflow::image::mex_save_image(tmp, Ireg);
+        opticalflow::image::save_image(tmp, Ireg);
     }
 
     // Close the library

@@ -8,109 +8,6 @@
 #include <stdexcept>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// Non-separable 2d convolution
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class conv2d {
-    public:
-        // Constructors and deconstructors
-        conv2d(const dim dimconv) : _dimconv(dimconv),
-                                    _stepconv(1, dimconv.x),
-                                    _sizeconv(dimconv.x*dimconv.y),
-                                    _weights(new double[dimconv.x*dimconv.y]) {
-            if (dimconv.x == 0 || dimconv.y == 0)
-                throw std::runtime_error("In conv2d(const dim), convolution dimensions must be non-zero.");
-
-            if (dimconv.x % 2 == 0 || dimconv.y % 2 == 0)
-                throw std::runtime_error("In conv2d(const dim), convolution dimensions must be odd.");
-        }
-        ~conv2d() {delete[] _weights;}
-
-        // Getters and setters
-        dim get_dimensions() const {return _dimconv;}
-        dim get_step() const {return _stepconv;}
-        std::size_t get_size() const {return _sizeconv;}
-        double get_weight(std::size_t i, std::size_t j) const {
-            if (i >= _dimconv.x || j >= _dimconv.y)
-                throw std::runtime_error("In double conv2d::get_weigh(std::size_t, std::size_t) index out of bounds");
-            return _weights[i * _stepconv.x + j * _stepconv.y];
-        }
-
-        void set_weight(double val, std::size_t i, std::size_t j) {
-            if (i >= _dimconv.x || j >= _dimconv.y)
-                throw std::runtime_error("In double conv2d::set_weigh(std::size_t, std::size_t) index out of bounds");
-            _weights[i * _stepconv.x + j * _stepconv.y] = val;
-        }
-
-        // Apply convolution
-        template<typename T>
-        void convolute(opticalflow::Field<T>& fin) const {
-            const dim dimin = fin.get_dimensions();
-
-            // Convolution centers
-            const std::size_t center_i = _dimconv.x / 2;
-            const std::size_t center_j = _dimconv.y / 2;
-
-            // Apply convolution in y-direction
-            opticalflow::Field<T> intermediate(dimin);
-            for (std::size_t i = 0; i < dimin.x; ++i) {
-                for (std::size_t j = 0; j < dimin.y; ++j) {
-                    T val{};
-
-                    for  (std::size_t ki = 0; ki < _dimconv.x; ++ki) {
-                        for (std::size_t kj = 0; kj < _dimconv.y; ++kj) {
-                            long ii = static_cast<long>(i) + static_cast<long>(ki) - static_cast<long>(center_i);
-                            long jj = static_cast<long>(j) + static_cast<long>(kj) - static_cast<long>(center_j);
-
-                            // Clip to boundary
-                            if (ii < 0) {ii = 0;}
-                            if (ii > dimin.x-1) {ii = dimin.x-1;}
-                            if (jj < 0) {jj = 0;}
-                            if (jj > dimin.y-1) {jj = dimin.y-1;}
-
-                            val += fin.get_val(
-                                static_cast<std::size_t>(ii),
-                                static_cast<std::size_t>(jj) ) * _weights[ki * _stepconv.x + kj * _stepconv.y];
-                        }
-                    }
-
-                    intermediate.set_val(val, i, j);
-                }
-            }
-
-            fin = std::move(intermediate);
-        }
-
-    protected:
-        dim _dimconv;
-        dim _stepconv;
-        std::size_t _sizeconv;
-
-        double* _weights;        
-};
-
-inline conv2d create_horn_schunck_laplacian_conv2d() {
-    conv2d kernel(dim(3,3));
-
-    constexpr double corner = 1/12.0;
-    constexpr double edge = 1/6.0;
-
-    kernel.set_weight(corner, 0, 0);
-    kernel.set_weight(edge,   0, 1);
-    kernel.set_weight(corner, 0, 2);
-
-    kernel.set_weight(edge,   1, 0);
-    kernel.set_weight(0.0,    1, 1);
-    kernel.set_weight(edge,   1, 2);
-
-    kernel.set_weight(corner, 2, 0);
-    kernel.set_weight(edge,   2, 1);
-    kernel.set_weight(corner, 2, 2);
-
-    return kernel;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 // Separable 2d convolution
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class separable_conv2d {
@@ -179,8 +76,7 @@ class separable_conv2d {
 
             // Apply convolution in x-direction
             opticalflow::Field<T> result(dimin);
-
-            #pragma omp parallel for
+            
             for (std::size_t i = 0; i < dimin.x; ++i) {
                 for (std::size_t j = 0; j < dimin.y; ++j) {
                     T val{};

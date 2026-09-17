@@ -74,60 +74,23 @@ namespace gradients {
         return (field.get_val(i+1,j+1) - field.get_val(i+1,j-1) - field.get_val(i-1,j+1) + field.get_val(i-1,j-1)) / 4.0;
     }
 
-    // template <typename T>
-    // inline T horn_schunck_average(const opticalflow::Field<T>& field, const std::size_t i, const std::size_t j) {
-    //     // const dim dimin = field.get_dimensions();
-    //     // if (dimin.x < 2 || dimin.y < 2)
-    //     //     throw  std::runtime_error("In T gradients::horn_schunck_average(const Field<T>&, const std::size_t, const std::size_t), field dimensions must be at least 2x2.");
-
-    //     T val{};
-
-    //     if (i == 0) {
-    //         val += field.get_val(i,j);
-    //         val += field.get_val(i+1,j);
-    //     }
-    //     else if (i == dimin.x-1) {
-    //         val += field.get_val(i-1,j);
-    //         val += field.get_val(i,j);
-    //     }
-    //     else {
-    //         val += field.get_val(i-1,j);
-    //         val += field.get_val(i+1,j);
-    //     }
-
-    //     if (j == 0) {
-    //         val += field.get_val(i,j);
-    //         val += field.get_val(i,j+1);
-    //     }
-    //     else if (j == dimin.y-1) {
-    //         val += field.get_val(i,j-1);
-    //         val += field.get_val(i,j);
-    //     }
-    //     else {
-    //         val += field.get_val(i,j-1);
-    //         val += field.get_val(i,j+1);
-    //     }
-
-    //     return val / 4.0;
-
-    // }
-
-    void horn_schunck_average(opticalflow::Motion& motion_avg, const opticalflow::Motion& motion) {
+    template <typename T>
+    void horn_schunck_average(opticalflow::Field<T>& field_avg, const opticalflow::Field<T>& field) {
         // Check that input dimensions are OK
-        if (motion_avg.get_dimensions() != motion.get_dimensions())
-            throw std::runtime_error("Error in gradients::horn_schunck_average(opticalflow::Motion&, const opticalflow::Motion&, const opticalflow::Image&): input dimensions have to be the same as target");
+        if (field_avg.get_dimensions() != field.get_dimensions())
+            throw std::runtime_error("Error in gradients::horn_schunck_average(opticalflow::Field<T>&, const opticalflow::Field<T>&): input dimensions have to be the same as target");
 
         // Get the dimensions of the image
-        const dim dimin = motion.get_dimensions();
+        const dim dimin = field.get_dimensions();
 
         // Iterate over interior points
         for (std::size_t i = 1; i < dimin.x-1; ++i) {
             for (std::size_t j = 1; j < dimin.y-1; ++j) {
-                motion_avg.set_val(
-                    0.25 * (motion.get_val(i+1,j) 
-                            + motion.get_val(i-1,j) 
-                            + motion.get_val(i,j+1) 
-                            + motion.get_val(i,j-1)),
+                field_avg.set_val(
+                    0.25 * (field.get_val(i+1,j) 
+                            + field.get_val(i-1,j) 
+                            + field.get_val(i,j+1) 
+                            + field.get_val(i,j-1)),
                     i,j
                 );
             }
@@ -135,72 +98,62 @@ namespace gradients {
 
         // Iterate over edges
         for (std::size_t j = 1; j < dimin.y-1; ++j) {
-            motion_avg.set_val(
-                0.25 * (motion.get_val(1,j) 
-                        + motion.get_val(0,j) 
-                        + motion.get_val(0,j+1) 
-                        + motion.get_val(0,j-1)),
+            field_avg.set_val(
+                0.25 * (field.get_val(1,j) 
+                        + field.get_val(0,j) 
+                        + field.get_val(0,j+1) 
+                        + field.get_val(0,j-1)),
                 0, j
             );
 
-            motion_avg.set_val(
-                0.25 * (motion.get_val(dimin.x-2, j) 
-                        + motion.get_val(dimin.x-1, j) 
-                        + motion.get_val(dimin.x-1, j+1) 
-                        + motion.get_val(dimin.x-1, j-1)),
+            field_avg.set_val(
+                0.25 * (field.get_val(dimin.x-2, j) 
+                        + field.get_val(dimin.x-1, j) 
+                        + field.get_val(dimin.x-1, j+1) 
+                        + field.get_val(dimin.x-1, j-1)),
                 dimin.x-1, j
             );
         }
 
         for (std::size_t i = 1; i < dimin.x-1; ++i) {
-            motion_avg.set_val(
-                0.25 * (motion.get_val(i,1) 
-                        + motion.get_val(i,0) 
-                        + motion.get_val(i+1,0) 
-                        + motion.get_val(i-1,0)),
+            field_avg.set_val(
+                0.25 * (field.get_val(i,1) 
+                        + field.get_val(i,0) 
+                        + field.get_val(i+1,0) 
+                        + field.get_val(i-1,0)),
                 i,0
             );
 
-            motion_avg.set_val(
-                0.25 * (motion.get_val(i,dimin.y-2) 
-                        + motion.get_val(i,dimin.y-1) 
-                        + motion.get_val(i+1,dimin.y-1) 
-                        + motion.get_val(i-1,dimin.y-1)),
+            field_avg.set_val(
+                0.25 * (field.get_val(i,dimin.y-2) 
+                        + field.get_val(i,dimin.y-1) 
+                        + field.get_val(i+1,dimin.y-1) 
+                        + field.get_val(i-1,dimin.y-1)),
                 i, dimin.y-1
             );
         }
 
         // Corner points
-        motion_avg.set_val(0.25 * (motion.get_val(1,0) 
-                                            + motion.get_val(0,0) 
-                                            + motion.get_val(0,1) 
-                                            + motion.get_val(0,0)),
-                                            0,0);
-        motion_avg.set_val(0.25 * (motion.get_val(dimin.x-2,0) 
-                                            + motion.get_val(dimin.x-1,0) 
-                                            + motion.get_val(dimin.x-1,1) 
-                                            + motion.get_val(dimin.x-1,0)),
-                                            dimin.x-1,0);
-        motion_avg.set_val(0.25 * (motion.get_val(0,dimin.y-2) 
-                                            + motion.get_val(0,dimin.y-1) 
-                                            + motion.get_val(1,dimin.y-1) 
-                                            + motion.get_val(0,dimin.y-1)),
-                                            0,dimin.y-1);
-        motion_avg.set_val(0.25 * (motion.get_val(dimin.x-2,dimin.y-1) 
-                                            + motion.get_val(dimin.x-1,dimin.y-1) 
-                                            + motion.get_val(dimin.x-1,dimin.y-2) 
-                                            + motion.get_val(dimin.x-1, dimin.y-1)),
-                                            dimin.x-1,dimin.y-1);
-
-
-        // for (std::size_t i = 0; i < dimin.x; i++) {
-        //     for (std::size_t j = 0; j < dimin.y; j++) {
-        //         motion_avg.set_val(
-        //             gradients::horn_schunck_average(motion, i, j),
-        //             i,j
-        //         );
-        //     }
-        // }
+        field_avg.set_val(0.25 * (field.get_val(1,0) 
+                                + field.get_val(0,0) 
+                                + field.get_val(0,1) 
+                                + field.get_val(0,0)),
+                                0,0);
+        field_avg.set_val(0.25 * (field.get_val(dimin.x-2,0) 
+                                + field.get_val(dimin.x-1,0) 
+                                + field.get_val(dimin.x-1,1) 
+                                + field.get_val(dimin.x-1,0)),
+                                dimin.x-1,0);
+        field_avg.set_val(0.25 * (field.get_val(0,dimin.y-2) 
+                                + field.get_val(0,dimin.y-1) 
+                                + field.get_val(1,dimin.y-1) 
+                                + field.get_val(0,dimin.y-1)),
+                                0,dimin.y-1);
+        field_avg.set_val(0.25 * (field.get_val(dimin.x-2,dimin.y-1) 
+                                + field.get_val(dimin.x-1,dimin.y-1) 
+                                + field.get_val(dimin.x-1,dimin.y-2) 
+                                + field.get_val(dimin.x-1, dimin.y-1)),
+                                dimin.x-1,dimin.y-1);
     }
     
     void gradient(opticalflow::Motion& dI, const opticalflow::Image& image) {

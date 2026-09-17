@@ -14,20 +14,20 @@ namespace opticalflow {
         public:
             // Constructors and deconstructors
             Field(dim dimin) : _dimin(dimin), 
-                            _step(1, dimin.x), 
-                            _size(dimin.x*dimin.y),
-                            _field(new T[_size]) {}
+                               _step(1, dimin.x), 
+                               _size(dimin.x*dimin.y),
+                               _field(new T[_size]) {}
 
             Field(const Field<T>& fin) : _dimin(fin.get_dimensions()), 
-                                        _step(fin.get_step()), 
-                                        _size(fin.get_size()),
-                                        _field(new T[fin.get_size()]) {
+                                         _step(fin.get_step()), 
+                                         _size(fin.get_size()),
+                                         _field(new T[fin.get_size()]) {
                 std::copy(fin.get_field(), fin.get_field() + _size, _field);
             }
             Field(Field<T>&& other) noexcept : _dimin(other.get_dimensions()),
-                                            _step(other.get_step()),
-                                            _size(other.get_size()),
-                                            _field(other.get_field()) {
+                                               _step(other.get_step()),
+                                               _size(other.get_size()),
+                                               _field(other.get_field()) {
                 other._field = nullptr;
             }
             ~Field() { delete[] _field; }
@@ -169,12 +169,12 @@ namespace opticalflow {
 
     namespace image {
         // TODO: change to mxArray* in future or separate from namespace
-        inline void mex_load_image(const double* vals, Image& image) {
+        inline void load_image(const double* vals, Image& image) {
             std::copy(vals, vals + image.get_size(), image.get_field());
         }
 
         // TODO: change to mxArray* in future or separate from namespace
-        inline void mex_save_image(double* vals, const Image& image) {
+        inline void save_image(double* vals, const Image& image) {
             std::copy(image.get_field(), image.get_field() + image.get_size(), vals);
         }
 
@@ -237,7 +237,7 @@ namespace opticalflow {
     }
 
     namespace motion {
-        inline void mex_save_motion(double* vals, const Motion& motion) {
+        inline void save_motion(double* vals, const Motion& motion) {
             std::size_t N = motion.get_size();
             for (std::size_t idx = 0; idx < N; ++idx) {
                 const vector2d v = motion.get_val(idx);

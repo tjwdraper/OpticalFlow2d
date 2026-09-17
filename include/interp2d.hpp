@@ -65,29 +65,6 @@ namespace interp2d {
         motion = std::move(motion_tmp);
     }
 
-    // Invert the motion field (i.e. calculate v such that (1 + u) \circ (1 + v) = (1 + v) \circ (1 + u) = 1)
-    inline void invert(opticalflow::Motion& motion_inv, const opticalflow::Motion& motion, const std::size_t niter = 1, const double omega = 1.0) {
-        if (omega < 0.0 || omega > 1.0)
-            throw std::runtime_error("In interp2d::inver(Motion&, const Motion&. const std::size_t, const double), omega has to be between 0 and 1.");
-
-        opticalflow::Motion motion_tmp(motion.get_dimensions());
-
-        motion_inv = -1.0*motion; // Implement unary operator for this...?
-
-        for (std::size_t iter = 0; iter < niter; ++iter) {
-            interp2d::interp2d<vector2d>(motion_tmp, motion, motion_inv);
-
-            motion_inv = -omega * motion_tmp + (1.0-omega) * motion_inv;
-
-            // TODO: some convergence check.
-        }
-    }
-    inline void invert(opticalflow::Motion& motion, const std::size_t niter, const double omega) {
-        opticalflow::Motion motion_tmp(motion.get_dimensions());
-        interp2d::invert(motion_tmp, motion, niter, omega);
-        motion = std::move(motion_tmp);
-    }
-
     // Resize
     inline void resize(opticalflow::Image& image_out, const opticalflow::Image& image_in) {
         const dim dim_out = image_out.get_dimensions();
