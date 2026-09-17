@@ -2,11 +2,14 @@
     "reference_image": "img/other-color-twoframes/other-data/RubberWhale/frame10.png",
     "moving_image": "img/other-color-twoframes/other-data/RubberWhale/frame11.png",
 
+    "optical_flow_option": "horn-schunck",
+
     "registration": {
         "nscales": 3,
         "nrefine": 2,
         "niter": [200, 200, 200, 200],
         "alpha": 0.4,
+        "beta": 0.2,
         "eps": 0.0001
     }
 }

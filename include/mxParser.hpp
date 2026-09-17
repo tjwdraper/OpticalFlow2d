@@ -3,8 +3,6 @@
 
 #include <string>
 #include <mex.h>
-// #include <octave-11.1.0/oct.h>
-// #include <matrix.h>
 #include <type_traits>
 #include <optional>
 #include <algorithm>
@@ -159,6 +157,11 @@ namespace mxParser {
         mxParser::verbose = parse_string<VerboseOption>(config, "verbose_option", mapper_verbose_option, VerboseOption::VERBOSE);
     }
 
+    // Parse optical flow method
+    inline void parse_opticalflow_option(ModelOption& option, const mxArray* config) {
+        option = parse_string<ModelOption>(config, "optical_flow_option", mapper_model_option, ModelOption::HORN_SCHUNCK);
+    }
+
     // Parse registration parameters
     inline void parse_size_image(dim& dimin, const mxArray* config) {
         dimin = parse_dim(config, "size_image");
@@ -176,7 +179,14 @@ namespace mxParser {
         }
     }
     inline void parse_alpha(double& alpha, const mxArray* config) {
+        if (alpha < 0.0)
+            throw std::runtime_error("regularization parameters alpha has to be a positive scalar");
         alpha = parse_scalar<double>(config, "alpha", std::optional<double>(0.4));
+    }
+    inline void parse_beta(double& beta, const mxArray* config) {
+        if (beta < 0.0)
+            throw std::runtime_error("regularization parameters beta has to be a positive scalar");
+        beta = parse_scalar<double>(config, "beta", std::optional<double>(0.2));
     }
     inline void parse_convergence_threshold(double& eps, const mxArray* config) {
         eps = parse_scalar<double>(config, "eps", std::optional<double>(1e-3));
