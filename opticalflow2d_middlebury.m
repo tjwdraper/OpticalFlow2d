@@ -4,8 +4,8 @@ close all;
 
 pkg load image;
 
-% Path containing readFlowFile.m and flowToColor.m
-addpath("img/flow-code-matlab");
+addpath("img/flow-code-matlab"); % localtion of readFlowFile.m and flowToColor.m
+addpath("build/") % location of .mex file.
 
 % Save figure
 save_figure = true;
@@ -103,19 +103,15 @@ config.nrefine              = config_json.registration.nrefine;
 % Initialize C++ optical-flow object
 % =============================================================
 
-fprintf("Passing configuration...");
 OpticalFlow2d(config);
-fprintf("Complete!\n");
 
 %% ============================================================
 % Estimate optical flow
 % =============================================================
 
-fprintf("Estimating optical flow...");
 tic;
 OpticalFlow2d(Iref, Imov);
 time = toc;
-fprintf("Complete!\n");
 
 %% ============================================================
 % Get estimated flow

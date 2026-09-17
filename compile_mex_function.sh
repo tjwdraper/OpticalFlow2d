@@ -6,7 +6,7 @@ rm -f OpticalFlow2d.mex
 
 echo "Compiling..."
 
-mkoctfile --mex -o OpticalFlow2d.mex WrapperOpticalFlow2d.cpp src/ImageRegistration.cpp src/IterativeSolver.cpp 
+mkoctfile --mex -o build/OpticalFlow2d.mex src/WrapperOpticalFlow2d.cpp src/ImageRegistration.cpp src/IterativeSolver.cpp 
 
 echo "Compilation successful!"
 

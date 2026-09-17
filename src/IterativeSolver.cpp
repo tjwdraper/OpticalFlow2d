@@ -49,7 +49,6 @@ void IterativeSolver::estimate_optical_flow(
 
     // Create convolution kernels
     average_conv2d filter(dim(3,3));
-    // conv2d filter_hs = create_horn_schunck_laplacian_conv2d();
 
     // Dereference some variables
     opticalflow::Motion& horn_schunck_average = *_horn_schunck_average;
@@ -67,8 +66,6 @@ void IterativeSolver::estimate_optical_flow(
 
     for (std::size_t iter = 0; iter < _niter; ++iter) {
         gradients::horn_schunck_average(horn_schunck_average, motion);
-        // horn_schunck_average = motion;
-        // filter_hs.convolute(horn_schunck_average); // User Meinhardt-Lopis et al. filter for Laplacian (no central contribution).
 
         for (std::size_t idx = 0; idx < motion.get_size(); ++idx) {
             // Get values
@@ -108,7 +105,6 @@ void IterativeSolver::estimate_optical_flow(
 
     // Create convolution kernels
     average_conv2d filter(dim(3,3));
-    // conv2d filter_hs = create_horn_schunck_laplacian_conv2d();
 
     // Dereference some variables
     opticalflow::Motion& horn_schunck_average = *_horn_schunck_average;
@@ -129,8 +125,6 @@ void IterativeSolver::estimate_optical_flow(
     for (std::size_t iter = 0; iter < _niter; ++iter) {
         gradients::horn_schunck_average(horn_schunck_average, motion);
         gradients::horn_schunck_average(c_average, c);
-        // horn_schunck_average = motion;
-        // filter_hs.convolute(horn_schunck_average); // User Meinhardt-Lopis et al. filter for Laplacian (no central contribution).
 
         for (std::size_t idx = 0; idx < motion.get_size(); ++idx) {
             // Get values

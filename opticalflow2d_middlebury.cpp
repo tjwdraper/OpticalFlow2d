@@ -86,7 +86,7 @@ void convert_cimg_to_opticalflow(opticalflow::Image& image, cimg_library::CImg<d
     }
 
     // Set data from opticalflow::Image target to raw data values
-    opticalflow::image::mex_load_image(image_gs, image);
+    opticalflow::image::load_image(image_gs, image);
 
     // Normalize intensities between zero and one
     opticalflow::image::normalize(image);

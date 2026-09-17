@@ -37,10 +37,6 @@ ImageRegistration::ImageRegistration(
         _c[s] = new opticalflow::Image(dim_s);
         _solver[s] = new IterativeSolver(dim_s, s, alpha, beta, niter[s], eps);
     }
-
-    // Display registration settings
-    // ImageRegistration::display_registration_parameters();
-
 }
 
 ImageRegistration::~ImageRegistration() {

@@ -1,8 +1,6 @@
 #ifndef _IMAGE_REGISTRATION_H_
 #define _IMAGE_REGISTRATION_H_
 
-// #include <mex.h>
-
 #include "include/coord2d.hpp"
 #include "include/Field.hpp"
 #include "include/ConfigurationOptions.hpp"
@@ -20,7 +18,6 @@ class ImageRegistration {
                           const double beta,
                           const double eps,
                           const std::size_t nrefine);
-        // ImageRegistration(const mxArray* config);
         ~ImageRegistration();
 
         // Getters and setters
