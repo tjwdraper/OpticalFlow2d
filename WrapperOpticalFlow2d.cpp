@@ -21,12 +21,18 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 
         // Registration parameters
+        ModelOption option;
+        mxParser::parse_opticalflow_option(option, prhs[0]);
+
         std::size_t nscales, nrefine;
         mxParser::parse_nscales(nscales, prhs[0]);
         mxParser::parse_nrefine(nrefine, prhs[0]);
 
         double alpha;
         mxParser::parse_alpha(alpha, prhs[0]);
+
+        double beta;
+        mxParser::parse_beta(beta, prhs[0]);
 
         std::size_t* niter = new size_t[nscales+1];
         mxParser::parse_niter(niter, prhs[0]);
@@ -35,7 +41,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         mxParser::parse_convergence_threshold(eps, prhs[0]);
 
 
-        myImageRegistration = new ImageRegistration(dimin, nscales, niter, alpha, eps, nrefine);
+        myImageRegistration = new ImageRegistration(dimin, option, nscales, niter, alpha, beta, eps, nrefine);
 
 
         // // Get the dimensions and the size of the images
