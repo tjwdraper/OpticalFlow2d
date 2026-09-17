@@ -82,7 +82,7 @@ void IterativeSolver::estimate_optical_flow(
             break;
 
         // Move
-        motion = std::move(motion_new);
+        motion = motion_new;
 
     }
 }

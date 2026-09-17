@@ -42,22 +42,30 @@ namespace opticalflow {
 
 
             const T& get_val(std::size_t idx) const {
-                Field::check_idx(idx);
+                #ifdef OPTICALFLOW_DEBUG
+                    Field::check_idx(idx);
+                #endif
                 return _field[idx];
             }
 
             const T& get_val(std::size_t i, std::size_t j) const {
-                Field::check_idx(i, j);
+                #ifdef _OPTICALFLOW_DEBUG
+                    Field::check_idx(i, j);
+                #endif
                 return _field[i * _step.x + j * _step.y];
             }
 
             void set_val(const T& val, std::size_t idx) {
-                Field::check_idx(idx);
+                #ifdef OPTICALFLOW_DEBUG
+                    Field::check_idx(idx);
+                #endif
                 _field[idx] = val;
             }
 
             void set_val(const T& val, std::size_t i, std::size_t j) {
-                Field::check_idx(i, j);
+                #ifdef OPTICALFLOW_DEBUG
+                    Field::check_idx(i, j);
+                #endif
                 _field[i * _step.x + j * _step.y] = val;
             }
 
