@@ -9,3 +9,5 @@ Makefile
 build/
 include/CImg.h
 include/json.hpp
+gmon.out
+profile.txt

@@ -64,9 +64,9 @@ void IterativeSolver::estimate_optical_flow(
 
         for (std::size_t idx = 0; idx < motion.get_size(); ++idx) {
             // Get values
-            vector2d hs_avg = horn_schunck_average.get_val(idx);
-            vector2d dI = spatial_gradient_image.get_val(idx);
-            double It = temporal_derivative_image.get_val(idx);
+            const vector2d& hs_avg = horn_schunck_average.get_val(idx);
+            const vector2d& dI = spatial_gradient_image.get_val(idx);
+            const double& It = temporal_derivative_image.get_val(idx);
 
             // Calculate prefactor
             double s = (dot(hs_avg, dI) + It) / (alphasq + normsq(dI));
@@ -82,7 +82,7 @@ void IterativeSolver::estimate_optical_flow(
             break;
 
         // Move
-        motion = std::move(motion_new);
+        motion = motion_new;
 
     }
 }

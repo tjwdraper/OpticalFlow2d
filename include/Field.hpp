@@ -39,23 +39,33 @@ namespace opticalflow {
             dim get_step() const { return _step; }
             std::size_t get_size() const { return _size; }
 
-            T get_val(std::size_t idx) const {
-                Field::check_idx(idx);
+
+
+            const T& get_val(std::size_t idx) const {
+                #ifdef OPTICALFLOW_DEBUG
+                    Field::check_idx(idx);
+                #endif
                 return _field[idx];
             }
 
-            T get_val(std::size_t i, std::size_t j) const {
-                Field::check_idx(i, j);
+            const T& get_val(std::size_t i, std::size_t j) const {
+                #ifdef _OPTICALFLOW_DEBUG
+                    Field::check_idx(i, j);
+                #endif
                 return _field[i * _step.x + j * _step.y];
             }
 
-            void set_val(T val, std::size_t idx) {
-                Field::check_idx(idx);
+            void set_val(const T& val, std::size_t idx) {
+                #ifdef OPTICALFLOW_DEBUG
+                    Field::check_idx(idx);
+                #endif
                 _field[idx] = val;
             }
 
-            void set_val(T val, std::size_t i, std::size_t j) {
-                Field::check_idx(i, j);
+            void set_val(const T& val, std::size_t i, std::size_t j) {
+                #ifdef OPTICALFLOW_DEBUG
+                    Field::check_idx(i, j);
+                #endif
                 _field[i * _step.x + j * _step.y] = val;
             }
 

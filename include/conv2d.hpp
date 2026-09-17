@@ -158,6 +158,7 @@ class separable_conv2d {
 
             // Apply convolution in y-direction
             opticalflow::Field<T> intermediate(dimin);
+
             for (std::size_t i = 0; i < dimin.x; ++i) {
                 for (std::size_t j = 0; j < dimin.y; ++j) {
                     T val{};
@@ -178,6 +179,8 @@ class separable_conv2d {
 
             // Apply convolution in x-direction
             opticalflow::Field<T> result(dimin);
+
+            #pragma omp parallel for
             for (std::size_t i = 0; i < dimin.x; ++i) {
                 for (std::size_t j = 0; j < dimin.y; ++j) {
                     T val{};
