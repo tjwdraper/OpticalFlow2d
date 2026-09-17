@@ -112,7 +112,8 @@ namespace gradients {
 
     // }
 
-    void horn_schunck_average(opticalflow::Motion& motion_avg, const opticalflow::Motion& motion) {
+    template <typename T>
+    void horn_schunck_average(opticalflow::Field<T>& motion_avg, const opticalflow::Field<T>& motion) {
         // Check that input dimensions are OK
         if (motion_avg.get_dimensions() != motion.get_dimensions())
             throw std::runtime_error("Error in gradients::horn_schunck_average(opticalflow::Motion&, const opticalflow::Motion&, const opticalflow::Image&): input dimensions have to be the same as target");

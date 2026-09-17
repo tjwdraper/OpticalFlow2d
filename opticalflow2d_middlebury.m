@@ -4,35 +4,8 @@ close all;
 
 pkg load image;
 
-%% ============================================================
-% Optical Flow Registration Analysis
-% =============================================================
-
-fid = fopen("config_middlebury.json", "r");
-
-if fid == -1
-    error("Could not open config.json");
-end
-
-raw = char(fread(fid, Inf)');
-fclose(fid);
-
-config_json = jsondecode(raw);
-
-%% Paths
-
-%data_path = "img/other-color-twoframes/other-data";
-gt_path   = "img/other-gt-flow";
-
 % Path containing readFlowFile.m and flowToColor.m
 addpath("img/flow-code-matlab");
-
-%% Parameters
-
-name = "RubberWhale";
-
-% Spacing between vectors in quiver plot
-quiver_step = 15;
 
 % Save figure
 save_figure = true;
@@ -40,8 +13,18 @@ save_figure = true;
 % Output files
 figure_path  = "middlebury_results.png";
 
-% Flow file
-filename_gt = fullfile(gt_path, name, "flow10.flo");
+%% ============================================================
+% Open .json configuration file
+% =============================================================
+
+fid = fopen("config_middlebury.json", "r");
+if fid == -1
+    error("Could not open config.json");
+end
+raw = char(fread(fid, Inf)');
+fclose(fid);
+config_json = jsondecode(raw);
+
 
 %% ============================================================
 % Check files
@@ -55,8 +38,8 @@ if (!exist(config_json.moving_image, "file"))
     error("Moving image not found: %s", config_json.moving_image);
 endif
 
-if (!exist(filename_gt, "file"))
-    error("Ground-truth flow not found: %s", filename_gt);
+if (!exist(config_json.ground_truth, "file"))
+    error("Ground-truth flow not found: %s", config_json.ground_truth);
 endif
 
 fprintf("\n");
@@ -76,10 +59,7 @@ Imov = imread(config_json.moving_image);
 fprintf("Reference image: %d x %d\n", size(Iref,1), size(Iref,2));
 fprintf("Moving image:    %d x %d\n", size(Imov,1), size(Imov,2));
 
-%% ============================================================
-% Convert RGB -> grayscale
-% =============================================================
-
+% Convert to grayscale and normalize
 Iref = double(Iref);
 Imov = double(Imov);
 
@@ -101,54 +81,47 @@ dimy = size(Iref,2);
 % Load ground-truth flow
 % =============================================================
 
-flow_gt = readFlowFile(filename_gt);
+flow_gt = readFlowFile(config_json.ground_truth);
 
-u_gt = flow_gt(:,:,2);
+u_gt = flow_gt(:,:,2); % .flo files have swapped order wrt to our implementation
 v_gt = flow_gt(:,:,1);
-
-%% ============================================================
-% Check dimensions
-% =============================================================
-
-if (size(u_gt,1) != dimx || size(u_gt,2) != dimy)
-
-    error( ...
-        "Dimension mismatch. Image = %d x %d, GT = %d x %d", ...
-        dimx, dimy, ...
-        size(u_gt,1), size(u_gt,2));
-
-endif
 
 %% ============================================================
 % Registration parameters
 % =============================================================
 
 config = struct();
-config.size_image   = int32(size(Iref));
-config.niter        = int32(config_json.registration.niter);
-config.alpha        = config_json.registration.alpha;
-config.eps          = config_json.registration.eps;
-config.nrefine      = config_json.registration.nrefine;
+config.size_image           = int32(size(Iref));
+config.optical_flow_option  = config_json.optical_flow_option;
+config.niter                = int32(config_json.registration.niter);
+config.alpha                = config_json.registration.alpha;
+config.beta                 = config_json.registration.beta;
+config.eps                  = config_json.registration.eps;
+config.nrefine              = config_json.registration.nrefine;
 
 %% ============================================================
 % Initialize C++ optical-flow object
 % =============================================================
 
+fprintf("Passing configuration...");
 OpticalFlow2d(config);
+fprintf("Complete!\n");
 
 %% ============================================================
 % Estimate optical flow
 % =============================================================
 
+fprintf("Estimating optical flow...");
 tic;
 OpticalFlow2d(Iref, Imov);
 time = toc;
+fprintf("Complete!\n");
 
 %% ============================================================
 % Get estimated flow
 % =============================================================
 
-motion = OpticalFlow2d();
+[motion, c] = OpticalFlow2d();
 
 u = motion(:,:,1);
 v = motion(:,:,2);
@@ -179,9 +152,7 @@ valid = ...
 % Endpoint error
 % =============================================================
 
-epe = sqrt( ...
-    (u - u_gt).^2 + ...
-    (v - v_gt).^2);
+epe = sqrt((u - u_gt).^2 + (v - v_gt).^2);
 
 epe_valid = epe(valid);
 
@@ -224,21 +195,17 @@ mse_after  = mean(difference_after(:).^2);
 [dudx, dudy] = gradient(u);
 [dvdx, dvdy] = gradient(v);
 
-jac = ...
-    (1.0 + dudx) .* ...
-    (1.0 + dvdy) - ...
-    dudy .* dvdx;
+jac = (1.0 + dudx) .* (1.0 + dvdy) - dudy .* dvdx;
 
 %% ============================================================
 % Quiver field
 % =============================================================
 
+quiver_step = 12;
 rows = 1:quiver_step:dimx;
 cols = 1:quiver_step:dimy;
 
 [X,Y] = meshgrid(cols, rows);
-
-%% Match your original visualization convention
 
 u_plot = u(end:-1:1,:);
 v_plot = v(end:-1:1,:);
@@ -341,13 +308,11 @@ if (save_figure)
 
     s4=subplot(3,4,4);
 
-    imagesc(jac);
+    imagesc(c);
+    colormap(s4,"gray");
     axis image off;
-    colormap(s4,"jet");
-    colorbar();
-    caxis([0.5, 2.0]);
 
-    title("Jacobian map");
+    title("c");
 
     %% ========================================================
     % Row 2

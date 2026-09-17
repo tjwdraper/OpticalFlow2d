@@ -167,12 +167,14 @@ namespace mxParser {
         dimin = parse_dim(config, "size_image");
     }
     inline void parse_nscales(std::size_t& nscales, const mxArray* config) {
-        nscales = parse_array_size(config, "niter");
+        nscales = parse_array_size(config, "niter") - 1;
     }
     inline void parse_niter(std::size_t* niter, const mxArray* config) {
-        std::size_t nscales = parse_array_size(config, "niter");
+        std::size_t nscales;
+        mxParser::parse_nscales(nscales, config);
+
         int32_T* niter_arr = parse_array_ptr<int32_T>(config, "niter");
-        for (std::size_t i = 0; i < nscales; ++i) {
+        for (std::size_t i = 0; i < nscales + 1; ++i) {
             if (niter_arr[i] < 0)
                 mexErrMsgIdAndTxt("mxParser:ValueError", "field %s contains negative values.", "niter");
             niter[i] = static_cast<std::size_t>(niter_arr[i]);

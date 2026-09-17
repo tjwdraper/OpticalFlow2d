@@ -21,11 +21,14 @@ struct json_config {
     std::string path_reference_image;
     std::string path_moving_image;
 
+    ModelOption option;
+
     std::size_t nscales;
     std::size_t nrefine;
     std::vector<std::size_t> niter;
 
     double alpha;
+    double beta;
     double eps;
 };
 
@@ -42,15 +45,22 @@ json_config load_config(const std::string& filename) {
     config.path_reference_image = json.at("reference_image").get<std::string>();
     config.path_moving_image = json.at("moving_image").get<std::string>();
 
+    std::string str_option = json.at("optical_flow_option").get<std::string>();
+    auto it = mapper_model_option.find(str_option);
+    if (it == mapper_model_option.end())
+        throw std::runtime_error("Cannot parse viable optical_flow_method from .json configuration file.");
+    config.option = it->second;
+
     const auto& registration = json.at("registration");
     config.nrefine = registration.at("nrefine").get<std::size_t>();
 
     config.niter = registration.at("niter").get<std::vector<std::size_t>>();
     if (config.niter.empty())
         throw std::runtime_error("niter must contain at least one value.");
-    config.nscales = config.niter.size() + 1;
+    config.nscales = config.niter.size() - 1;
 
     config.alpha = registration.at("alpha").get<double>();
+    config.beta = registration.at("beta").get<double>();
     config.eps = registration.at("eps").get<double>();
 
     return config;
@@ -114,7 +124,7 @@ int main(int argc, char* argv[]) {
 
     // Initialize registration class
     std::cout << "Initialize ImageRegistration class...";
-    ImageRegistration myImageRegistration(dimin, config.nscales, config.niter.data(), config.alpha, config.eps, config.nrefine);
+    ImageRegistration myImageRegistration(dimin, config.option, config.nscales, config.niter.data(), config.alpha, config.beta, config.eps, config.nrefine);
     std::cout << "Complete!" << std::endl;
 
     // Set images

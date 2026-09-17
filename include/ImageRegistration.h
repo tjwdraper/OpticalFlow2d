@@ -27,6 +27,7 @@ class ImageRegistration {
         void set_reference_image(const opticalflow::Image& im);
         void set_moving_image(const opticalflow::Image& im);
         const opticalflow::Motion& get_estimated_motion() const;
+        const opticalflow::Image& get_estimated_c() const;
 
         // Estimate motion
         void estimate_optical_flow();
@@ -35,6 +36,8 @@ class ImageRegistration {
         // void display_registration_parameters() const;
         std::size_t _nscales;
         std::size_t _nrefine;
+        ModelOption _option;
+
         IterativeSolver** _solver;
 
         opticalflow::Image** _Iref;
@@ -42,8 +45,6 @@ class ImageRegistration {
 
         opticalflow::Motion** _motion;
         opticalflow::Image** _c;
-
-        ModelOption _option;
 };
 
 #endif
