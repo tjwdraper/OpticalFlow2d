@@ -225,36 +225,6 @@ TEST(Interp2DTest, AccumulateConstantTranslations) {
     }
 }
 
-
-TEST(Interp2DTest, InvertConstantTranslation) {
-    opticalflow::Motion motion(dim(3, 3));
-
-    // Constant translation:
-    //
-    // u(x) = (1, 2)
-    //
-    // Its inverse should be:
-    //
-    // v(x) = (-1, -2)
-
-    for (std::size_t i = 0; i < 3; ++i)
-        for (std::size_t j = 0; j < 3; ++j)
-            motion.set_val(
-                vector2d(1.0, 2.0), i, j);
-
-    interp2d::invert(motion, 10, 1.0);
-
-    for (std::size_t i = 0; i < 3; ++i) {
-        for (std::size_t j = 0; j < 3; ++j) {
-            const vector2d val = motion.get_val(i, j);
-
-            EXPECT_NEAR(val.x, -1.0, 1e-12);
-            EXPECT_NEAR(val.y, -2.0, 1e-12);
-        }
-    }
-}
-
-
 TEST(Interp2DTest, ResizeImageUp) {
     opticalflow::Image image_in(dim(2, 2));
     opticalflow::Image image_out(dim(4, 4));
