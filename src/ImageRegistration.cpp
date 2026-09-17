@@ -87,9 +87,11 @@
 
 ImageRegistration::ImageRegistration(
     const dim dimin, 
+    const ModelOption option,
     const std::size_t nscales, 
     const std::size_t* niter,
     const double alpha,
+    const double beta,
     const double eps,
     const std::size_t nrefine) {
     // Registration parameters
@@ -100,6 +102,7 @@ ImageRegistration::ImageRegistration(
     _Iref = new opticalflow::Image*[nscales + 1];
     _Imov = new opticalflow::Image*[nscales + 1];
     _motion = new opticalflow::Motion*[nscales + 1];
+    _c = new opticalflow::Image*[nscales + 1];
     _solver = new IterativeSolver*[nscales + 1];
     for (int s = static_cast<int>(nscales); s >= 0; s--) {
         double scale = pow(2.0, s);
@@ -111,7 +114,8 @@ ImageRegistration::ImageRegistration(
         _Iref[s] = new opticalflow::Image(dim_s);
         _Imov[s] = new opticalflow::Image(dim_s);
         _motion[s] = new opticalflow::Motion(dim_s);
-        _solver[s] = new IterativeSolver(dim_s, s, alpha, niter[s], eps);
+        _c[s] = new opticalflow::Image(dim_s);
+        _solver[s] = new IterativeSolver(dim_s, s, alpha, beta, niter[s], eps);
     }
 
     // Display registration settings
@@ -163,12 +167,14 @@ ImageRegistration::~ImageRegistration() {
         delete _Iref[s];
         delete _Imov[s];
         delete _motion[s];
+        delete _c[s];
         delete _solver[s];
     }
     delete[] _solver;
     delete[] _Iref;
     delete[] _Imov;
     delete[] _motion;
+    delete[] _c;
 }
 
 // Getters and setters
@@ -224,6 +230,7 @@ void ImageRegistration::estimate_optical_flow() {
     for (int s = static_cast<int>(_nscales); s >= 0; s--) {
         // Dereference variables at current level
         opticalflow::Motion& motion_s = *_motion[s];
+        opticalflow::Image& c_s = *_c[s];
         const opticalflow::Image& Iref_s = *_Iref[s];
         const opticalflow::Image& Imov_s = *_Imov[s];
         IterativeSolver& solver_s = *_solver[s];
@@ -231,13 +238,14 @@ void ImageRegistration::estimate_optical_flow() {
         // Upsample from previous resolution
         if (s < _nscales)
             interp2d::resize(motion_s, *_motion[s+1]); // Resample estimated DVF from previous resolution level
+            if (_option == ModelOption::CORNELIUS_KANADE)
+                interp2d::resize(c_s, *_c[s+1]);
 
         // Estimate motion at current resolution level
-        solver_s.estimate_optical_flow(
-            motion_s,
-            Iref_s, 
-            Imov_s
-        );
+        if (_option == ModelOption::HORN_SCHUNCK)
+            solver_s.estimate_optical_flow(motion_s, Iref_s, Imov_s);
+        else if (_option == ModelOption::CORNELIUS_KANADE)
+            solver_s.estimate_optical_flow(motion_s, c_s, Iref_s, Imov_s);
 
         // Refinement
         for (std::size_t r = 0; r < _nrefine; ++r) {
@@ -250,11 +258,10 @@ void ImageRegistration::estimate_optical_flow() {
             interp2d::warp2d(Imov_aux_s, Imov_s, motion_s);
 
             // ...use deformed image to estimate an deformation field from Imov_aux -> Iref...
-            solver_s.estimate_optical_flow(
-                motion_aux_s,
-                Iref_s,
-                Imov_aux_s
-            );
+            if (_option == ModelOption::HORN_SCHUNCK)
+                solver_s.estimate_optical_flow(motion_aux_s, Iref_s, Imov_aux_s);
+            else if (_option == ModelOption::CORNELIUS_KANADE)
+                solver_s.estimate_optical_flow(motion_aux_s, c_s, Iref_s, Imov_aux_s);
 
             // ...accumulate (= motion field composition) to get the estimated deformation field from Imov to Iref
             interp2d::accumulate(motion_s, motion_aux_s);

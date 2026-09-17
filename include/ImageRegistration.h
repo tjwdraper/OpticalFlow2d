@@ -5,7 +5,7 @@
 
 #include "include/coord2d.hpp"
 #include "include/Field.hpp"
-// #include "include/SolverOptions.h"
+#include "include/ConfigurationOptions.hpp"
 
 #include "include/IterativeSolver.h"
 
@@ -13,9 +13,11 @@ class ImageRegistration {
     public:
         // Constructors and deconstructors
         ImageRegistration(const dim dimin, 
+                          const ModelOption option,
                           const std::size_t nscales, 
                           const std::size_t* niter,
                           const double alpha,
+                          const double beta,
                           const double eps,
                           const std::size_t nrefine);
         // ImageRegistration(const mxArray* config);
@@ -39,6 +41,9 @@ class ImageRegistration {
         opticalflow::Image** _Imov;
 
         opticalflow::Motion** _motion;
+        opticalflow::Image** _c;
+
+        ModelOption _option;
 };
 
 #endif
