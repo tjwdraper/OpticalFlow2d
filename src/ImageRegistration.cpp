@@ -12,11 +12,13 @@ ImageRegistration::ImageRegistration(
     const double alpha,
     const double beta,
     const double eps,
-    const std::size_t nrefine) {
+    const std::size_t nrefine,
+    const double resampling_factor) {
     // Registration parameters
     _nscales = nscales;
     _nrefine = nrefine;
     _option = option;
+    _resampling_factor = resampling_factor;
 
     // Allocate image and motion 
     _Iref = new opticalflow::Image*[nscales + 1];
@@ -25,10 +27,10 @@ ImageRegistration::ImageRegistration(
     _c = new opticalflow::Image*[nscales + 1];
     _solver = new IterativeSolver*[nscales + 1];
     for (int s = static_cast<int>(nscales); s >= 0; s--) {
-        double scale = pow(2.0, s);
+        double scale = pow(_resampling_factor, s);
         const dim dim_s = dim(
-            static_cast<std::size_t> (dimin.x/scale),
-            static_cast<std::size_t> (dimin.y/scale)
+            static_cast<std::size_t> (dimin.x*scale),
+            static_cast<std::size_t> (dimin.y*scale)
         );
 
         _Iref[s] = new opticalflow::Image(dim_s);
@@ -64,7 +66,7 @@ void ImageRegistration::set_reference_image(const opticalflow::Image& image) {
     filter.convolute(*_Iref[0]);
 
     // Anti-aliasing filter for downsampling
-    const double sigma_aa = 0.6 * std::sqrt(1.0 / (0.5 * 0.5) - 1.0);
+    const double sigma_aa = 0.6 * std::sqrt(1.0 / (_resampling_factor * _resampling_factor) - 1.0);
     gaussian_conv2d filter_aa(sigma_aa);
 
     // Build Gaussian pyramid
@@ -85,7 +87,7 @@ void ImageRegistration::set_moving_image(const opticalflow::Image& image) {
     filter.convolute(*_Imov[0]);
 
     // Anti-aliasing filter for downsampling
-    const double sigma_aa = 0.6 * std::sqrt(1.0 / (0.5 * 0.5) - 1.0);
+    const double sigma_aa = 0.6 * std::sqrt(1.0 / (_resampling_factor * _resampling_factor) - 1.0);
     gaussian_conv2d filter_aa(sigma_aa);
 
     // Build Gaussian pyramid

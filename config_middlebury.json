@@ -10,6 +10,7 @@
         "niter": [200, 200, 200, 200],
         "alpha": 0.1,
         "beta": 5.0,
+        "resampling_factor": 0.5,
         "eps": 0.0001
     }
 }

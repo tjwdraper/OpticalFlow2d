@@ -17,7 +17,8 @@ class ImageRegistration {
                           const double alpha,
                           const double beta,
                           const double eps,
-                          const std::size_t nrefine);
+                          const std::size_t nrefine,
+                          const double resampling_factor);
         ~ImageRegistration();
 
         // Getters and setters
@@ -34,6 +35,7 @@ class ImageRegistration {
         std::size_t _nscales;
         std::size_t _nrefine;
         ModelOption _option;
+        double _resampling_factor;
 
         IterativeSolver** _solver;
 

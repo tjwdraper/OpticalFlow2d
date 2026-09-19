@@ -40,7 +40,10 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         double eps;
         mxParser::parse_convergence_threshold(eps, prhs[0]);
 
-        myImageRegistration = new ImageRegistration(dimin, option, nscales, niter, alpha, beta, eps, nrefine);
+        double resampling_factor;
+        mxParser::parse_resampling_factor(resampling_factor, prhs[0]);
+
+        myImageRegistration = new ImageRegistration(dimin, option, nscales, niter, alpha, beta, eps, nrefine, resampling_factor);
 
         // Set the output dimension for image and motion field
         dim_image_mw = new mwSize[2];
