@@ -37,7 +37,7 @@ if(BUILD_EXAMPLES)
        EXISTS "${PROJECT_SOURCE_DIR}/include/CImg.h")
 
         add_executable(opticalflow2d_middlebury
-            opticalflow2d_middlebury.cpp
+            example/opticalflow2d_middlebury.cpp
         )
 
         target_link_libraries(opticalflow2d_middlebury
@@ -48,6 +48,11 @@ if(BUILD_EXAMPLES)
             PRIVATE
                 ${PROJECT_SOURCE_DIR}
                 ${PROJECT_SOURCE_DIR}/include
+        )
+
+        set_target_properties(opticalflow2d_middlebury
+            PROPERTIES
+                RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/example"
         )
 
         message(STATUS "Standalone executable: ENABLED")
@@ -148,7 +153,7 @@ if(BUILD_MEX)
                     -I${PROJECT_SOURCE_DIR}
                     -I${PROJECT_SOURCE_DIR}/include
                     -o
-                    ${CMAKE_CURRENT_BINARY_DIR}/OpticalFlow2d.mex
+                    ${PROJECT_SOURCE_DIR}/mex/OpticalFlow2d.mex
                     ${PROJECT_SOURCE_DIR}/src/WrapperOpticalFlow2d.cpp
                     ${PROJECT_SOURCE_DIR}/src/ImageRegistration.cpp
                     ${PROJECT_SOURCE_DIR}/src/IterativeSolver.cpp
