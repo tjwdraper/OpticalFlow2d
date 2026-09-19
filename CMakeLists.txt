@@ -149,14 +149,11 @@ if(BUILD_MEX)
                     -I${PROJECT_SOURCE_DIR}/include
                     -o
                     ${PROJECT_SOURCE_DIR}/mex/OpticalFlow2d.mex
-                    ${PROJECT_SOURCE_DIR}/src/WrapperOpticalFlow2d.cpp
-                    ${PROJECT_SOURCE_DIR}/src/ImageRegistration.cpp
-                    ${PROJECT_SOURCE_DIR}/src/IterativeSolver.cpp
+                    -lImageRegistration
+                    -L${PROJECT_SOURCE_DIR}/build
 
                 DEPENDS
-                    ${PROJECT_SOURCE_DIR}/src/WrapperOpticalFlow2d.cpp
-                    ${PROJECT_SOURCE_DIR}/src/ImageRegistration.cpp
-                    ${PROJECT_SOURCE_DIR}/src/IterativeSolver.cpp
+                    ImageRegistration
 
                 WORKING_DIRECTORY
                     ${PROJECT_SOURCE_DIR}
@@ -177,3 +174,65 @@ if(BUILD_MEX)
     endif()
 
 endif()
+
+
+
+
+# if(BUILD_MEX)
+
+#     find_program(MKOCTFILE_EXECUTABLE
+#         NAMES mkoctfile
+#     )
+
+#     if(MKOCTFILE_EXECUTABLE)
+
+#         message(STATUS "mkoctfile found: ${MKOCTFILE_EXECUTABLE}")
+
+#         execute_process(
+#             COMMAND ${MKOCTFILE_EXECUTABLE} -p OCTINCLUDEDIR
+#             OUTPUT_VARIABLE OCTAVE_INCLUDE_DIR
+#             OUTPUT_STRIP_TRAILING_WHITESPACE
+#         )
+
+#         if(EXISTS "${OCTAVE_INCLUDE_DIR}/mex.h")
+
+#             message(STATUS "Octave include directory: ${OCTAVE_INCLUDE_DIR}")
+#             message(STATUS "Octave MEX: ENABLED")
+
+#             add_custom_target(OpticalFlow2d_mex ALL
+
+#                 COMMAND
+#                     ${MKOCTFILE_EXECUTABLE}
+#                     --mex
+#                     -O3
+#                     -I${PROJECT_SOURCE_DIR}/include
+#                     -o
+#                     ${PROJECT_SOURCE_DIR}/mex/OpticalFlow2d.mex
+#                     ${PROJECT_SOURCE_DIR}/src/WrapperOpticalFlow2d.cpp
+#                     ${PROJECT_SOURCE_DIR}/src/ImageRegistration.cpp
+#                     ${PROJECT_SOURCE_DIR}/src/IterativeSolver.cpp
+
+#                 DEPENDS
+#                     ${PROJECT_SOURCE_DIR}/src/WrapperOpticalFlow2d.cpp
+#                     ${PROJECT_SOURCE_DIR}/src/ImageRegistration.cpp
+#                     ${PROJECT_SOURCE_DIR}/src/IterativeSolver.cpp
+
+#                 WORKING_DIRECTORY
+#                     ${PROJECT_SOURCE_DIR}
+#             )
+
+#         else()
+
+#             message(STATUS
+#                 "mex.h not found in ${OCTAVE_INCLUDE_DIR} -- skipping MEX"
+#             )
+
+#         endif()
+
+#     else()
+
+#         message(STATUS "mkoctfile not found -- skipping MEX")
+
+#     endif()
+
+# endif()
