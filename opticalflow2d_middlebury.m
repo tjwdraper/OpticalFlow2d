@@ -98,6 +98,7 @@ config.alpha                = config_json.registration.alpha;
 config.beta                 = config_json.registration.beta;
 config.eps                  = config_json.registration.eps;
 config.nrefine              = config_json.registration.nrefine;
+config.resampling_factor    = config_json.registration.resampling_factor;
 
 %% ============================================================
 % Initialize C++ optical-flow object

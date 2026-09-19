@@ -181,20 +181,26 @@ namespace mxParser {
         }
     }
     inline void parse_alpha(double& alpha, const mxArray* config) {
-        if (alpha < 0.0)
-            throw std::runtime_error("regularization parameters alpha has to be a positive scalar");
         alpha = parse_scalar<double>(config, "alpha", std::optional<double>(0.4));
+        if (alpha < 0.0)
+                mexErrMsgIdAndTxt("mxParser:ValueError", "alpha has to be positive");
     }
     inline void parse_beta(double& beta, const mxArray* config) {
-        if (beta < 0.0)
-            throw std::runtime_error("regularization parameters beta has to be a positive scalar");
         beta = parse_scalar<double>(config, "beta", std::optional<double>(0.2));
+        if (beta < 0.0)
+                mexErrMsgIdAndTxt("mxParser:ValueError", "beta has to be positive.");
     }
     inline void parse_convergence_threshold(double& eps, const mxArray* config) {
         eps = parse_scalar<double>(config, "eps", std::optional<double>(1e-3));
     }
     inline void parse_nrefine(std::size_t& nrefine, const mxArray* config) {
         nrefine = parse_scalar<std::size_t>(config, "nrefine", std::optional<std::size_t>(0));
+    }
+
+    inline void parse_resampling_factor(double& resampling_factor, const mxArray* config) {
+        resampling_factor = parse_scalar<double>(config, "resampling_factor", std::optional<double>(0.5));
+        if (resampling_factor <= 0 || resampling_factor >= 1)
+                mexErrMsgIdAndTxt("mxParser:ValueError", "field resampling_factor has to contain a value between 0 and 1.");
     }
 }
 

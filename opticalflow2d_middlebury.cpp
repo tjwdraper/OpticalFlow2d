@@ -30,6 +30,7 @@ struct json_config {
     double alpha;
     double beta;
     double eps;
+    double resampling_factor;
 };
 
 json_config load_config(const std::string& filename) {
@@ -62,6 +63,7 @@ json_config load_config(const std::string& filename) {
     config.alpha = registration.at("alpha").get<double>();
     config.beta = registration.at("beta").get<double>();
     config.eps = registration.at("eps").get<double>();
+    config.resampling_factor = registration.at("resampling_factor").get<double>();
 
     return config;
 }
@@ -124,7 +126,7 @@ int main(int argc, char* argv[]) {
 
     // Initialize registration class
     std::cout << "Initialize ImageRegistration class...";
-    ImageRegistration myImageRegistration(dimin, config.option, config.nscales, config.niter.data(), config.alpha, config.beta, config.eps, config.nrefine);
+    ImageRegistration myImageRegistration(dimin, config.option, config.nscales, config.niter.data(), config.alpha, config.beta, config.eps, config.nrefine, config.resampling_factor);
     std::cout << "Complete!" << std::endl;
 
     // Set images
