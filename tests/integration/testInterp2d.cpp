@@ -1,4 +1,4 @@
-#include "include/interp2d.hpp"
+#include "interp2d.hpp"
 
 #include <gtest/gtest.h>
 

@@ -1,11 +1,11 @@
 #ifndef _IMAGE_REGISTRATION_H_
 #define _IMAGE_REGISTRATION_H_
 
-#include "include/coord2d.hpp"
-#include "include/Field.hpp"
-#include "include/ConfigurationOptions.hpp"
+#include "coord2d.hpp"
+#include "Field.hpp"
+#include "ConfigurationOptions.hpp"
 
-#include "include/IterativeSolver.h"
+#include "IterativeSolver.h"
 
 class ImageRegistration {
     public:

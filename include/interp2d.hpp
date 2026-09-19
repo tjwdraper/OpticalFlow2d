@@ -1,7 +1,7 @@
 #ifndef _INTERP_2D_HPP_
 #define _INTERP_2D_HPP_
 
-#include "include/Field.hpp"
+#include "Field.hpp"
 
 #include <cmath>
 #include <stdexcept>

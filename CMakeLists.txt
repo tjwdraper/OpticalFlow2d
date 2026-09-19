@@ -22,7 +22,6 @@ add_library(ImageRegistration
 
 target_include_directories(ImageRegistration
     PUBLIC
-        ${PROJECT_SOURCE_DIR}
         ${PROJECT_SOURCE_DIR}/include
 )
 
@@ -46,7 +45,6 @@ if(BUILD_EXAMPLES)
 
         target_include_directories(opticalflow2d_middlebury
             PRIVATE
-                ${PROJECT_SOURCE_DIR}
                 ${PROJECT_SOURCE_DIR}/include
         )
 
@@ -93,7 +91,6 @@ if(BUILD_TESTS)
 
         target_include_directories(testOpticalFlow2d
             PRIVATE
-                ${PROJECT_SOURCE_DIR}
                 ${PROJECT_SOURCE_DIR}/include
         )
 
@@ -122,7 +119,6 @@ endif()
 # ============================================================
 # Octave MEX
 # ============================================================
-
 if(BUILD_MEX)
 
     find_program(MKOCTFILE_EXECUTABLE
@@ -150,7 +146,6 @@ if(BUILD_MEX)
                     ${MKOCTFILE_EXECUTABLE}
                     --mex
                     -O3
-                    -I${PROJECT_SOURCE_DIR}
                     -I${PROJECT_SOURCE_DIR}/include
                     -o
                     ${PROJECT_SOURCE_DIR}/mex/OpticalFlow2d.mex

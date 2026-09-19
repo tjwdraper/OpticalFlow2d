@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <include/coord2d.hpp>
+#include "coord2d.hpp"
 
 class Coord2dTest : public testing::Test {
     protected:

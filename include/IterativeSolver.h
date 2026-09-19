@@ -1,10 +1,8 @@
 #ifndef _ITERATIVE_SOLVER_H_
 #define _ITERATIVE_SOLVER_H_
 
-#include "include/coord2d.hpp"
-#include "include/Field.hpp"
-
-// #include <mex.h>
+#include "coord2d.hpp"
+#include "Field.hpp"
 
 class IterativeSolver {
     public:
