@@ -5,10 +5,10 @@ close all;
 pkg load image;
 
 addpath("img/flow-code-matlab"); % localtion of readFlowFile.m and flowToColor.m
-addpath("build/") % location of .mex file.
+addpath("mex/") % location of .mex file.
 
 % Save figure
-save_figure = true;
+save_figure = false;
 
 % Output files
 figure_path  = "middlebury_results.png";
@@ -17,7 +17,7 @@ figure_path  = "middlebury_results.png";
 % Open .json configuration file
 % =============================================================
 
-fid = fopen("config_middlebury.json", "r");
+fid = fopen("example/config_middlebury.json", "r");
 if fid == -1
     error("Could not open config.json");
 end
