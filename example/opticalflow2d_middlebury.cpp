@@ -18,52 +18,68 @@
 // Read json configuration file and store in structure
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct json_config {
+    // Paths to input images
     std::string path_reference_image;
     std::string path_moving_image;
 
-    ModelOption option;
+    // Registration parameters with default values
+    ModelOption option = ModelOption::HORN_SCHUNCK;
 
-    std::size_t nscales;
-    std::size_t nrefine;
-    std::vector<std::size_t> niter;
+    std::size_t nrefine = 0;
+    std::vector<std::size_t> niter = {100, 100, 100, 100};
+    std::size_t nscales = 3;
 
-    double alpha;
-    double beta;
-    double eps;
-    double resampling_factor;
+    double alpha = 0.1;
+    double beta = 5.0;
+    double eps = 1e-4;
+    double resampling_factor = 0.5;
 };
 
 json_config load_config(const std::string& filename) {
+    // Open .json configuration file
     std::ifstream file(filename);
     if (!file.is_open())
         throw std::runtime_error("Could not open json configuration file: " + filename);
-
     nlohmann::json json;
     file >> json;
 
+    // Create json_config structure
     json_config config;
 
+    // Set the image paths
     config.path_reference_image = json.at("reference_image").get<std::string>();
     config.path_moving_image = json.at("moving_image").get<std::string>();
 
+    // Set json_config variables from .json fields
     std::string str_option = json.at("optical_flow_option").get<std::string>();
     auto it = mapper_model_option.find(str_option);
-    if (it == mapper_model_option.end())
-        throw std::runtime_error("Cannot parse viable optical_flow_method from .json configuration file.");
-    config.option = it->second;
+    if (it != mapper_model_option.end())
+        config.option = it->second;
 
-    const auto& registration = json.at("registration");
-    config.nrefine = registration.at("nrefine").get<std::size_t>();
+    if (json.contains("registration")) {
+        const auto& registration = json.at("registration");
 
-    config.niter = registration.at("niter").get<std::vector<std::size_t>>();
-    if (config.niter.empty())
-        throw std::runtime_error("niter must contain at least one value.");
-    config.nscales = config.niter.size() - 1;
+        if (json.contains("nrefine"))
+            config.nrefine = registration.at("nrefine").get<std::size_t>();
 
-    config.alpha = registration.at("alpha").get<double>();
-    config.beta = registration.at("beta").get<double>();
-    config.eps = registration.at("eps").get<double>();
-    config.resampling_factor = registration.at("resampling_factor").get<double>();
+        if (json.contains("niter"))
+            config.niter = registration.at("niter").get<std::vector<std::size_t>>();
+            if (config.niter.empty())
+                throw std::runtime_error("niter must contain at least one value.");
+            config.nscales = config.niter.size() - 1;
+
+        if (json.contains("alpha"))
+            config.alpha = registration.at("alpha").get<double>();
+        
+        if (json.contains("beta"))
+            config.beta = registration.at("beta").get<double>();
+        
+        if (json.contains("eps"))
+            config.eps = registration.at("eps").get<double>();
+
+        if (json.contains("resampling_factor"))
+            config.resampling_factor = registration.at("resampling_factor").get<double>();
+    }
 
     return config;
 }

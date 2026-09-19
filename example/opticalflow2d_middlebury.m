@@ -91,14 +91,48 @@ v_gt = flow_gt(:,:,1);
 % =============================================================
 
 config = struct();
-config.size_image           = int32(size(Iref));
-config.optical_flow_option  = config_json.optical_flow_option;
-config.niter                = int32(config_json.registration.niter);
-config.alpha                = config_json.registration.alpha;
-config.beta                 = config_json.registration.beta;
-config.eps                  = config_json.registration.eps;
-config.nrefine              = config_json.registration.nrefine;
-config.resampling_factor    = config_json.registration.resampling_factor;
+config.size_image = int32(size(Iref));
+
+% Set default parameters
+config.optical_flow_option = "horn-schunck";
+config.niter               = int32([200 200 200 200]);
+config.nscales             = 3;
+config.alpha               = 0.1;
+config.beta                = 5.0; % Only relevant for "cornelius-kanade"
+config.eps                 = 1e-4;
+config.nrefine             = 0;
+config.resampling_factor   = 0.5;
+
+% Alter variables given in the .json configuration file
+if (isfield(config_json, "optical_flow_option"))
+    config.optical_flow_option = config_json.optical_flow_option;
+endif
+
+if (isfield(config_json, "registration"))
+    if (isfield(config_json.registration, "nrefine"))
+        config.nrefine = config_json.registration.nrefine;
+    endif
+    
+    if (isfield(config_json.registration, "niter"))
+        config.niter = int32(config_json.registration.niter);
+    endif
+    
+    if (isfield(config_json.registration, "alpha"))
+        config.alpha = config_json.registration.alpha;
+    endif
+
+    if (isfield(config_json.registration, "beta"))
+        config.beta = config_json.registration.beta;
+    endif
+
+    if (isfield(config_json.registration, "eps"))
+        config.eps = config_json.registration.eps;
+    endif
+
+    if (isfield(config_json.registration, "resampling_factor"))
+        config.resampling_factor = config_json.registration.resampling_factor;
+    endif
+endif
 
 %% ============================================================
 % Initialize C++ optical-flow object
