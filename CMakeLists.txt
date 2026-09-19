@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(BUILD_EXAMPLES "Build standalone optical flow executable" ON)
-option(BUILD_TESTS "Build GoogleTest tests" ON)
+option(BUILD_TESTS "Build GoogleTest tests" OFF)
 option(BUILD_MEX "Build Octave MEX wrapper" ON)
 
 
