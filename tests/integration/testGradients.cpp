@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "include/Field.hpp"
-#include "include/gradients.hpp"
+#include "Field.hpp"
+#include "gradients.hpp"
 
 TEST(GradientsTest, PartialX)
 {

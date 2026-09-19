@@ -1,8 +1,8 @@
 #ifndef _GRADIENTS_H_
 #define _GRADIENTS_H_
 
-#include "include/coord2d.hpp"
-#include "include/Field.hpp"
+#include "coord2d.hpp"
+#include "Field.hpp"
 
 namespace gradients {
     // First order partial derivatives

@@ -9,8 +9,8 @@
 #include <cstddef>
 #include <map>
 
-#include "include/coord2d.hpp"
-#include "include/ConfigurationOptions.hpp"
+#include "coord2d.hpp"
+#include "ConfigurationOptions.hpp"
 
 namespace mxParser {
     inline VerboseOption verbose = VerboseOption::VERBOSE;

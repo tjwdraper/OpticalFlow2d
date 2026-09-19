@@ -1,12 +1,12 @@
 #define cimg_display 0 // Remove if making use of plot functions from cimg_library. If so, add -lX11 to compilation flags.
 
-#include "include/CImg.h"
+#include "CImg.h"
 
-#include "include/coord2d.hpp"
-#include "include/Field.hpp"
-#include "include/interp2d.hpp"
-#include "include/ImageRegistration.h"
-#include "include/json.hpp"
+#include "coord2d.hpp"
+#include "Field.hpp"
+#include "interp2d.hpp"
+#include "ImageRegistration.h"
+#include "json.hpp"
 
 #include <fstream>
 #include <string>
@@ -59,25 +59,25 @@ json_config load_config(const std::string& filename) {
     if (json.contains("registration")) {
         const auto& registration = json.at("registration");
 
-        if (json.contains("nrefine"))
+        if (registration.contains("nrefine"))
             config.nrefine = registration.at("nrefine").get<std::size_t>();
 
-        if (json.contains("niter"))
+        if (registration.contains("niter"))
             config.niter = registration.at("niter").get<std::vector<std::size_t>>();
             if (config.niter.empty())
                 throw std::runtime_error("niter must contain at least one value.");
             config.nscales = config.niter.size() - 1;
 
-        if (json.contains("alpha"))
+        if (registration.contains("alpha"))
             config.alpha = registration.at("alpha").get<double>();
         
-        if (json.contains("beta"))
+        if (registration.contains("beta"))
             config.beta = registration.at("beta").get<double>();
         
-        if (json.contains("eps"))
+        if (registration.contains("eps"))
             config.eps = registration.at("eps").get<double>();
 
-        if (json.contains("resampling_factor"))
+        if (registration.contains("resampling_factor"))
             config.resampling_factor = registration.at("resampling_factor").get<double>();
     }
 

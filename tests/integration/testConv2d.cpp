@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
-#include "include/conv2d.hpp"
-#include "include/Field.hpp"
+#include "conv2d.hpp"
+#include "Field.hpp"
 
 #include <cmath>
 

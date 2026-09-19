@@ -1,8 +1,8 @@
-#include "include/ImageRegistration.h"
-#include "include/conv2d.hpp"
-#include "include/interp2d.hpp"
-#include <cstring>
+#include "ImageRegistration.h"
+#include "conv2d.hpp"
+#include "interp2d.hpp"
 
+#include <cstring>
 
 ImageRegistration::ImageRegistration(
     const dim dimin, 

@@ -1,6 +1,6 @@
-#include "include/IterativeSolver.h"
-#include "include/gradients.hpp"
-#include "include/conv2d.hpp"
+#include "IterativeSolver.h"
+#include "gradients.hpp"
+#include "conv2d.hpp"
 
 // Constructors and deconstructors
 IterativeSolver::IterativeSolver(const dim dimin, const std::size_t resolution_level, const double alpha, const double beta, const std::size_t niter, const double eps) {

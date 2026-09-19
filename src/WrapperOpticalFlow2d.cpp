@@ -2,11 +2,11 @@
 #include <stdexcept>
 #include <mex.h>
 
-#include "include/coord2d.hpp"
-#include "include/Field.hpp"
-#include "include/ImageRegistration.h"
-#include "include/interp2d.hpp"
-#include "include/mxParser.hpp"
+#include "coord2d.hpp"
+#include "Field.hpp"
+#include "ImageRegistration.h"
+#include "interp2d.hpp"
+#include "mxParser.hpp"
 
 
 static ImageRegistration *myImageRegistration = nullptr;
