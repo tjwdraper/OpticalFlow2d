@@ -38,7 +38,7 @@ cmake --build build -j
 
 creating binaries in the dedicated directories.
 
-# Syntax: Execute from Matlab/GNU Octave
+# Running the examples
 
 Examples are given to launch the application for C++ and Octave, both depending on the .json configuration file containing the registration parameters. The .json file in the example folder is as follows:
 
@@ -62,37 +62,9 @@ Examples are given to launch the application for C++ and Octave, both depending 
 ```
 
 
-Running the Horn-Schunck optical flow method can be done with the following steps:
+The example directory contains scripts to launch the image registration model from the command line, as a C++ standalone implementation, or from GNU Octave. Both use the images from [Middlebury Flow dataset](https://vision.middlebury.edu/flow/data/), as well as the ground truth and Matlab scripts.
 
-```
-config.struct()
-config.size_image = int32(size(Iref));
-config.niter      = int32([100 200 400]); // 400->200->100 iterations
-config.alpha      = 0.5;
-config.eps        = 1e-3;
-config.nrefine    = 0;
-
-OpticalFlow2d(config); // Initialize
-```
-
-Estimation of the DVF is then performed using:
-
-```
-OpticalFlow2d(Iref, Imov);
-```
-
-The registered image and the estimated DVF can be returned through:
-
-```
-motion = OpticalFlow2d();
-Ireg = OpticalFlow2d(Imov);
-```
-
-To close the registration library:
-
-```
-OpticalFlow2d();
-```
+The standalone C++ implementation can be run launching the executable from the example directory: ```./example/opticalflow2d_middlebury ./example/config_middlebury.json```. The GNU Octave script ```opticaflow2d_middlebury.m``` reads the .json configuration file, converts it to a structure and loads into the MEX function. It can be launched from the terminal through ```octave --persist ./example/opticalflow2d_middlebury.m```.
 
 # Results: proof-of-principle
 As a proof-of-princple, the Middlebury _flow_ dataset was used for validation of the estimated deformation fields. 
@@ -101,11 +73,8 @@ As a proof-of-princple, the Middlebury _flow_ dataset was used for validation of
 
 # Code testing
 
-The tests directory contains unit, integration and system tests for the OpticalFlow2D codebase. Tests have been written using the Google's gtest testing framework. Tests can be compiled and run (on Linux) through
-
+The tests directory contains unit, integration and system tests for the implementation of the image registration model. These tests are compiled and executed using Google's GTest testing framework. To compile the tests, run the cmake command with the ```-DBUILD_TESTS=ON``` flag. This creates the ```testOpticalFlow2d``` executable in the build directory: 
 ```
-bash run_tests.sh
+./build/testOpticalFlow2d
 ```
-
-Which requires access to the gtest.h and gtest library during compilation. Alter the path in the bash script accordingly if required.
 
