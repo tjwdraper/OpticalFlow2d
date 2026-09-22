@@ -8,7 +8,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(BUILD_EXAMPLES "Build standalone optical flow executable" ON)
 option(BUILD_TESTS "Build GoogleTest tests" OFF)
-option(BUILD_MEX "Build Octave MEX wrapper" ON)
+option(BUILD_MATLAB_MEX "Build Matlab MEX wrapper" ON)
+option(BUILD_OCTAVE_MEX "Build Octave MEX wrapper" ON)
 
 
 # ============================================================
@@ -36,7 +37,7 @@ if(BUILD_EXAMPLES)
        EXISTS "${PROJECT_SOURCE_DIR}/include/CImg.h")
 
         add_executable(opticalflow2d_middlebury
-            example/opticalflow2d_middlebury.cpp
+            src/opticalflow2d_middlebury.cpp
         )
 
         target_link_libraries(opticalflow2d_middlebury
@@ -120,7 +121,7 @@ endif()
 # ============================================================
 # Octave MEX
 # ============================================================
-if(BUILD_MEX)
+if(BUILD_OCTAVE_MEX)
 
     find_program(MKOCTFILE_EXECUTABLE
         NAMES mkoctfile
@@ -141,7 +142,7 @@ if(BUILD_MEX)
             message(STATUS "Octave include directory: ${OCTAVE_INCLUDE_DIR}")
             message(STATUS "Octave MEX: ENABLED")
 
-            add_custom_target(OpticalFlow2d_mex ALL
+            add_custom_target(OpticalFlow2d ALL
 
                 COMMAND
                     ${MKOCTFILE_EXECUTABLE}
@@ -150,8 +151,8 @@ if(BUILD_MEX)
                     -I${PROJECT_SOURCE_DIR}/include
                     -o
                     ${PROJECT_SOURCE_DIR}/mex/OpticalFlow2d.mex
-                    -lImageRegistration
-                    -L${PROJECT_SOURCE_DIR}/build
+                    ${PROJECT_SOURCE_DIR}/src/WrapperOpticalFlow2d.cpp
+                    $<TARGET_FILE:ImageRegistration>
 
                 DEPENDS
                     ImageRegistration
@@ -179,7 +180,7 @@ endif()
 # ============================================================
 # Matlab MEX
 # ============================================================
-if (BUILD_MEX)
+if (BUILD_MATLAB_MEX)
 
     find_package(Matlab QUIET COMPONENTS MEX_COMPILER)
 
@@ -187,25 +188,28 @@ if (BUILD_MEX)
         message(STATUS "MATLAB found: ${Matlab_ROOT_DIR}")
 
         matlab_add_mex(
-            NAME OpticalFlow2D_matlab
+            NAME OpticalFlow2d
             SRC
                 src/WrapperOpticalFlow2d.cpp
             LINK_TO
                 ImageRegistration
         )
 
-        target_include_directories(OpticalFlow2D_matlab
+        target_include_directories(OpticalFlow2d
             PRIVATE
                 ${PROJECT_SOURCE_DIR}/include
         )
 
-        set_target_properties(OpticalFlow2D_matlab
-            PROPERTIES
-                LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/mex"
-                RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/mex"
+        add_custom_command(TARGET OpticalFlow2d POST_BUILD
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+                "$<TARGET_FILE:OpticalFlow2d>"
+                "${PROJECT_SOURCE_DIR}/mex/$<TARGET_FILE_NAME:OpticalFlow2d>"
         )
+
     else()
+
         message(STATUS "MATLAB/MEX compiler not found -- skipping MEX")
+
     endif()
 
 
