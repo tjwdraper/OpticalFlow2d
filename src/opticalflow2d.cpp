@@ -1,5 +1,4 @@
 #define cimg_display 0 // Remove if making use of plot functions from cimg_library. If so, add -lX11 to compilation flags.
-
 #include "CImg.h"
 
 #include "coord2d.hpp"
@@ -62,11 +61,12 @@ json_config load_config(const std::string& filename) {
         if (registration.contains("nrefine"))
             config.nrefine = registration.at("nrefine").get<std::size_t>();
 
-        if (registration.contains("niter"))
+        if (registration.contains("niter")) {
             config.niter = registration.at("niter").get<std::vector<std::size_t>>();
             if (config.niter.empty())
                 throw std::runtime_error("niter must contain at least one value.");
             config.nscales = config.niter.size() - 1;
+        }
 
         if (registration.contains("alpha"))
             config.alpha = registration.at("alpha").get<double>();
@@ -121,6 +121,7 @@ int main(int argc, char* argv[]) {
         std::cerr << "Usage: " << argv[0] << " config.json\n";
         return 1;
     }
+
     json_config config = load_config(argv[1]);
 
     // Load images

@@ -6,9 +6,10 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-option(BUILD_EXAMPLES "Build standalone optical flow executable" ON)
+option(BUILD_STANDALONE_EXE "Build standalone optical flow executable" ON)
 option(BUILD_TESTS "Build GoogleTest tests" OFF)
-option(BUILD_MEX "Build Octave MEX wrapper" ON)
+option(BUILD_MATLAB_MEX "Build Matlab MEX wrapper" ON)
+option(BUILD_OCTAVE_MEX "Build Octave MEX wrapper" ON)
 
 
 # ============================================================
@@ -30,27 +31,33 @@ target_include_directories(ImageRegistration
 # Standalone executable
 # ============================================================
 
-if(BUILD_EXAMPLES)
+if(BUILD_STANDALONE_EXE)
 
     if(EXISTS "${PROJECT_SOURCE_DIR}/include/json.hpp" AND
        EXISTS "${PROJECT_SOURCE_DIR}/include/CImg.h")
 
-        add_executable(opticalflow2d_middlebury
-            example/opticalflow2d_middlebury.cpp
+        add_executable(StandaloneOpticalFlow2d
+            src/opticalflow2d.cpp
         )
 
-        target_link_libraries(opticalflow2d_middlebury
+        target_link_libraries(StandaloneOpticalFlow2d
             PRIVATE ImageRegistration
         )
 
-        target_include_directories(opticalflow2d_middlebury
+        target_include_directories(StandaloneOpticalFlow2d
             PRIVATE
                 ${PROJECT_SOURCE_DIR}/include
         )
 
-        set_target_properties(opticalflow2d_middlebury
+        set_target_properties(StandaloneOpticalFlow2d
             PROPERTIES
-                RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/example"
+                OUTPUT_NAME opticalflow2d
+        )
+
+        add_custom_command(TARGET StandaloneOpticalFlow2d POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "$<TARGET_FILE:StandaloneOpticalFlow2d>"
+                "${PROJECT_SOURCE_DIR}/example/cpp/$<TARGET_FILE_NAME:StandaloneOpticalFlow2d>"
         )
 
         message(STATUS "Standalone executable: ENABLED")
@@ -119,7 +126,7 @@ endif()
 # ============================================================
 # Octave MEX
 # ============================================================
-if(BUILD_MEX)
+if(BUILD_OCTAVE_MEX)
 
     find_program(MKOCTFILE_EXECUTABLE
         NAMES mkoctfile
@@ -140,7 +147,7 @@ if(BUILD_MEX)
             message(STATUS "Octave include directory: ${OCTAVE_INCLUDE_DIR}")
             message(STATUS "Octave MEX: ENABLED")
 
-            add_custom_target(OpticalFlow2d_mex ALL
+            add_custom_target(OctaveOpticalFlow2d ALL
 
                 COMMAND
                     ${MKOCTFILE_EXECUTABLE}
@@ -148,9 +155,9 @@ if(BUILD_MEX)
                     -O3
                     -I${PROJECT_SOURCE_DIR}/include
                     -o
-                    ${PROJECT_SOURCE_DIR}/mex/OpticalFlow2d.mex
-                    -lImageRegistration
-                    -L${PROJECT_SOURCE_DIR}/build
+                    ${PROJECT_SOURCE_DIR}/mex/OctaveOpticalFlow2d.mex
+                    ${PROJECT_SOURCE_DIR}/src/WrapperOpticalFlow2d.cpp
+                    $<TARGET_FILE:ImageRegistration>
 
                 DEPENDS
                     ImageRegistration
@@ -172,5 +179,43 @@ if(BUILD_MEX)
         message(STATUS "mkoctfile not found -- skipping MEX")
 
     endif()
+
+endif()
+
+# ============================================================
+# Matlab MEX
+# ============================================================
+if (BUILD_MATLAB_MEX)
+
+    find_package(Matlab QUIET COMPONENTS MEX_COMPILER)
+
+    if(Matlab_FOUND)
+        message(STATUS "MATLAB found: ${Matlab_ROOT_DIR}")
+
+        matlab_add_mex(
+            NAME MatlabOpticalFlow2d
+            SRC
+                src/WrapperOpticalFlow2d.cpp
+            LINK_TO
+                ImageRegistration
+        )
+
+        target_include_directories(MatlabOpticalFlow2d
+            PRIVATE
+                ${PROJECT_SOURCE_DIR}/include
+        )
+
+        add_custom_command(TARGET MatlabOpticalFlow2d POST_BUILD
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+                "$<TARGET_FILE:MatlabOpticalFlow2d>"
+                "${PROJECT_SOURCE_DIR}/mex/$<TARGET_FILE_NAME:MatlabOpticalFlow2d>"
+        )
+
+    else()
+
+        message(STATUS "MATLAB/MEX compiler not found -- skipping MEX")
+
+    endif()
+
 
 endif()
