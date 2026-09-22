@@ -70,7 +70,7 @@ namespace opticalflow {
             }
 
             void fill(T val) {
-                for (std::size_t idx; idx < _size; ++idx)
+                for (std::size_t idx = 0; idx < _size; ++idx)
                     _field[idx] = val;
             }
 

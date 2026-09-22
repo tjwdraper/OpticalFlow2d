@@ -6,3 +6,6 @@ include/json.hpp
 legacy/
 mex/
 example/opticalflow2d_middlebury
+example/opticalflow2d_middlebury.exe
+example/*_abdomen2d.*
+abdomen2d.png

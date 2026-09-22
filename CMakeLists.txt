@@ -48,9 +48,10 @@ if(BUILD_EXAMPLES)
                 ${PROJECT_SOURCE_DIR}/include
         )
 
-        set_target_properties(opticalflow2d_middlebury
-            PROPERTIES
-                RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/example"
+        add_custom_command(TARGET opticalflow2d_middlebury POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "$<TARGET_FILE:opticalflow2d_middlebury>"
+                "${PROJECT_SOURCE_DIR}/example/opticalflow2d_middlebury.exe"
         )
 
         message(STATUS "Standalone executable: ENABLED")
@@ -172,5 +173,40 @@ if(BUILD_MEX)
         message(STATUS "mkoctfile not found -- skipping MEX")
 
     endif()
+
+endif()
+
+# ============================================================
+# Matlab MEX
+# ============================================================
+if (BUILD_MEX)
+
+    find_package(Matlab QUIET COMPONENTS MEX_COMPILER)
+
+    if(Matlab_FOUND)
+        message(STATUS "MATLAB found: ${Matlab_ROOT_DIR}")
+
+        matlab_add_mex(
+            NAME OpticalFlow2D_matlab
+            SRC
+                src/WrapperOpticalFlow2d.cpp
+            LINK_TO
+                ImageRegistration
+        )
+
+        target_include_directories(OpticalFlow2D_matlab
+            PRIVATE
+                ${PROJECT_SOURCE_DIR}/include
+        )
+
+        set_target_properties(OpticalFlow2D_matlab
+            PROPERTIES
+                LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/mex"
+                RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/mex"
+        )
+    else()
+        message(STATUS "MATLAB/MEX compiler not found -- skipping MEX")
+    endif()
+
 
 endif()
