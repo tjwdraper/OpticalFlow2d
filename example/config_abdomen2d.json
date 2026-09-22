@@ -1,0 +1,15 @@
+{
+    "reference_image": "img/abdomen2D_001.png",
+    "moving_image": "img/abdomen2D_127.png",
+
+    "optical_flow_option": "cornelius-kanade",
+
+    "registration": {
+        "nrefine": 2,
+        "niter": [200, 200, 200, 200],
+        "alpha": 0.1,
+        "beta": 10.0,
+        "resampling_factor": 0.5,
+        "eps": 0.0001
+    }
+}

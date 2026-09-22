@@ -123,21 +123,21 @@ end
 % Initialize C++ optical-flow object
 % =============================================================
 
-OpticalFlow2d(config);
+MatlabOpticalFlow2d(config);
 
 %% ============================================================
 % Estimate optical flow
 % =============================================================
 
 tic;
-OpticalFlow2d(sqrt(Iref), Imov);
+MatlabOpticalFlow2d(sqrt(Iref), Imov);
 time = toc;
 
 %% ============================================================
 % Get estimated flow
 % =============================================================
 
-[motion, c] = OpticalFlow2d();
+[motion, c] = MatlabOpticalFlow2d();
 
 u = motion(:,:,1);
 v = motion(:,:,2);
@@ -146,13 +146,13 @@ v = motion(:,:,2);
 % Warp moving image
 % =============================================================
 
-Ireg = OpticalFlow2d(Imov);
+Ireg = MatlabOpticalFlow2d(Imov);
 
 %% ============================================================
 % Close C++ object
 % =============================================================
 
-OpticalFlow2d();
+MatlabOpticalFlow2d();
 
 %% ============================================================
 % Flow magnitude

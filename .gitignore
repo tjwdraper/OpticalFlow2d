@@ -5,7 +5,6 @@ include/CImg.h
 include/json.hpp
 legacy/
 mex/
-example/opticalflow2d_middlebury
-example/opticalflow2d_middlebury.exe
-example/*_abdomen2d.*
+example/cpp/opticallfow2d
+example/cpp/opticalflow2d.exe
 abdomen2d.png

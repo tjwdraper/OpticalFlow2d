@@ -138,21 +138,21 @@ endif
 % Initialize C++ optical-flow object
 % =============================================================
 
-OpticalFlow2d(config);
+OctaveOpticalFlow2d(config);
 
 %% ============================================================
 % Estimate optical flow
 % =============================================================
 
 tic;
-OpticalFlow2d(Iref, Imov);
+OctaveOpticalFlow2d(Iref, Imov);
 time = toc;
 
 %% ============================================================
 % Get estimated flow
 % =============================================================
 
-[motion, c] = OpticalFlow2d();
+[motion, c] = OctaveOpticalFlow2d();
 
 u = motion(:,:,1);
 v = motion(:,:,2);
@@ -161,13 +161,13 @@ v = motion(:,:,2);
 % Warp moving image
 % =============================================================
 
-Ireg = OpticalFlow2d(Imov);
+Ireg = OctaveOpticalFlow2d(Imov);
 
 %% ============================================================
 % Close C++ object
 % =============================================================
 
-OpticalFlow2d();
+OctaveOpticalFlow2d();
 
 %% ============================================================
 % Ground-truth validity mask
