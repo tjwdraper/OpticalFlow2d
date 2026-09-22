@@ -21,6 +21,11 @@ add_library(ImageRegistration
     src/IterativeSolver.cpp
 )
 
+set_target_properties(ImageRegistration
+    PROPERTIES
+        POSITION_INDEPENDENT_CODE ON
+)
+
 target_include_directories(ImageRegistration
     PUBLIC
         ${PROJECT_SOURCE_DIR}/include

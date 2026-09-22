@@ -99,8 +99,18 @@ void convert_cimg_to_opticalflow(opticalflow::Image& image, cimg_library::CImg<d
     double* image_gs = new double[size];
     double* cimage_rgb = cimage.data();
 
-    for (std::size_t idx = 0; idx < size; ++idx) {
-        image_gs[idx] = (cimage_rgb[idx] + cimage_rgb[idx + size] + cimage_rgb[idx + 2*size]) / 3.0;
+    if (cimage.spectrum() == 1) {
+        for (std::size_t idx = 0; idx < size; ++idx) {
+            image_gs[idx] = cimage_rgb[idx];
+        }
+    }
+    else if (cimage.spectrum() == 3) {
+        for (std::size_t idx = 0; idx < size; ++idx) {
+            image_gs[idx] = (cimage_rgb[idx] + cimage_rgb[idx + size] + cimage_rgb[idx + 2*size]) / 3.0;
+        }
+    }
+    else {
+        std::runtime_error("In convert_cimg_to_opticalflow(Image&, cimg_library::CImg<double>&), number of channgels should be either 1 or 3.");
     }
 
     // Set data from opticalflow::Image target to raw data values
