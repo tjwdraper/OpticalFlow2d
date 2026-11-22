@@ -4,10 +4,14 @@
 
 #include <cstring>
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Private methods
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Set static member variable
 std::unique_ptr<ImageRegistration> ImageRegistration::_instance = nullptr;
 
-
+// Constructor
 ImageRegistration::ImageRegistration(
     const dim dimin, 
     const ModelOption option,
@@ -45,6 +49,12 @@ ImageRegistration::ImageRegistration(
     }
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Private methods
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Deconstructor
 ImageRegistration::~ImageRegistration() {
     _instance.reset();
 
@@ -60,6 +70,54 @@ ImageRegistration::~ImageRegistration() {
     delete[] _motion;
     delete[] _c;
     delete[] _solver;
+}
+
+// Instance management
+void ImageRegistration::createInstance(
+    const dim dimin,
+    const ModelOption option,
+    const std::size_t nscales,
+    const std::size_t* niter,
+    const double alpha,
+    const double beta,
+    const double eps,
+    const std::size_t nrefine,
+    const double resampling_factor) {
+    // Check if an instance already exists
+    if (_instance)
+        throw std::logic_error("Error: ImageRegistration is already initialized.");
+
+    // Create a new instance of ImageRegistration. Note: we cannot use std::make_unique 
+    // here because the constructor is private.
+    _instance.reset(
+        new ImageRegistration(
+            dimin,
+            option,
+            nscales,
+            niter,
+            alpha,
+            beta,
+            eps,
+            nrefine,
+            resampling_factor
+        )
+    );
+}
+
+ImageRegistration& ImageRegistration::getInstance() {
+    if (!_instance)
+        throw std::logic_error("Error: ImageRegistration is not initialized.");
+    return *_instance;
+}
+
+void ImageRegistration::shutdownInstance() {
+    if (!_instance)
+        throw std::logic_error("Error: ImageRegistration is not initialized.");
+    _instance.reset();
+}
+
+bool ImageRegistration::isInitialized() {
+    return _instance != nullptr;
 }
 
 // Getters and setters

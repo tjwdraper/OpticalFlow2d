@@ -10,9 +10,6 @@
 
 #include <memory>
 
-// static ImageRegistration& myImageRegistration;
-
-// static ImageRegistration *myImageRegistration = nullptr;
 static mwSize *dim_image_mw;
 static mwSize *dim_motion_mw;
 static dim dimin;
@@ -57,8 +54,6 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
             nrefine,
             resampling_factor
         );
-
-        // myImageRegistration = new ImageRegistration(dimin, option, nscales, niter, alpha, beta, eps, nrefine, resampling_factor);
 
         // Set the output dimension for image and motion field
         dim_image_mw = new mwSize[2];
@@ -151,9 +146,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
     // Close the library
     else if ((nlhs == 0) && (nrhs == 0) && (ImageRegistration::isInitialized())) {
-        // Deallocate and free all the mem
-        // delete myImageRegistration;
-        // myImageRegistration = nullptr;
+        ImageRegistration::shutdownInstance();
 
         delete[] dim_image_mw;
         delete[] dim_motion_mw;

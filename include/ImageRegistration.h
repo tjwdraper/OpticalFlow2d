@@ -42,7 +42,7 @@ class ImageRegistration {
         opticalflow::Image** _c;
 
     public:
-        // Create an instance
+        // Instance management
         static void createInstance(const dim dimin,
                                    const ModelOption option,
                                    const std::size_t nscales,
@@ -51,40 +51,15 @@ class ImageRegistration {
                                    const double beta,
                                    const double eps,
                                    const std::size_t nrefine,
-                                   const double resampling_factor) {
-            if (_instance)
-                throw std::logic_error("Error: ImageRegistration is already initialized.");
-
-            // Create a new instance of ImageRegistration. Note: we cannot use std::make_unique 
-            // here because the constructor is private.
-            _instance.reset(
-                new ImageRegistration(
-                    dimin,
-                    option,
-                    nscales,
-                    niter,
-                    alpha,
-                    beta,
-                    eps,
-                    nrefine,
-                    resampling_factor
-                )
-            );
-        }
-
-        static ImageRegistration& getInstance() {
-            if (!_instance)
-                throw std::logic_error("Error: ImageRegistration is not initialized.");
-            return *_instance;
-        }
+                                   const double resampling_factor); 
+        static ImageRegistration& getInstance(); 
+        static void shutdownInstance();
 
         // Deconstructor
         ~ImageRegistration();
 
         // Check if ImageRegistration has been initialized
-        static bool isInitialized() {
-            return _instance != nullptr;
-        }
+        static bool isInitialized(); 
 
         // Getters and setters
         void set_reference_image(const opticalflow::Image& im);
