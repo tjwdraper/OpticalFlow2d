@@ -4,6 +4,10 @@
 
 #include <cstring>
 
+
+std::unique_ptr<ImageRegistration> ImageRegistration::_instance = nullptr;
+
+
 ImageRegistration::ImageRegistration(
     const dim dimin, 
     const ModelOption option,
@@ -42,6 +46,8 @@ ImageRegistration::ImageRegistration(
 }
 
 ImageRegistration::~ImageRegistration() {
+    _instance.reset();
+
     for (int s = static_cast<int>(_nscales); s>=0; s--) {
         delete _Iref[s];
         delete _Imov[s];
