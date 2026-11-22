@@ -7,31 +7,27 @@
 
 #include "IterativeSolver.h"
 
+#include <memory>
+
 class ImageRegistration {
-    public:
-        // Constructors and deconstructors
-        ImageRegistration(const dim dimin, 
-                          const ModelOption option,
-                          const std::size_t nscales, 
-                          const std::size_t* niter,
-                          const double alpha,
-                          const double beta,
-                          const double eps,
-                          const std::size_t nrefine,
-                          const double resampling_factor);
-        ~ImageRegistration();
-
-        // Getters and setters
-        void set_reference_image(const opticalflow::Image& im);
-        void set_moving_image(const opticalflow::Image& im);
-        const opticalflow::Motion& get_estimated_motion() const;
-        const opticalflow::Image& get_estimated_c() const;
-
-        // Estimate motion
-        void estimate_optical_flow();
-
     private:
-        // void display_registration_parameters() const;
+        static std::unique_ptr<ImageRegistration> _instance;
+
+        // Remove default constructor, create constructor for registration parameters
+        ImageRegistration() = delete;
+        ImageRegistration(
+            const dim dimin,
+            const ModelOption option,
+            const std::size_t nscales,
+            const std::size_t* niter,
+            const double alpha,
+            const double beta,
+            const double eps,
+            const std::size_t nrefine,
+            const double resampling_factor
+        );
+
+        // Private members
         std::size_t _nscales;
         std::size_t _nrefine;
         ModelOption _option;
@@ -44,6 +40,35 @@ class ImageRegistration {
 
         opticalflow::Motion** _motion;
         opticalflow::Image** _c;
+
+    public:
+        // Instance management
+        static void createInstance(const dim dimin,
+                                   const ModelOption option,
+                                   const std::size_t nscales,
+                                   const std::size_t* niter,
+                                   const double alpha,
+                                   const double beta,
+                                   const double eps,
+                                   const std::size_t nrefine,
+                                   const double resampling_factor); 
+        static ImageRegistration& getInstance(); 
+        static void shutdownInstance();
+
+        // Deconstructor
+        ~ImageRegistration();
+
+        // Check if ImageRegistration has been initialized
+        static bool isInitialized(); 
+
+        // Getters and setters
+        void set_reference_image(const opticalflow::Image& im);
+        void set_moving_image(const opticalflow::Image& im);
+        const opticalflow::Motion& get_estimated_motion() const;
+        const opticalflow::Image& get_estimated_c() const;
+
+        // Estimate motion
+        void estimate_optical_flow();
 };
 
 #endif
