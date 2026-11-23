@@ -37,44 +37,6 @@ ImageRegistration::ImageRegistration(const RegistrationConfiguration& config) {
     }
 }
 
-// ImageRegistration::ImageRegistration(
-//     const dim dimin, 
-//     const ModelOption option,
-//     const std::size_t nscales, 
-//     const std::size_t* niter,
-//     const double alpha,
-//     const double beta,
-//     const double eps,
-//     const std::size_t nrefine,
-//     const double resampling_factor) {
-//     // Registration parameters
-//     _nscales = nscales;
-//     _nrefine = nrefine;
-//     _option = option;
-//     _resampling_factor = resampling_factor;
-
-//     // Allocate image and motion 
-//     _Iref = new opticalflow::Image*[nscales + 1];
-//     _Imov = new opticalflow::Image*[nscales + 1];
-//     _motion = new opticalflow::Motion*[nscales + 1];
-//     _c = new opticalflow::Image*[nscales + 1];
-//     _solver = new IterativeSolver*[nscales + 1];
-//     for (int s = static_cast<int>(nscales); s >= 0; s--) {
-//         double scale = pow(_resampling_factor, s);
-//         const dim dim_s = dim(
-//             static_cast<std::size_t> (dimin.x*scale),
-//             static_cast<std::size_t> (dimin.y*scale)
-//         );
-
-//         _Iref[s] = new opticalflow::Image(dim_s);
-//         _Imov[s] = new opticalflow::Image(dim_s);
-//         _motion[s] = new opticalflow::Motion(dim_s);
-//         _c[s] = new opticalflow::Image(dim_s);
-//         _solver[s] = new IterativeSolver(dim_s, s, alpha, beta, niter[s], eps);
-//     }
-// }
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,37 +69,6 @@ void ImageRegistration::createInstance(const RegistrationConfiguration& config) 
     // here because the constructor is private.
     _instance.reset(new ImageRegistration(config));
 }
-
-// void ImageRegistration::createInstance(
-//     const dim dimin,
-//     const ModelOption option,
-//     const std::size_t nscales,
-//     const std::size_t* niter,
-//     const double alpha,
-//     const double beta,
-//     const double eps,
-//     const std::size_t nrefine,
-//     const double resampling_factor) {
-//     // Check if an instance already exists
-//     if (_instance)
-//         throw std::logic_error("Error: ImageRegistration is already initialized.");
-
-//     // Create a new instance of ImageRegistration. Note: we cannot use std::make_unique 
-//     // here because the constructor is private.
-//     _instance.reset(
-//         new ImageRegistration(
-//             dimin,
-//             option,
-//             nscales,
-//             niter,
-//             alpha,
-//             beta,
-//             eps,
-//             nrefine,
-//             resampling_factor
-//         )
-//     );
-// }
 
 ImageRegistration& ImageRegistration::getInstance() {
     if (!_instance)

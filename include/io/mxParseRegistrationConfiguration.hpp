@@ -1,3 +1,10 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// This file defines a helper function to parse the registration configuration from a Matlab struct
+// stored in a mxArray pointer. The function reads the fields of the struct and populates
+// a RegistrationConfiguration object with the corresponding values. It also performs validation
+// checks on the parsed values to ensure they are within acceptable ranges.
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #ifndef MX_PARSE_REGISTRATION_CONFIGURATION_HPP
 #define MX_PARSE_REGISTRATION_CONFIGURATION_HPP
 

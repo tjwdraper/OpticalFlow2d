@@ -6,7 +6,6 @@
 #include "Field.hpp"
 #include "ImageRegistration.h"
 #include "interp2d.hpp"
-// #include "mxParser.hpp"
 #include "mxParseRegistrationConfiguration.hpp"
 
 #include <memory>
@@ -18,50 +17,14 @@ static dim dimin;
 void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // Set registration parameters
     if ((nlhs == 0) && (nrhs == 1) && (!ImageRegistration::isInitialized())) {
+        // Read the registration configuration from the input mxArray
         RegistrationConfiguration config = mxParseRegistrationConfiguration(prhs[0]);
 
+        // Create the ImageRegistration instance with the parsed configuration
         ImageRegistration::createInstance(config);
 
-        // mxParser::parse_size_image(dimin, prhs[0]);
-
-        // // Registration parameters
-        // ModelOption option;
-        // mxParser::parse_opticalflow_option(option, prhs[0]);
-
-        // std::size_t nscales, nrefine;
-        // mxParser::parse_nscales(nscales, prhs[0]);
-        // mxParser::parse_nrefine(nrefine, prhs[0]);
-
-        // double alpha;
-        // mxParser::parse_alpha(alpha, prhs[0]);
-
-
-        // double beta;
-        // mxParser::parse_beta(beta, prhs[0]);
-
-        // std::size_t* niter = new size_t[nscales+1];
-        // mxParser::parse_niter(niter, prhs[0]);
-
-        // double eps;
-        // mxParser::parse_convergence_threshold(eps, prhs[0]);
-
-        // double resampling_factor;
-        // mxParser::parse_resampling_factor(resampling_factor, prhs[0]);
-
-        // ImageRegistration::createInstance(
-        //     dimin,
-        //     option,
-        //     nscales,
-        //     niter,
-        //     alpha,
-        //     beta,
-        //     eps,
-        //     nrefine,
-        //     resampling_factor
-        // );
-
         // Set the output dimension for image and motion field
-        dimin = config.solver_parameters[0].dimin;
+        dimin = config.size_image();
 
         dim_image_mw = new mwSize[2];
         dim_image_mw[0] = dimin.x;
@@ -71,9 +34,6 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         dim_motion_mw[0] = dimin.x;
         dim_motion_mw[1] = dimin.y;
         dim_motion_mw[2] = 2;
-
-        // Free memory
-        // delete[] niter;
     }
 
     // Load the images and estimate motion through image registration

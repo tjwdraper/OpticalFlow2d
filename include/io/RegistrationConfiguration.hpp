@@ -1,3 +1,11 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// This file defines two structures:
+// 1. SolverParameters: contains the parameters for the IterativeSolver class, which are used to 
+//      estimate the optical flow at any given resolution scale.
+// 2. RegistrationConfiguration: contains the parameters for the ImageRegistration class, which
+//      are used to configure the multiscale image registration process.
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 #ifndef _CONFIGURATION_OPTIONS_HPP_
 #define _CONFIGURATION_OPTIONS_HPP_
 
@@ -40,6 +48,12 @@ struct RegistrationConfiguration {
     std::vector<SolverParameters> solver_parameters;
 
     double resampling_factor;
+
+    dim size_image() {
+        if (solver_parameters.empty())
+            throw std::logic_error("Error: solver_parameters is empty.");
+        return solver_parameters[0].dimin;
+    }
 };
 
 #endif
