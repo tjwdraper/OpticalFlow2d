@@ -7,13 +7,13 @@ class FieldTest : public testing::Test {
         ~FieldTest() override {}
 
         void SetUp() override {
-            field.set_val(1.0, 0, 0);
-            field.set_val(2.0, 1, 0);
-            field.set_val(3.0, 2, 0);
+            field.set(1.0, 0, 0);
+            field.set(2.0, 1, 0);
+            field.set(3.0, 2, 0);
 
-            field.set_val(4.0, 0, 1);
-            field.set_val(5.0, 1, 1);
-            field.set_val(6.0, 2, 1);
+            field.set(4.0, 0, 1);
+            field.set(5.0, 1, 1);
+            field.set(6.0, 2, 1);
         }
         void TearDown() override {}
 
@@ -59,7 +59,7 @@ TEST_F(FieldTest, move) {
     for (std::size_t idx = 0; idx < moved.get_size(); ++idx)
         ASSERT_DOUBLE_EQ(moved.at(idx), static_cast<double>(idx+1));
     
-    moved.set_val(100,0);
+    moved.set(100,0);
     ASSERT_DOUBLE_EQ(moved.at(0), 100.0);    
 }
 
@@ -83,23 +83,23 @@ TEST_F(FieldTest, at_linear_idx) {
     ASSERT_DOUBLE_EQ(field.at(3), expected);
 }
 
-TEST_F(FieldTest, set_val) {
+TEST_F(FieldTest, set) {
     // Arange
     double expected(10.0);
 
     // Act
-    field.set_val(10.0,0,1);
+    field.set(10.0,0,1);
 
     // Assert
     ASSERT_DOUBLE_EQ(field.at(0,1), expected);
 }
 
-TEST_F(FieldTest, set_val_linear_idx) {
+TEST_F(FieldTest, set_linear_idx) {
     // Arange
     double expected(10.0);
 
     // Act
-    field.set_val(10.0,3);
+    field.set(10.0,3);
 
     // Assert
     ASSERT_DOUBLE_EQ(field.at(3), expected);
@@ -110,7 +110,7 @@ TEST_F(FieldTest, assignment) {
     // Arange
     opticalflow::Image other(dim(3, 2));
     for (std::size_t idx = 0; idx < other.get_size(); ++idx) 
-        other.set_val(static_cast<double>(10+idx), idx);
+        other.set(static_cast<double>(10+idx), idx);
 
     // Act
     field = other;
@@ -138,7 +138,7 @@ TEST_F(FieldTest, addition)
     // Arrange
     opticalflow::Image other(dim(3, 2));
     for (std::size_t idx = 0; idx < other.get_size(); ++idx)
-        other.set_val(10.0, idx);
+        other.set(10.0, idx);
 
     // Act
     opticalflow::Image result = field + other;
@@ -164,7 +164,7 @@ TEST_F(FieldTest, addition_assignment)
     // Arrange
     opticalflow::Image other(dim(3, 2));
     for (std::size_t idx = 0; idx < other.get_size(); ++idx)
-        other.set_val(10.0, idx);
+        other.set(10.0, idx);
 
     // Act
     field += other;
@@ -183,7 +183,7 @@ TEST_F(FieldTest, subtraction)
     // Arrange
     opticalflow::Image other(dim(3, 2));
     for (std::size_t idx = 0; idx < other.get_size(); ++idx)
-        other.set_val(10.0, idx);
+        other.set(10.0, idx);
 
     // Act
     opticalflow::Image result = field - other;
@@ -206,7 +206,7 @@ TEST_F(FieldTest, subtraction_assignment)
     // Arange
     opticalflow::Image other(dim(3, 2));
     for (std::size_t idx = 0; idx < other.get_size(); ++idx)
-        other.set_val(10.0, idx);
+        other.set(10.0, idx);
 
     // Act
     field -= other;

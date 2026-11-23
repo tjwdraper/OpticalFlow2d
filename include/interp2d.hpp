@@ -43,7 +43,7 @@ namespace interp2d {
 
                 T val = interpolate_at_value<T>(field_in, p, dim_in);
 
-                field_out.set_val(val, i, j);
+                field_out.set(val, i, j);
             }
         }
     }
@@ -82,7 +82,7 @@ namespace interp2d {
                     (static_cast<double>(j) + 0.5) * factor.y - 0.5
                 );
 
-                image_out.set_val(
+                image_out.set(
                     interpolate_at_value<double>(image_in, pos, dim_in),
                     i, j
                 );
@@ -107,7 +107,7 @@ namespace interp2d {
 
                 vector2d val = interpolate_at_value<vector2d>(motion_in, pos, dim_in);
 
-                motion_out.set_val(vector2d(val.x / factor.x, val.y / factor.y), i, j);
+                motion_out.set(vector2d(val.x / factor.x, val.y / factor.y), i, j);
             }
         }
     }

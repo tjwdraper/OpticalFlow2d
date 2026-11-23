@@ -70,7 +70,7 @@ class separable_conv2d {
                         val += fin.at(i, static_cast<std::size_t>(jj)) * _weights_j[kj];
                     }
 
-                    intermediate.set_val(val, i, j);
+                    intermediate.set(val, i, j);
                 }
             }
 
@@ -91,7 +91,7 @@ class separable_conv2d {
                         val += intermediate.at(static_cast<std::size_t>(ii), j) * _weights_i[ki];
                     }
 
-                    result.set_val(val, i, j);
+                    result.set(val, i, j);
                 }
             }
 

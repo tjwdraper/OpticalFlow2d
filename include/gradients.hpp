@@ -86,7 +86,7 @@ namespace gradients {
         // Iterate over interior points
         for (std::size_t i = 1; i < dimin.x-1; ++i) {
             for (std::size_t j = 1; j < dimin.y-1; ++j) {
-                field_avg.set_val(
+                field_avg.set(
                     0.25 * (field.at(i+1,j) 
                             + field.at(i-1,j) 
                             + field.at(i,j+1) 
@@ -98,7 +98,7 @@ namespace gradients {
 
         // Iterate over edges
         for (std::size_t j = 1; j < dimin.y-1; ++j) {
-            field_avg.set_val(
+            field_avg.set(
                 0.25 * (field.at(1,j) 
                         + field.at(0,j) 
                         + field.at(0,j+1) 
@@ -106,7 +106,7 @@ namespace gradients {
                 0, j
             );
 
-            field_avg.set_val(
+            field_avg.set(
                 0.25 * (field.at(dimin.x-2, j) 
                         + field.at(dimin.x-1, j) 
                         + field.at(dimin.x-1, j+1) 
@@ -116,7 +116,7 @@ namespace gradients {
         }
 
         for (std::size_t i = 1; i < dimin.x-1; ++i) {
-            field_avg.set_val(
+            field_avg.set(
                 0.25 * (field.at(i,1) 
                         + field.at(i,0) 
                         + field.at(i+1,0) 
@@ -124,7 +124,7 @@ namespace gradients {
                 i,0
             );
 
-            field_avg.set_val(
+            field_avg.set(
                 0.25 * (field.at(i,dimin.y-2) 
                         + field.at(i,dimin.y-1) 
                         + field.at(i+1,dimin.y-1) 
@@ -134,22 +134,22 @@ namespace gradients {
         }
 
         // Corner points
-        field_avg.set_val(0.25 * (field.at(1,0) 
+        field_avg.set(0.25 * (field.at(1,0) 
                                 + field.at(0,0) 
                                 + field.at(0,1) 
                                 + field.at(0,0)),
                                 0,0);
-        field_avg.set_val(0.25 * (field.at(dimin.x-2,0) 
+        field_avg.set(0.25 * (field.at(dimin.x-2,0) 
                                 + field.at(dimin.x-1,0) 
                                 + field.at(dimin.x-1,1) 
                                 + field.at(dimin.x-1,0)),
                                 dimin.x-1,0);
-        field_avg.set_val(0.25 * (field.at(0,dimin.y-2) 
+        field_avg.set(0.25 * (field.at(0,dimin.y-2) 
                                 + field.at(0,dimin.y-1) 
                                 + field.at(1,dimin.y-1) 
                                 + field.at(0,dimin.y-1)),
                                 0,dimin.y-1);
-        field_avg.set_val(0.25 * (field.at(dimin.x-2,dimin.y-1) 
+        field_avg.set(0.25 * (field.at(dimin.x-2,dimin.y-1) 
                                 + field.at(dimin.x-1,dimin.y-1) 
                                 + field.at(dimin.x-1,dimin.y-2) 
                                 + field.at(dimin.x-1, dimin.y-1)),
@@ -166,7 +166,7 @@ namespace gradients {
 
         for (std::size_t i = 0; i < dimin.x; i++) {
             for (std::size_t j = 0; j < dimin.y; j++) {
-                dI.set_val(
+                dI.set(
                     vector2d(gradients::partial_x(image, i, j),
                              gradients::partial_y(image, i, j)),
                     i,j
@@ -190,7 +190,7 @@ namespace gradients {
                 dudx = gradients::partial_x<vector2d>(motion, i, j);
                 dudy = gradients::partial_y<vector2d>(motion, i, j);
 
-                image.set_val(
+                image.set(
                     (1.0 + dudx.x) * (1.0 + dudy.y) - dudx.y * dudy.x,
                     i, j
                 );

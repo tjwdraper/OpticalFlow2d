@@ -1,5 +1,5 @@
-#ifndef _FIELD_NEW_HPP_
-#define _FIELD_NEW_HPP_
+#ifndef FIELD_HPP
+#define FIELD_HPP
 
 #include "coord2d.hpp"
 
@@ -18,18 +18,21 @@ namespace opticalflow {
             explicit Field(dim dimin) : _dimin(dimin), 
                                         _step(1, dimin.x), 
                                         _size(dimin.x*dimin.y),
-                                        _field(_size) {}
-                                        
+                                        _field(_size) {}             
             ~Field() = default;
 
+            // Getters and setters
             T* data() noexcept { return _field.data(); }
             const T* data() const noexcept { return _field.data(); }
+
+            typename std::vector<T>::iterator begin() noexcept { return _field.begin(); } // typename tells the compiler that std::vector<T>::iterator is a type, not a static member
+            typename std::vector<T>::iterator end() noexcept { return _field.end(); }
+            typename std::vector<T>::const_iterator begin() const noexcept { return _field.begin(); }
+            typename std::vector<T>::const_iterator end() const noexcept { return _field.end(); }
 
             dim get_dimensions() const { return _dimin; }
             dim get_step() const { return _step; }
             std::size_t get_size() const { return _size; }
-
-
 
             const T& at(std::size_t idx) const {
                 return _field.at(idx); // .at check bounds automatically
@@ -39,11 +42,11 @@ namespace opticalflow {
                 return _field.at(index(i,j));
             }
 
-            void set_val(const T& val, std::size_t idx) {
+            void set(const T& val, std::size_t idx) {
                 _field.at(idx) = val;
             }
 
-            void set_val(const T& val, std::size_t i, std::size_t j) {
+            void set(const T& val, std::size_t i, std::size_t j) {
                 _field.at(index(i,j)) = val;
             }
 
@@ -56,7 +59,7 @@ namespace opticalflow {
                 if (_dimin != fin.get_dimensions())
                     throw std::runtime_error("In Field<T>& operator=(const Field<T>&) dimensions of input and target do not match.");
 
-                std::copy(fin.data(), fin.data() + _size, _field.data());
+                std::copy(fin.begin(), fin.end(), _field.data());
                 return *this;
             }
 
@@ -97,8 +100,8 @@ namespace opticalflow {
             }
 
             Field<T>& operator*=(double val) {
-                for (std::size_t idx = 0; idx < _size; ++idx)
-                    _field[idx] *= val;
+                for (auto& elem : _field)
+                    elem *= val;
                 return *this;
             }
 
@@ -115,9 +118,8 @@ namespace opticalflow {
                 if (val == 0.0)
                     throw std::runtime_error("In Field<T>& operator/=(double ), division by zero.");
 
-                // _field /= val;
-                for (std::size_t idx = 0; idx < _size; ++idx)
-                    _field[idx] /= val;
+                for (auto& elem : _field)
+                    elem /= val;
                 return *this;
             }
 
@@ -150,48 +152,23 @@ namespace opticalflow {
 
         // TODO: change to mxArray* in future or separate from namespace
         inline void save_image(double* vals, const Image& image) {
-            std::copy(image.data(), image.data() + image.get_size(), vals);
-            // std::copy(image.get_field(), image.get_field() + image.get_size(), vals);
+            std::copy(image.begin(), image.end(), vals);
         }
 
         inline double norm(const Image& image) {
-            return std::sqrt(std::inner_product(image.data(), image.data() + image.get_size(), image.data(), 0.0));
-            // double norm(0.0);
-            // for (std::size_t idx = 0; idx < image.get_size(); ++idx) 
-            //     norm += std::pow(image.at(idx), 2);
-            // return std::sqrt(norm);
+            return std::sqrt(std::inner_product(image.begin(), image.end(), image.begin(), 0.0));
         }
 
         inline double sum(const Image& image) {
-            return std::accumulate(image.data(), image.data() + image.get_size(), 0.0);
-            // double sum(0.0);
-            // for (std::size_t idx = 0; idx < image.get_size(); ++idx)
-            //     sum += image.at(idx);
-            // return sum;
+            return std::accumulate(image.begin(), image.end(), 0.0);
         }
 
         inline double max(const Image& image) {
-            return *std::max_element(image.data(), image.data() + image.get_size());
-            // double max(image.at(0));
-            // if (image.get_size() == 1)
-            //     return max;
-
-            // for (std::size_t idx = 1; idx < image.get_size(); ++idx)
-            //     if (image.at(idx) > max)
-            //         max = image.at(idx);
-            // return max;
+            return *std::max_element(image.begin(), image.end());
         }
 
         inline double min(const Image& image) {
-            return *std::min_element(image.data(), image.data() + image.get_size());
-            // double min(image.at(0));
-            // if (image.get_size() == 1)
-            //     return min;
-
-            // for (std::size_t idx = 1; idx < image.get_size(); ++idx)
-            //     if (image.at(idx) < min)
-            //         min = image.at(idx);
-            // return min;
+            return *std::min_element(image.begin(), image.end());
         }
 
         inline void normalize(Image& image) {
@@ -202,7 +179,7 @@ namespace opticalflow {
                 throw std::runtime_error("In opticalflow::image::normalize(Image&) input.min() = input.max().");
 
             for (std::size_t idx = 0; idx < image.get_size(); ++idx) 
-                image.set_val((image.at(idx)-low)/(high-low), idx);
+                image.set((image.at(idx)-low)/(high-low), idx);
         }
 
         inline double mse(const Image& image_a, const Image& image_b) {
@@ -234,28 +211,11 @@ namespace opticalflow {
         }
 
         inline vector2d max(const Motion& motion) {
-            return *std::max_element(motion.data(), motion.data() + motion.get_size());
-
-            // vector2d max(motion.at(0));
-            // if (motion.get_size() == 1)
-            //     return max;
-
-            // for (std::size_t idx = 1; idx < motion.get_size(); ++idx)
-            //     if (motion.at(idx) > max)
-            //         max = motion.at(idx);
-            // return max;
+            return *std::max_element(motion.begin(), motion.end());
         }
 
         inline vector2d min(const Motion& motion) {
-            return *std::min_element(motion.data(), motion.data() + motion.get_size());
-            // vector2d min(motion.at(0));
-            // if (motion.get_size() == 1)
-            //     return min;
-
-            // for (std::size_t idx = 1; idx < motion.get_size(); ++idx)
-            //     if (motion.at(idx) < min)
-            //         min = motion.at(idx);
-            // return min;
+            return *std::min_element(motion.begin(), motion.end());
         }
     }
 }

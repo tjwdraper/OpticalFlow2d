@@ -12,7 +12,7 @@ TEST(GradientsTest, PartialX)
         for (std::size_t j = 0; j < d.y; ++j) {
             const double x = static_cast<double>(i);
             const double y = static_cast<double>(j);
-            image.set_val(x * x + y * y, i, j);
+            image.set(x * x + y * y, i, j);
         }
     }
 
@@ -36,7 +36,7 @@ TEST(GradientsTest, PartialY)
         for (std::size_t j = 0; j < d.y; ++j) {
             const double x = static_cast<double>(i);
             const double y = static_cast<double>(j);
-            image.set_val(x * x + y * y, i, j);
+            image.set(x * x + y * y, i, j);
         }
     }
 
@@ -58,7 +58,7 @@ TEST(GradientsTest, PartialXX)
         for (std::size_t j = 0; j < d.y; ++j) {
             const double x = static_cast<double>(i);
             const double y = static_cast<double>(j);
-            image.set_val(x * x + y * y, i, j);
+            image.set(x * x + y * y, i, j);
         }
     }
 
@@ -80,7 +80,7 @@ TEST(GradientsTest, PartialYY)
         for (std::size_t j = 0; j < d.y; ++j) {
             const double x = static_cast<double>(i);
             const double y = static_cast<double>(j);
-            image.set_val(x * x + y * y, i, j);
+            image.set(x * x + y * y, i, j);
         }
     }
 
@@ -102,7 +102,7 @@ TEST(GradientsTest, PartialXY)
         for (std::size_t j = 0; j < d.y; ++j) {
             const double x = static_cast<double>(i);
             const double y = static_cast<double>(j);
-            image.set_val(x * x + y * y, i, j);
+            image.set(x * x + y * y, i, j);
         }
     }
 

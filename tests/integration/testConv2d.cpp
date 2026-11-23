@@ -17,7 +17,7 @@ TEST(SeparableConv2dIntegrationTest, AverageFilter3x3)
 
     for (std::size_t i = 0; i < dimin.x; ++i) {
         for (std::size_t j = 0; j < dimin.y; ++j) {
-            image.set_val(
+            image.set(
                 static_cast<double>(i * dimin.y + j + 1),
                 i,
                 j
@@ -67,7 +67,7 @@ TEST(SeparableConv2dIntegrationTest, AverageFilterPreservesConstantImage)
 
     // Fill image with 10.
     for (std::size_t idx = 0; idx < image.get_size(); ++idx)
-        image.set_val(10.0, idx);
+        image.set(10.0, idx);
 
     average_conv2d filter(dim(3, 3));
 
@@ -129,7 +129,7 @@ TEST(SeparableConv2dIntegrationTest, GaussianFilterPreservesConstantImage)
 
     // Fill image with a constant.
     for (std::size_t idx = 0; idx < image.get_size(); ++idx)
-        image.set_val(42.0, idx);
+        image.set(42.0, idx);
 
     gaussian_conv2d filter(
         dim(5, 5),

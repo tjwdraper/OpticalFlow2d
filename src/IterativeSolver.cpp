@@ -76,7 +76,7 @@ void IterativeSolver::estimate_optical_flow(
             double s = (dot(hs_avg, dI) + It) / (falpha + normsq(dI));
 
             // Horn-Schunck iteration
-            motion_new.set_val(hs_avg - s * dI, idx);
+            motion_new.set(hs_avg - s * dI, idx);
         }
 
         // Convergence criteria
@@ -136,8 +136,8 @@ void IterativeSolver::estimate_optical_flow(
             double s = (dot(hs_avg, dI) + It - c_avg) / (1.0 + normsq(dI)/falpha + 1.0/fbeta);
 
             // Horn-Schunck iteration
-            motion_new.set_val(hs_avg - s * dI / falpha, idx);
-            c_new.set_val(c_avg + s / fbeta, idx);
+            motion_new.set(hs_avg - s * dI / falpha, idx);
+            c_new.set(c_avg + s / fbeta, idx);
         }
 
         // Convergence criteria

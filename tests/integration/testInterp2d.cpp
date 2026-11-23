@@ -11,15 +11,15 @@ TEST(Interp2DTest, BilinearInterpolation) {
     // 1 2 3
     // 4 5 6
     // 7 8 9
-    image.set_val(1.0, 0, 0);
-    image.set_val(2.0, 0, 1);
-    image.set_val(3.0, 0, 2);
-    image.set_val(4.0, 1, 0);
-    image.set_val(5.0, 1, 1);
-    image.set_val(6.0, 1, 2);
-    image.set_val(7.0, 2, 0);
-    image.set_val(8.0, 2, 1);
-    image.set_val(9.0, 2, 2);
+    image.set(1.0, 0, 0);
+    image.set(2.0, 0, 1);
+    image.set(3.0, 0, 2);
+    image.set(4.0, 1, 0);
+    image.set(5.0, 1, 1);
+    image.set(6.0, 1, 2);
+    image.set(7.0, 2, 0);
+    image.set(8.0, 2, 1);
+    image.set(9.0, 2, 2);
 
     // Centre of the four pixels:
     //
@@ -54,7 +54,7 @@ TEST(Interp2DTest, BilinearInterpolationAtBoundary) {
     // 7 8 9
     for (std::size_t i = 0; i < 3; ++i)
         for (std::size_t j = 0; j < 3; ++j)
-            image.set_val(
+            image.set(
                 static_cast<double>(1 + i * 3 + j),
                 i, j);
 
@@ -89,11 +89,11 @@ TEST(Interp2DTest, WarpWithZeroMotionPreservesImage) {
 
     for (std::size_t i = 0; i < 3; ++i) {
         for (std::size_t j = 0; j < 3; ++j) {
-            image_in.set_val(
+            image_in.set(
                 static_cast<double>(1 + i * 3 + j),
                 i, j);
 
-            motion.set_val(vector2d(0.0, 0.0), i, j);
+            motion.set(vector2d(0.0, 0.0), i, j);
         }
     }
 
@@ -119,12 +119,12 @@ TEST(Interp2DTest, WarpWithConstantTranslation) {
     // 7 8 9
     for (std::size_t i = 0; i < 3; ++i) {
         for (std::size_t j = 0; j < 3; ++j) {
-            image_in.set_val(
+            image_in.set(
                 static_cast<double>(1 + i * 3 + j),
                 i, j);
 
             // Sample one pixel to the right.
-            motion.set_val(vector2d(0.0, 1.0), i, j);
+            motion.set(vector2d(0.0, 1.0), i, j);
         }
     }
 
@@ -160,11 +160,11 @@ TEST(Interp2DTest, AccumulateZeroMotion) {
 
     for (std::size_t i = 0; i < 3; ++i) {
         for (std::size_t j = 0; j < 3; ++j) {
-            motion.set_val(vector2d(
+            motion.set(vector2d(
                 static_cast<double>(i),
                 static_cast<double>(j)), i, j);
 
-            motion_interp.set_val(
+            motion_interp.set(
                 vector2d(0.0, 0.0), i, j);
         }
     }
@@ -202,10 +202,10 @@ TEST(Interp2DTest, AccumulateConstantTranslations) {
 
     for (std::size_t i = 0; i < 3; ++i) {
         for (std::size_t j = 0; j < 3; ++j) {
-            motion.set_val(
+            motion.set(
                 vector2d(1.0, 2.0), i, j);
 
-            motion_interp.set_val(
+            motion_interp.set(
                 vector2d(3.0, 4.0), i, j);
         }
     }
@@ -231,10 +231,10 @@ TEST(Interp2DTest, ResizeImageUp) {
 
     // 1 2
     // 3 4
-    image_in.set_val(1.0, 0, 0);
-    image_in.set_val(2.0, 0, 1);
-    image_in.set_val(3.0, 1, 0);
-    image_in.set_val(4.0, 1, 1);
+    image_in.set(1.0, 0, 0);
+    image_in.set(2.0, 0, 1);
+    image_in.set(3.0, 1, 0);
+    image_in.set(4.0, 1, 1);
 
     interp2d::resize(image_out, image_in);
 
@@ -261,7 +261,7 @@ TEST(Interp2DTest, ResizeImageConstantPreservesValue) {
 
     for (std::size_t i = 0; i < 3; ++i)
         for (std::size_t j = 0; j < 3; ++j)
-            image_in.set_val(42.0, i, j);
+            image_in.set(42.0, i, j);
 
     interp2d::resize(image_out, image_in);
 
@@ -281,7 +281,7 @@ TEST(Interp2DTest, ResizeMotionScalesDisplacement) {
     // in the original image.
     for (std::size_t i = 0; i < 2; ++i)
         for (std::size_t j = 0; j < 2; ++j)
-            motion_in.set_val(
+            motion_in.set(
                 vector2d(2.0, 4.0), i, j);
 
     interp2d::resize(motion_out, motion_in);
@@ -305,7 +305,7 @@ TEST(Interp2DTest, ResizeZeroMotionPreservesZero) {
 
     for (std::size_t i = 0; i < 3; ++i)
         for (std::size_t j = 0; j < 3; ++j)
-            motion_in.set_val(
+            motion_in.set(
                 vector2d(0.0, 0.0), i, j);
 
     interp2d::resize(motion_out, motion_in);

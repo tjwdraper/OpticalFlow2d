@@ -6,13 +6,13 @@ class MotionTest : public testing::Test {
     opticalflow::Motion motion{dim(3, 2)};
 
     void SetUp() override {
-        motion.set_val(vector2d(1.0, 2.0), 0, 0);
-        motion.set_val(vector2d(2.0, 3.0), 1, 0);
-        motion.set_val(vector2d(3.0, 4.0), 2, 0);
+        motion.set(vector2d(1.0, 2.0), 0, 0);
+        motion.set(vector2d(2.0, 3.0), 1, 0);
+        motion.set(vector2d(3.0, 4.0), 2, 0);
 
-        motion.set_val(vector2d(4.0, 5.0), 0, 1);
-        motion.set_val(vector2d(5.0, 6.0), 1, 1);
-        motion.set_val(vector2d(6.0, 7.0), 2, 1);
+        motion.set(vector2d(4.0, 5.0), 0, 1);
+        motion.set(vector2d(5.0, 6.0), 1, 1);
+        motion.set(vector2d(6.0, 7.0), 2, 1);
     }
 };
 
@@ -34,7 +34,7 @@ TEST_F(MotionTest, Min) {
 
 TEST_F(MotionTest, MaxSingleValue) {
     opticalflow::Motion single(dim(1, 1));
-    single.set_val(vector2d(42.0, 24.0), 0);
+    single.set(vector2d(42.0, 24.0), 0);
 
     const vector2d result = opticalflow::motion::max(single);
 
@@ -44,7 +44,7 @@ TEST_F(MotionTest, MaxSingleValue) {
 
 TEST_F(MotionTest, MinSingleValue) {
     opticalflow::Motion single(dim(1, 1));
-    single.set_val(vector2d(42.0, 24.0), 0);
+    single.set(vector2d(42.0, 24.0), 0);
 
     const vector2d result = opticalflow::motion::min(single);
 
@@ -78,7 +78,7 @@ TEST_F(MotionTest, MexSaveMotion) {
 
 TEST_F(MotionTest, MexSaveMotionSingleValue) {
     opticalflow::Motion single(dim(1, 1));
-    single.set_val(vector2d(42.0, 24.0), 0);
+    single.set(vector2d(42.0, 24.0), 0);
 
     double vals[2] = {};
 

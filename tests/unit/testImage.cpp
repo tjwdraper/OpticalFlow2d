@@ -6,13 +6,13 @@ protected:
     opticalflow::Image image{dim(3, 2)};
 
     void SetUp() override {
-        image.set_val(1.0, 0, 0);
-        image.set_val(2.0, 1, 0);
-        image.set_val(3.0, 2, 0);
+        image.set(1.0, 0, 0);
+        image.set(2.0, 1, 0);
+        image.set(3.0, 2, 0);
 
-        image.set_val(4.0, 0, 1);
-        image.set_val(5.0, 1, 1);
-        image.set_val(6.0, 2, 1);
+        image.set(4.0, 0, 1);
+        image.set(5.0, 1, 1);
+        image.set(6.0, 2, 1);
     }
 };
 
@@ -48,7 +48,7 @@ TEST_F(ImageTest, Min)
 TEST_F(ImageTest, MaxSingleValue)
 {
     opticalflow::Image single(dim(1, 1));
-    single.set_val(42.0, 0);
+    single.set(42.0, 0);
 
     EXPECT_DOUBLE_EQ(opticalflow::image::max(single), 42.0);
 }
@@ -57,7 +57,7 @@ TEST_F(ImageTest, MaxSingleValue)
 TEST_F(ImageTest, MinSingleValue)
 {
     opticalflow::Image single(dim(1, 1));
-    single.set_val(42.0, 0);
+    single.set(42.0, 0);
 
     EXPECT_DOUBLE_EQ(opticalflow::image::min(single), 42.0);
 }
@@ -91,7 +91,7 @@ TEST_F(ImageTest, NormalizeConstantImageThrows)
     opticalflow::Image constant(dim(3, 2));
 
     for (std::size_t idx = 0; idx < constant.get_size(); ++idx)
-        constant.set_val(5.0, idx);
+        constant.set(5.0, idx);
 
     EXPECT_THROW(
         opticalflow::image::normalize(constant),
@@ -105,7 +105,7 @@ TEST_F(ImageTest, NormalizeConstantImageRemainsUnchanged)
     opticalflow::Image constant(dim(3, 2));
 
     for (std::size_t idx = 0; idx < constant.get_size(); ++idx)
-        constant.set_val(5.0, idx);
+        constant.set(5.0, idx);
 
     EXPECT_THROW(
         opticalflow::image::normalize(constant),
