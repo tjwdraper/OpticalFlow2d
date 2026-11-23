@@ -102,8 +102,8 @@ TEST(Interp2DTest, WarpWithZeroMotionPreservesImage) {
     for (std::size_t i = 0; i < 3; ++i) {
         for (std::size_t j = 0; j < 3; ++j) {
             EXPECT_DOUBLE_EQ(
-                image_out.get_val(i, j),
-                image_in.get_val(i, j));
+                image_out.at(i, j),
+                image_in.at(i, j));
         }
     }
 }
@@ -139,17 +139,17 @@ TEST(Interp2DTest, WarpWithConstantTranslation) {
     // 2 3 3
     // 5 6 6
     // 8 9 9
-    EXPECT_DOUBLE_EQ(image_out.get_val(0, 0), 2.0);
-    EXPECT_DOUBLE_EQ(image_out.get_val(0, 1), 3.0);
-    EXPECT_DOUBLE_EQ(image_out.get_val(0, 2), 3.0);
+    EXPECT_DOUBLE_EQ(image_out.at(0, 0), 2.0);
+    EXPECT_DOUBLE_EQ(image_out.at(0, 1), 3.0);
+    EXPECT_DOUBLE_EQ(image_out.at(0, 2), 3.0);
 
-    EXPECT_DOUBLE_EQ(image_out.get_val(1, 0), 5.0);
-    EXPECT_DOUBLE_EQ(image_out.get_val(1, 1), 6.0);
-    EXPECT_DOUBLE_EQ(image_out.get_val(1, 2), 6.0);
+    EXPECT_DOUBLE_EQ(image_out.at(1, 0), 5.0);
+    EXPECT_DOUBLE_EQ(image_out.at(1, 1), 6.0);
+    EXPECT_DOUBLE_EQ(image_out.at(1, 2), 6.0);
 
-    EXPECT_DOUBLE_EQ(image_out.get_val(2, 0), 8.0);
-    EXPECT_DOUBLE_EQ(image_out.get_val(2, 1), 9.0);
-    EXPECT_DOUBLE_EQ(image_out.get_val(2, 2), 9.0);
+    EXPECT_DOUBLE_EQ(image_out.at(2, 0), 8.0);
+    EXPECT_DOUBLE_EQ(image_out.at(2, 1), 9.0);
+    EXPECT_DOUBLE_EQ(image_out.at(2, 2), 9.0);
 }
 
 
@@ -174,12 +174,12 @@ TEST(Interp2DTest, AccumulateZeroMotion) {
     for (std::size_t i = 0; i < 3; ++i) {
         for (std::size_t j = 0; j < 3; ++j) {
             EXPECT_DOUBLE_EQ(
-                motion_acc.get_val(i, j).x,
-                motion.get_val(i, j).x);
+                motion_acc.at(i, j).x,
+                motion.at(i, j).x);
 
             EXPECT_DOUBLE_EQ(
-                motion_acc.get_val(i, j).y,
-                motion.get_val(i, j).y);
+                motion_acc.at(i, j).y,
+                motion.at(i, j).y);
         }
     }
 }
@@ -217,7 +217,7 @@ TEST(Interp2DTest, AccumulateConstantTranslations) {
 
     for (std::size_t i = 0; i < 3; ++i) {
         for (std::size_t j = 0; j < 3; ++j) {
-            const vector2d val = motion_acc.get_val(i, j);
+            const vector2d val = motion_acc.at(i, j);
 
             EXPECT_DOUBLE_EQ(val.x, 4.0);
             EXPECT_DOUBLE_EQ(val.y, 6.0);
@@ -242,16 +242,16 @@ TEST(Interp2DTest, ResizeImageUp) {
     //
     // The resize uses pixel-center coordinates and
     // clamped bilinear interpolation.
-    EXPECT_NEAR(image_out.get_val(0, 0), 1.0, 1e-12);
-    EXPECT_NEAR(image_out.get_val(0, 3), 2.0, 1e-12);
-    EXPECT_NEAR(image_out.get_val(3, 0), 3.0, 1e-12);
-    EXPECT_NEAR(image_out.get_val(3, 3), 4.0, 1e-12);
+    EXPECT_NEAR(image_out.at(0, 0), 1.0, 1e-12);
+    EXPECT_NEAR(image_out.at(0, 3), 2.0, 1e-12);
+    EXPECT_NEAR(image_out.at(3, 0), 3.0, 1e-12);
+    EXPECT_NEAR(image_out.at(3, 3), 4.0, 1e-12);
 
     // Interior values should be interpolated.
-    EXPECT_NEAR(image_out.get_val(1, 1), 1.75, 1e-12);
-    EXPECT_NEAR(image_out.get_val(1, 2), 2.25, 1e-12);
-    EXPECT_NEAR(image_out.get_val(2, 1), 2.75, 1e-12);
-    EXPECT_NEAR(image_out.get_val(2, 2), 3.25, 1e-12);
+    EXPECT_NEAR(image_out.at(1, 1), 1.75, 1e-12);
+    EXPECT_NEAR(image_out.at(1, 2), 2.25, 1e-12);
+    EXPECT_NEAR(image_out.at(2, 1), 2.75, 1e-12);
+    EXPECT_NEAR(image_out.at(2, 2), 3.25, 1e-12);
 }
 
 
@@ -268,7 +268,7 @@ TEST(Interp2DTest, ResizeImageConstantPreservesValue) {
     for (std::size_t i = 0; i < 7; ++i)
         for (std::size_t j = 0; j < 5; ++j)
             EXPECT_DOUBLE_EQ(
-                image_out.get_val(i, j),
+                image_out.at(i, j),
                 42.0);
 }
 
@@ -290,7 +290,7 @@ TEST(Interp2DTest, ResizeMotionScalesDisplacement) {
     // also become twice as large.
     for (std::size_t i = 0; i < 4; ++i) {
         for (std::size_t j = 0; j < 4; ++j) {
-            const vector2d val = motion_out.get_val(i, j);
+            const vector2d val = motion_out.at(i, j);
 
             EXPECT_NEAR(val.x, 4.0, 1e-12);
             EXPECT_NEAR(val.y, 8.0, 1e-12);
@@ -312,7 +312,7 @@ TEST(Interp2DTest, ResizeZeroMotionPreservesZero) {
 
     for (std::size_t i = 0; i < 6; ++i) {
         for (std::size_t j = 0; j < 6; ++j) {
-            const vector2d val = motion_out.get_val(i, j);
+            const vector2d val = motion_out.at(i, j);
 
             EXPECT_DOUBLE_EQ(val.x, 0.0);
             EXPECT_DOUBLE_EQ(val.y, 0.0);

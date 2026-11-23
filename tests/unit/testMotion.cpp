@@ -96,7 +96,7 @@ TEST_F(MotionTest, MexSaveMotionPreservesComponents) {
     const std::size_t N = motion.get_size();
 
     for (std::size_t idx = 0; idx < N; ++idx) {
-        const vector2d value = motion.get_val(idx);
+        const vector2d value = motion.at(idx);
 
         EXPECT_DOUBLE_EQ(vals[idx], value.x);
         EXPECT_DOUBLE_EQ(vals[idx + N], value.y);

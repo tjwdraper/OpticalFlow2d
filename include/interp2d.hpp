@@ -14,7 +14,7 @@ namespace interp2d {
         if (posy < 0) {posy = 0;}
         if (posx > dim_field.x-1) {posx = dim_field.x-1;}
         if (posy > dim_field.y-1) {posy = dim_field.y-1;}
-        return field.get_val(posx, posy);
+        return field.at(posx, posy);
     }
 
     template <typename T>
@@ -39,7 +39,7 @@ namespace interp2d {
 
         for (std::size_t i = 0; i < dim_out.x; ++i) {
             for (std::size_t j = 0; j < dim_out.y; ++j) {
-                const vector2d p = vector2d(static_cast<double>(i), static_cast<double>(j)) + motion.get_val(i,j);
+                const vector2d p = vector2d(static_cast<double>(i), static_cast<double>(j)) + motion.at(i,j);
 
                 T val = interpolate_at_value<T>(field_in, p, dim_in);
 
