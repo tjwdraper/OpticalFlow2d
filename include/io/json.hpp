@@ -16172,7 +16172,7 @@ class primitive_iterator_t
     difference_type m_it = (std::numeric_limits<std::ptrdiff_t>::min)();
 
   public:
-    constexpr difference_type get_value() const noexcept
+    constexpr difference_type atue() const noexcept
     {
         return m_it;
     }
@@ -17018,7 +17018,7 @@ class iter_impl // NOLINT(cppcoreguidelines-special-member-functions,hicpp-speci
             case value_t::discarded:
             default:
             {
-                if (JSON_HEDLEY_LIKELY(m_it.primitive_iterator.get_value() == -n))
+                if (JSON_HEDLEY_LIKELY(m_it.primitive_iterator.atue() == -n))
                 {
                     return *m_object;
                 }
@@ -29026,7 +29026,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         for (const auto& val : json_patch)
         {
             // wrapper to get a value for an operation
-            const auto get_value = [&val](const string_t& op,
+            const auto atue = [&val](const string_t& op,
                                           const string_t& member,
                                           bool string_type) -> basic_json &
             {
@@ -29061,15 +29061,15 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
             }
 
             // collect mandatory members
-            const auto op = get_value("op", "op", true).template get<string_t>();
-            const auto path = get_value(op, "path", true).template get<string_t>();
+            const auto op = atue("op", "op", true).template get<string_t>();
+            const auto path = atue(op, "path", true).template get<string_t>();
             json_pointer ptr(path);
 
             switch (get_op(op))
             {
                 case patch_operations::add:
                 {
-                    operation_add(ptr, get_value("add", "value", false));
+                    operation_add(ptr, atue("add", "value", false));
                     break;
                 }
 
@@ -29082,13 +29082,13 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
                 case patch_operations::replace:
                 {
                     // the "path" location must exist - use at()
-                    result.at(ptr) = get_value("replace", "value", false);
+                    result.at(ptr) = atue("replace", "value", false);
                     break;
                 }
 
                 case patch_operations::move:
                 {
-                    const auto from_path = get_value("move", "from", true).template get<string_t>();
+                    const auto from_path = atue("move", "from", true).template get<string_t>();
                     json_pointer from_ptr(from_path);
 
                     if (JSON_HEDLEY_UNLIKELY(is_proper_prefix(from_ptr, ptr)))
@@ -29110,7 +29110,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
                 case patch_operations::copy:
                 {
-                    const auto from_path = get_value("copy", "from", true).template get<string_t>();
+                    const auto from_path = atue("copy", "from", true).template get<string_t>();
                     const json_pointer from_ptr(from_path);
 
                     // the "from" location must exist - use at()
@@ -29130,7 +29130,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
                     {
                         // check if "value" matches the one at "path"
                         // the "path" location must exist - use at()
-                        success = (result.at(ptr) == get_value("test", "value", false));
+                        success = (result.at(ptr) == atue("test", "value", false));
                     }
                     JSON_INTERNAL_CATCH (out_of_range&)
                     {

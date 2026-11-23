@@ -7,13 +7,13 @@ class FieldTest : public testing::Test {
         ~FieldTest() override {}
 
         void SetUp() override {
-            field.set_val(1.0, 0, 0);
-            field.set_val(2.0, 1, 0);
-            field.set_val(3.0, 2, 0);
+            field.set(1.0, 0, 0);
+            field.set(2.0, 1, 0);
+            field.set(3.0, 2, 0);
 
-            field.set_val(4.0, 0, 1);
-            field.set_val(5.0, 1, 1);
-            field.set_val(6.0, 2, 1);
+            field.set(4.0, 0, 1);
+            field.set(5.0, 1, 1);
+            field.set(6.0, 2, 1);
         }
         void TearDown() override {}
 
@@ -46,7 +46,7 @@ TEST_F(FieldTest, constructor) {
     ASSERT_EQ(fcopy.get_dimensions(), field.get_dimensions());
     ASSERT_EQ(fcopy.get_size(), field.get_size());
     for (std::size_t idx = 0; idx < fcopy.get_size(); ++idx)
-        ASSERT_EQ(fcopy.get_val(idx), field.get_val(idx));
+        ASSERT_EQ(fcopy.at(idx), field.at(idx));
 }
 
 TEST_F(FieldTest, move) {
@@ -57,52 +57,52 @@ TEST_F(FieldTest, move) {
 
     // Assert
     for (std::size_t idx = 0; idx < moved.get_size(); ++idx)
-        ASSERT_DOUBLE_EQ(moved.get_val(idx), static_cast<double>(idx+1));
+        ASSERT_DOUBLE_EQ(moved.at(idx), static_cast<double>(idx+1));
     
-    moved.set_val(100,0);
-    ASSERT_DOUBLE_EQ(moved.get_val(0), 100.0);    
+    moved.set(100,0);
+    ASSERT_DOUBLE_EQ(moved.at(0), 100.0);    
 }
 
-TEST_F(FieldTest, get_val) {
+TEST_F(FieldTest, at) {
     // Arange
     double expected(4.0);
 
     // Act
 
     // Assert
-    ASSERT_DOUBLE_EQ(field.get_val(0,1), expected);
+    ASSERT_DOUBLE_EQ(field.at(0,1), expected);
 }
 
-TEST_F(FieldTest, get_val_linear_idx) {
+TEST_F(FieldTest, at_linear_idx) {
     // Arange
     double expected(4.0);
 
     // Act
 
     // Assert
-    ASSERT_DOUBLE_EQ(field.get_val(3), expected);
+    ASSERT_DOUBLE_EQ(field.at(3), expected);
 }
 
-TEST_F(FieldTest, set_val) {
+TEST_F(FieldTest, set) {
     // Arange
     double expected(10.0);
 
     // Act
-    field.set_val(10.0,0,1);
+    field.set(10.0,0,1);
 
     // Assert
-    ASSERT_DOUBLE_EQ(field.get_val(0,1), expected);
+    ASSERT_DOUBLE_EQ(field.at(0,1), expected);
 }
 
-TEST_F(FieldTest, set_val_linear_idx) {
+TEST_F(FieldTest, set_linear_idx) {
     // Arange
     double expected(10.0);
 
     // Act
-    field.set_val(10.0,3);
+    field.set(10.0,3);
 
     // Assert
-    ASSERT_DOUBLE_EQ(field.get_val(3), expected);
+    ASSERT_DOUBLE_EQ(field.at(3), expected);
 }
 
 // Operator overloading
@@ -110,7 +110,7 @@ TEST_F(FieldTest, assignment) {
     // Arange
     opticalflow::Image other(dim(3, 2));
     for (std::size_t idx = 0; idx < other.get_size(); ++idx) 
-        other.set_val(static_cast<double>(10+idx), idx);
+        other.set(static_cast<double>(10+idx), idx);
 
     // Act
     field = other;
@@ -118,7 +118,7 @@ TEST_F(FieldTest, assignment) {
     // Assert
     ASSERT_EQ(field.get_dimensions(), other.get_dimensions());
     for (std::size_t idx = 0; idx < field.get_size(); ++idx) {
-        EXPECT_DOUBLE_EQ(field.get_val(idx), other.get_val(idx));
+        EXPECT_DOUBLE_EQ(field.at(idx), other.at(idx));
     }
 }
 
@@ -130,7 +130,7 @@ TEST_F(FieldTest, assignment_self) {
 
     // Assert
     for (std::size_t idx = 0; idx < field.get_size(); ++idx)
-        EXPECT_DOUBLE_EQ(field.get_val(idx), static_cast<double>(idx+1));
+        EXPECT_DOUBLE_EQ(field.at(idx), static_cast<double>(idx+1));
 }
 
 TEST_F(FieldTest, addition)
@@ -138,25 +138,25 @@ TEST_F(FieldTest, addition)
     // Arrange
     opticalflow::Image other(dim(3, 2));
     for (std::size_t idx = 0; idx < other.get_size(); ++idx)
-        other.set_val(10.0, idx);
+        other.set(10.0, idx);
 
     // Act
     opticalflow::Image result = field + other;
 
     // Assert
-    EXPECT_DOUBLE_EQ(result.get_val(0), 11.0);
-    EXPECT_DOUBLE_EQ(result.get_val(1), 12.0);
-    EXPECT_DOUBLE_EQ(result.get_val(2), 13.0);
-    EXPECT_DOUBLE_EQ(result.get_val(3), 14.0);
-    EXPECT_DOUBLE_EQ(result.get_val(4), 15.0);
-    EXPECT_DOUBLE_EQ(result.get_val(5), 16.0);
+    EXPECT_DOUBLE_EQ(result.at(0), 11.0);
+    EXPECT_DOUBLE_EQ(result.at(1), 12.0);
+    EXPECT_DOUBLE_EQ(result.at(2), 13.0);
+    EXPECT_DOUBLE_EQ(result.at(3), 14.0);
+    EXPECT_DOUBLE_EQ(result.at(4), 15.0);
+    EXPECT_DOUBLE_EQ(result.at(5), 16.0);
 
     // Original field should be unchanged.
-    EXPECT_DOUBLE_EQ(field.get_val(0), 1.0);
-    EXPECT_DOUBLE_EQ(field.get_val(5), 6.0);
+    EXPECT_DOUBLE_EQ(field.at(0), 1.0);
+    EXPECT_DOUBLE_EQ(field.at(5), 6.0);
 
     // Other should be unchanged.
-    EXPECT_DOUBLE_EQ(other.get_val(0), 10.0);
+    EXPECT_DOUBLE_EQ(other.at(0), 10.0);
 }
 
 TEST_F(FieldTest, addition_assignment)
@@ -164,18 +164,18 @@ TEST_F(FieldTest, addition_assignment)
     // Arrange
     opticalflow::Image other(dim(3, 2));
     for (std::size_t idx = 0; idx < other.get_size(); ++idx)
-        other.set_val(10.0, idx);
+        other.set(10.0, idx);
 
     // Act
     field += other;
 
     // Assert
-    EXPECT_DOUBLE_EQ(field.get_val(0), 11.0);
-    EXPECT_DOUBLE_EQ(field.get_val(1), 12.0);
-    EXPECT_DOUBLE_EQ(field.get_val(2), 13.0);
-    EXPECT_DOUBLE_EQ(field.get_val(3), 14.0);
-    EXPECT_DOUBLE_EQ(field.get_val(4), 15.0);
-    EXPECT_DOUBLE_EQ(field.get_val(5), 16.0);
+    EXPECT_DOUBLE_EQ(field.at(0), 11.0);
+    EXPECT_DOUBLE_EQ(field.at(1), 12.0);
+    EXPECT_DOUBLE_EQ(field.at(2), 13.0);
+    EXPECT_DOUBLE_EQ(field.at(3), 14.0);
+    EXPECT_DOUBLE_EQ(field.at(4), 15.0);
+    EXPECT_DOUBLE_EQ(field.at(5), 16.0);
 }
 
 TEST_F(FieldTest, subtraction)
@@ -183,22 +183,22 @@ TEST_F(FieldTest, subtraction)
     // Arrange
     opticalflow::Image other(dim(3, 2));
     for (std::size_t idx = 0; idx < other.get_size(); ++idx)
-        other.set_val(10.0, idx);
+        other.set(10.0, idx);
 
     // Act
     opticalflow::Image result = field - other;
 
     // Assert
-    EXPECT_DOUBLE_EQ(result.get_val(0), -9.0);
-    EXPECT_DOUBLE_EQ(result.get_val(1), -8.0);
-    EXPECT_DOUBLE_EQ(result.get_val(2), -7.0);
-    EXPECT_DOUBLE_EQ(result.get_val(3), -6.0);
-    EXPECT_DOUBLE_EQ(result.get_val(4), -5.0);
-    EXPECT_DOUBLE_EQ(result.get_val(5), -4.0);
+    EXPECT_DOUBLE_EQ(result.at(0), -9.0);
+    EXPECT_DOUBLE_EQ(result.at(1), -8.0);
+    EXPECT_DOUBLE_EQ(result.at(2), -7.0);
+    EXPECT_DOUBLE_EQ(result.at(3), -6.0);
+    EXPECT_DOUBLE_EQ(result.at(4), -5.0);
+    EXPECT_DOUBLE_EQ(result.at(5), -4.0);
 
     // Original unchanged.
-    EXPECT_DOUBLE_EQ(field.get_val(0), 1.0);
-    EXPECT_DOUBLE_EQ(field.get_val(5), 6.0);
+    EXPECT_DOUBLE_EQ(field.at(0), 1.0);
+    EXPECT_DOUBLE_EQ(field.at(5), 6.0);
 }
 
 TEST_F(FieldTest, subtraction_assignment)
@@ -206,14 +206,14 @@ TEST_F(FieldTest, subtraction_assignment)
     // Arange
     opticalflow::Image other(dim(3, 2));
     for (std::size_t idx = 0; idx < other.get_size(); ++idx)
-        other.set_val(10.0, idx);
+        other.set(10.0, idx);
 
     // Act
     field -= other;
 
     // Assert
-    EXPECT_DOUBLE_EQ(field.get_val(0), -9.0);
-    EXPECT_DOUBLE_EQ(field.get_val(5), -4.0);
+    EXPECT_DOUBLE_EQ(field.at(0), -9.0);
+    EXPECT_DOUBLE_EQ(field.at(5), -4.0);
 }
 
 TEST_F(FieldTest, multiplication)
@@ -224,16 +224,16 @@ TEST_F(FieldTest, multiplication)
     opticalflow::Image result = field * s;
 
     // Assert
-    EXPECT_DOUBLE_EQ(result.get_val(0), 2.0);
-    EXPECT_DOUBLE_EQ(result.get_val(1), 4.0);
-    EXPECT_DOUBLE_EQ(result.get_val(2), 6.0);
-    EXPECT_DOUBLE_EQ(result.get_val(3), 8.0);
-    EXPECT_DOUBLE_EQ(result.get_val(4), 10.0);
-    EXPECT_DOUBLE_EQ(result.get_val(5), 12.0);
+    EXPECT_DOUBLE_EQ(result.at(0), 2.0);
+    EXPECT_DOUBLE_EQ(result.at(1), 4.0);
+    EXPECT_DOUBLE_EQ(result.at(2), 6.0);
+    EXPECT_DOUBLE_EQ(result.at(3), 8.0);
+    EXPECT_DOUBLE_EQ(result.at(4), 10.0);
+    EXPECT_DOUBLE_EQ(result.at(5), 12.0);
 
     // Original unchanged.
-    EXPECT_DOUBLE_EQ(field.get_val(0), 1.0);
-    EXPECT_DOUBLE_EQ(field.get_val(5), 6.0);
+    EXPECT_DOUBLE_EQ(field.at(0), 1.0);
+    EXPECT_DOUBLE_EQ(field.at(5), 6.0);
 }
 
 TEST_F(FieldTest, multiplication_assignment)
@@ -245,12 +245,12 @@ TEST_F(FieldTest, multiplication_assignment)
     field *= s;
 
     // Assert
-    EXPECT_DOUBLE_EQ(field.get_val(0), 2.0);
-    EXPECT_DOUBLE_EQ(field.get_val(1), 4.0);
-    EXPECT_DOUBLE_EQ(field.get_val(2), 6.0);
-    EXPECT_DOUBLE_EQ(field.get_val(3), 8.0);
-    EXPECT_DOUBLE_EQ(field.get_val(4), 10.0);
-    EXPECT_DOUBLE_EQ(field.get_val(5), 12.0);
+    EXPECT_DOUBLE_EQ(field.at(0), 2.0);
+    EXPECT_DOUBLE_EQ(field.at(1), 4.0);
+    EXPECT_DOUBLE_EQ(field.at(2), 6.0);
+    EXPECT_DOUBLE_EQ(field.at(3), 8.0);
+    EXPECT_DOUBLE_EQ(field.at(4), 10.0);
+    EXPECT_DOUBLE_EQ(field.at(5), 12.0);
 }
 
 TEST_F(FieldTest, scalar_multiplication)
@@ -262,8 +262,8 @@ TEST_F(FieldTest, scalar_multiplication)
     opticalflow::Image result2 = s * field;
 
     for (std::size_t idx = 0; idx < field.get_size(); ++idx) {
-        EXPECT_DOUBLE_EQ(result1.get_val(idx), static_cast<double>(2.0 * (idx + 1)));
-        EXPECT_DOUBLE_EQ(result2.get_val(idx), static_cast<double>(2.0 * (idx + 1)));
+        EXPECT_DOUBLE_EQ(result1.at(idx), static_cast<double>(2.0 * (idx + 1)));
+        EXPECT_DOUBLE_EQ(result2.at(idx), static_cast<double>(2.0 * (idx + 1)));
     }
 }
 
@@ -276,15 +276,15 @@ TEST_F(FieldTest, division)
     opticalflow::Image result = field / s;
 
     // Assert
-    EXPECT_DOUBLE_EQ(result.get_val(0), 0.5);
-    EXPECT_DOUBLE_EQ(result.get_val(1), 1.0);
-    EXPECT_DOUBLE_EQ(result.get_val(2), 1.5);
-    EXPECT_DOUBLE_EQ(result.get_val(3), 2.0);
-    EXPECT_DOUBLE_EQ(result.get_val(4), 2.5);
-    EXPECT_DOUBLE_EQ(result.get_val(5), 3.0);
+    EXPECT_DOUBLE_EQ(result.at(0), 0.5);
+    EXPECT_DOUBLE_EQ(result.at(1), 1.0);
+    EXPECT_DOUBLE_EQ(result.at(2), 1.5);
+    EXPECT_DOUBLE_EQ(result.at(3), 2.0);
+    EXPECT_DOUBLE_EQ(result.at(4), 2.5);
+    EXPECT_DOUBLE_EQ(result.at(5), 3.0);
 
     // Original unchanged.
-    EXPECT_DOUBLE_EQ(field.get_val(0), 1.0);
+    EXPECT_DOUBLE_EQ(field.at(0), 1.0);
 }
 
 TEST_F(FieldTest, division_assignment)
@@ -296,12 +296,12 @@ TEST_F(FieldTest, division_assignment)
     field /= s;
 
     // Assert
-    EXPECT_DOUBLE_EQ(field.get_val(0), 0.5);
-    EXPECT_DOUBLE_EQ(field.get_val(1), 1.0);
-    EXPECT_DOUBLE_EQ(field.get_val(2), 1.5);
-    EXPECT_DOUBLE_EQ(field.get_val(3), 2.0);
-    EXPECT_DOUBLE_EQ(field.get_val(4), 2.5);    
-    EXPECT_DOUBLE_EQ(field.get_val(5), 3.0);
+    EXPECT_DOUBLE_EQ(field.at(0), 0.5);
+    EXPECT_DOUBLE_EQ(field.at(1), 1.0);
+    EXPECT_DOUBLE_EQ(field.at(2), 1.5);
+    EXPECT_DOUBLE_EQ(field.at(3), 2.0);
+    EXPECT_DOUBLE_EQ(field.at(4), 2.5);    
+    EXPECT_DOUBLE_EQ(field.at(5), 3.0);
 }
 
 

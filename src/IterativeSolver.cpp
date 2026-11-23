@@ -22,26 +22,6 @@ IterativeSolver::IterativeSolver(const SolverParameters& params) {
     _niter = params.niter;
 }
 
-// IterativeSolver::IterativeSolver(const dim dimin, const std::size_t resolution_level, const double alpha, const double beta, const std::size_t niter, const double eps) {
-//     // Get the dimensions and size of the images
-//     _dimin  = dimin;
-//     _step   = dim(1, dimin.x);
-//     _sizein = dimin.x * dimin.y;
-
-//     // Allocate memory for image gradients
-//     _spatial_gradient_image = new opticalflow::Motion(_dimin);
-//     _temporal_derivative_image = new opticalflow::Image(_dimin);
-//     _horn_schunck_average = new opticalflow::Motion(_dimin);
-//     _c_average = new opticalflow::Image(_dimin);
-
-//     // Model parameters
-//     _alpha = alpha;
-//     _beta = beta;
-//     _eps = eps;
-//     _niter = niter;
-//     _resolution_level = resolution_level;
-// }
-
 IterativeSolver::~IterativeSolver() {
     delete _horn_schunck_average;
     delete _c_average;
@@ -88,15 +68,15 @@ void IterativeSolver::estimate_optical_flow(
 
         for (std::size_t idx = 0; idx < motion.get_size(); ++idx) {
             // Get values
-            const vector2d& hs_avg = horn_schunck_average.get_val(idx);
-            const vector2d& dI = spatial_gradient_image.get_val(idx);
-            const double& It = temporal_derivative_image.get_val(idx);
+            const vector2d& hs_avg = horn_schunck_average.at(idx);
+            const vector2d& dI = spatial_gradient_image.at(idx);
+            const double& It = temporal_derivative_image.at(idx);
 
             // Calculate prefactor
             double s = (dot(hs_avg, dI) + It) / (falpha + normsq(dI));
 
             // Horn-Schunck iteration
-            motion_new.set_val(hs_avg - s * dI, idx);
+            motion_new.set(hs_avg - s * dI, idx);
         }
 
         // Convergence criteria
@@ -147,17 +127,17 @@ void IterativeSolver::estimate_optical_flow(
 
         for (std::size_t idx = 0; idx < motion.get_size(); ++idx) {
             // Get values
-            const vector2d& hs_avg = horn_schunck_average.get_val(idx);
-            const double& c_avg = c_average.get_val(idx);
-            const vector2d& dI = spatial_gradient_image.get_val(idx);
-            const double& It = temporal_derivative_image.get_val(idx);
+            const vector2d& hs_avg = horn_schunck_average.at(idx);
+            const double& c_avg = c_average.at(idx);
+            const vector2d& dI = spatial_gradient_image.at(idx);
+            const double& It = temporal_derivative_image.at(idx);
 
             // Calculate prefactor
             double s = (dot(hs_avg, dI) + It - c_avg) / (1.0 + normsq(dI)/falpha + 1.0/fbeta);
 
             // Horn-Schunck iteration
-            motion_new.set_val(hs_avg - s * dI / falpha, idx);
-            c_new.set_val(c_avg + s / fbeta, idx);
+            motion_new.set(hs_avg - s * dI / falpha, idx);
+            c_new.set(c_avg + s / fbeta, idx);
         }
 
         // Convergence criteria

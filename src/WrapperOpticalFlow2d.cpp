@@ -10,9 +10,9 @@
 
 #include <memory>
 
-static mwSize *dim_image_mw;
-static mwSize *dim_motion_mw;
 static dim dimin;
+static std::vector<mwSize> dim_image_mw(2); // 2d-vector for image dimensions
+static std::vector<mwSize> dim_motion_mw(3); // 3d-vector for motion dimensions (2 channels for x and y)
 
 void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     // Set registration parameters
@@ -26,14 +26,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         // Set the output dimension for image and motion field
         dimin = config.size_image();
 
-        dim_image_mw = new mwSize[2];
-        dim_image_mw[0] = dimin.x;
-        dim_image_mw[1] = dimin.y;
-
-        dim_motion_mw = new mwSize[3];
-        dim_motion_mw[0] = dimin.x;
-        dim_motion_mw[1] = dimin.y;
-        dim_motion_mw[2] = 2;
+        // Allocate memory for the output dimensions
+        dim_image_mw = {dimin.x, dimin.y};
+        dim_motion_mw = {dimin.x, dimin.y, 2};
     }
 
     // Load the images and estimate motion through image registration
@@ -64,7 +59,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         const opticalflow::Motion& motion = myImageRegistration.get_estimated_motion();
 
         // Create output array and pointer to data
-        plhs[0] = mxCreateNumericArray(3, dim_motion_mw, mxDOUBLE_CLASS, mxREAL);
+        plhs[0] = mxCreateNumericArray(3, dim_motion_mw.data(), mxDOUBLE_CLASS, mxREAL);
         double *tmp = mxGetPr(plhs[0]);
 
         // Fill the data with the motion field
@@ -78,8 +73,8 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         const opticalflow::Image& c = myImageRegistration.get_estimated_c();
 
         // Create output array and pointer to data
-        plhs[0] = mxCreateNumericArray(3, dim_motion_mw, mxDOUBLE_CLASS, mxREAL);
-        plhs[1] = mxCreateNumericArray(2, dim_image_mw, mxDOUBLE_CLASS, mxREAL);
+        plhs[0] = mxCreateNumericArray(3, dim_motion_mw.data(), mxDOUBLE_CLASS, mxREAL);
+        plhs[1] = mxCreateNumericArray(2, dim_image_mw.data(), mxDOUBLE_CLASS, mxREAL);
 
         double *tmp = mxGetPr(plhs[0]);
         opticalflow::motion::save_motion(tmp, motion);
@@ -103,8 +98,8 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         // Warp the image with the motion field
         interp2d::warp2d(Ireg, Imov, motion);
 
-        // Create output array and postd::size_ter to data
-        plhs[0] = mxCreateNumericArray(2, dim_image_mw, mxDOUBLE_CLASS, mxREAL);
+        // Create output array and poiter to data
+        plhs[0] = mxCreateNumericArray(2, dim_image_mw.data(), mxDOUBLE_CLASS, mxREAL);
         tmp = mxGetPr(plhs[0]);
 
         // Fill the data with the registered image
@@ -115,8 +110,8 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     else if ((nlhs == 0) && (nrhs == 0) && (ImageRegistration::isInitialized())) {
         ImageRegistration::shutdownInstance();
 
-        delete[] dim_image_mw;
-        delete[] dim_motion_mw;
+        dim_image_mw.clear();
+        dim_motion_mw.clear();
     }
 
     else {

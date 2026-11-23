@@ -67,10 +67,10 @@ class separable_conv2d {
                         if (jj < 0) {jj = 0;}
                         if (jj > dimin.y-1) {jj = dimin.y-1;}
 
-                        val += fin.get_val(i, static_cast<std::size_t>(jj)) * _weights_j[kj];
+                        val += fin.at(i, static_cast<std::size_t>(jj)) * _weights_j[kj];
                     }
 
-                    intermediate.set_val(val, i, j);
+                    intermediate.set(val, i, j);
                 }
             }
 
@@ -88,10 +88,10 @@ class separable_conv2d {
                         if (ii < 0) {ii = 0;}
                         if (ii > dimin.x-1) {ii = dimin.x-1;}
 
-                        val += intermediate.get_val(static_cast<std::size_t>(ii), j) * _weights_i[ki];
+                        val += intermediate.at(static_cast<std::size_t>(ii), j) * _weights_i[ki];
                     }
 
-                    result.set_val(val, i, j);
+                    result.set(val, i, j);
                 }
             }
 

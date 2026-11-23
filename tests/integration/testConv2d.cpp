@@ -17,7 +17,7 @@ TEST(SeparableConv2dIntegrationTest, AverageFilter3x3)
 
     for (std::size_t i = 0; i < dimin.x; ++i) {
         for (std::size_t j = 0; j < dimin.y; ++j) {
-            image.set_val(
+            image.set(
                 static_cast<double>(i * dimin.y + j + 1),
                 i,
                 j
@@ -46,17 +46,17 @@ TEST(SeparableConv2dIntegrationTest, AverageFilter3x3)
     // 11/3  5   19/3
     // 17/3  7   23/3
     //
-    EXPECT_NEAR(image.get_val(0, 0), 7.0 / 3.0, 1e-12);
-    EXPECT_NEAR(image.get_val(0, 1), 3.0,       1e-12);
-    EXPECT_NEAR(image.get_val(0, 2), 11.0 / 3.0, 1e-12);
+    EXPECT_NEAR(image.at(0, 0), 7.0 / 3.0, 1e-12);
+    EXPECT_NEAR(image.at(0, 1), 3.0,       1e-12);
+    EXPECT_NEAR(image.at(0, 2), 11.0 / 3.0, 1e-12);
 
-    EXPECT_NEAR(image.get_val(1, 0), 13.0 / 3.0, 1e-12);
-    EXPECT_NEAR(image.get_val(1, 1), 5.0,        1e-12);
-    EXPECT_NEAR(image.get_val(1, 2), 17.0 / 3.0, 1e-12);
+    EXPECT_NEAR(image.at(1, 0), 13.0 / 3.0, 1e-12);
+    EXPECT_NEAR(image.at(1, 1), 5.0,        1e-12);
+    EXPECT_NEAR(image.at(1, 2), 17.0 / 3.0, 1e-12);
 
-    EXPECT_NEAR(image.get_val(2, 0), 19.0 / 3.0, 1e-12);
-    EXPECT_NEAR(image.get_val(2, 1), 7.0,        1e-12);
-    EXPECT_NEAR(image.get_val(2, 2), 23.0 / 3.0, 1e-12);
+    EXPECT_NEAR(image.at(2, 0), 19.0 / 3.0, 1e-12);
+    EXPECT_NEAR(image.at(2, 1), 7.0,        1e-12);
+    EXPECT_NEAR(image.at(2, 2), 23.0 / 3.0, 1e-12);
 }
 
 
@@ -67,7 +67,7 @@ TEST(SeparableConv2dIntegrationTest, AverageFilterPreservesConstantImage)
 
     // Fill image with 10.
     for (std::size_t idx = 0; idx < image.get_size(); ++idx)
-        image.set_val(10.0, idx);
+        image.set(10.0, idx);
 
     average_conv2d filter(dim(3, 3));
 
@@ -76,7 +76,7 @@ TEST(SeparableConv2dIntegrationTest, AverageFilterPreservesConstantImage)
     // A normalized averaging filter should preserve
     // a constant image, including at the boundaries.
     for (std::size_t idx = 0; idx < image.get_size(); ++idx)
-        EXPECT_DOUBLE_EQ(image.get_val(idx), 10.0);
+        EXPECT_DOUBLE_EQ(image.at(idx), 10.0);
 }
 
 
@@ -129,7 +129,7 @@ TEST(SeparableConv2dIntegrationTest, GaussianFilterPreservesConstantImage)
 
     // Fill image with a constant.
     for (std::size_t idx = 0; idx < image.get_size(); ++idx)
-        image.set_val(42.0, idx);
+        image.set(42.0, idx);
 
     gaussian_conv2d filter(
         dim(5, 5),
@@ -141,5 +141,5 @@ TEST(SeparableConv2dIntegrationTest, GaussianFilterPreservesConstantImage)
     // A normalized Gaussian filter should preserve
     // a constant image.
     for (std::size_t idx = 0; idx < image.get_size(); ++idx)
-        EXPECT_NEAR(image.get_val(idx), 42.0, 1e-12);
+        EXPECT_NEAR(image.at(idx), 42.0, 1e-12);
 }

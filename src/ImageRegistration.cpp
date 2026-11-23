@@ -20,20 +20,25 @@ ImageRegistration::ImageRegistration(const RegistrationConfiguration& config) {
     _resampling_factor = config.resampling_factor;
 
     // Allocate image and motion 
-    _Iref = new opticalflow::Image*[config.nscales + 1];
-    _Imov = new opticalflow::Image*[config.nscales + 1];
-    _motion = new opticalflow::Motion*[config.nscales + 1];
-    _c = new opticalflow::Image*[config.nscales + 1];
-    _solver = new IterativeSolver*[config.nscales + 1];
+    _Iref.resize(_nscales + 1);
+    _Imov.resize(_nscales + 1);
+    _motion.resize(_nscales + 1);
+    _c.resize(_nscales + 1);
+    _solver.resize(_nscales + 1);
 
     for (int s = static_cast<int>(config.nscales); s >= 0; s--) {
+        // Get the solver parameters for the current scale
         const SolverParameters& solver_params = config.solver_parameters[s];
 
-        _Iref[s] = new opticalflow::Image(solver_params.dimin);
-        _Imov[s] = new opticalflow::Image(solver_params.dimin);
-        _motion[s] = new opticalflow::Motion(solver_params.dimin);
-        _c[s] = new opticalflow::Image(solver_params.dimin);
-        _solver[s] = new IterativeSolver(solver_params);
+        // Get image dimensions at current resolution level
+        const dim dimin = solver_params.dimin;
+
+        // Allocate memory for images and motion fields at current resolution level
+        _Iref[s] = std::make_unique<opticalflow::Image>(solver_params.dimin);
+        _Imov[s] = std::make_unique<opticalflow::Image>(solver_params.dimin);
+        _motion[s] = std::make_unique<opticalflow::Motion>(solver_params.dimin);
+        _c[s] = std::make_unique<opticalflow::Image>(solver_params.dimin);
+        _solver[s] = std::make_unique<IterativeSolver>(solver_params);
     }
 }
 
@@ -46,17 +51,12 @@ ImageRegistration::~ImageRegistration() {
     _instance.reset();
 
     for (int s = static_cast<int>(_nscales); s>=0; s--) {
-        delete _Iref[s];
-        delete _Imov[s];
-        delete _motion[s];
-        delete _c[s];
-        delete _solver[s];
+        _Iref[s].reset();
+        _Imov[s].reset();
+        _motion[s].reset();
+        _c[s].reset();
+        _solver[s].reset();
     }
-    delete[] _Iref;
-    delete[] _Imov;
-    delete[] _motion;
-    delete[] _c;
-    delete[] _solver;
 }
 
 // Instance management

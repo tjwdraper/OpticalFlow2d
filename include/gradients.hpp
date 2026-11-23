@@ -13,11 +13,11 @@ namespace gradients {
             throw std::runtime_error("In T gradients::partial_x(const Field<T>&, const std::size_t, const std::size_t), x-dimension must be at least 2.");
 
         if (i == 0)
-            return field.get_val(i+1,j) - field.get_val(i,j); 
+            return field.at(i+1,j) - field.at(i,j); 
         else if (i == dimin.x-1)
-            return field.get_val(i,j) - field.get_val(i-1, j);
+            return field.at(i,j) - field.at(i-1, j);
         else
-            return (field.get_val(i+1,j) - field.get_val(i-1,j)) / 2.0; 
+            return (field.at(i+1,j) - field.at(i-1,j)) / 2.0; 
     }
 
     template <typename T>
@@ -27,11 +27,11 @@ namespace gradients {
             throw std::runtime_error("In T gradients::partial_y(const Field<T>&, const std::size_t, const std::size_t), y-dimension must be at least 2.");
 
         if (j == 0)
-            return field.get_val(i,j+1) - field.get_val(i,j); 
+            return field.at(i,j+1) - field.at(i,j); 
         else if (j == dimin.y-1)
-            return field.get_val(i,j) - field.get_val(i, j-1);
+            return field.at(i,j) - field.at(i, j-1);
         else
-            return (field.get_val(i,j+1) - field.get_val(i,j-1)) / 2.0; 
+            return (field.at(i,j+1) - field.at(i,j-1)) / 2.0; 
     }
 
     template <typename T>
@@ -41,11 +41,11 @@ namespace gradients {
             throw std::runtime_error("In T gradients::partial_xx(const Field<T>&, const std::size_t, const std::size_t), x-dimension must be at least 4");
 
         if (i == 0)
-            return 2.0*field.get_val(i,j) - 5.0*field.get_val(i+1,j) + 4.0*field.get_val(i+2,j) - field.get_val(i+3,j);
+            return 2.0*field.at(i,j) - 5.0*field.at(i+1,j) + 4.0*field.at(i+2,j) - field.at(i+3,j);
         else if (i == dimin.x-1)
-            return 2.0*field.get_val(i,j) - 5.0*field.get_val(i-1,j) + 4.0*field.get_val(i-2,j) - field.get_val(i-3,j);
+            return 2.0*field.at(i,j) - 5.0*field.at(i-1,j) + 4.0*field.at(i-2,j) - field.at(i-3,j);
         else
-            return field.get_val(i+1,j) - 2.0*field.get_val(i,j) + field.get_val(i-1,j);
+            return field.at(i+1,j) - 2.0*field.at(i,j) + field.at(i-1,j);
     }
 
     template <typename T>
@@ -55,11 +55,11 @@ namespace gradients {
             throw std::runtime_error("In T gradients::partial_yy(const Field<T>&, const std::size_t, const std::size_t), y-dimension must be at least 4");
 
         if (j == 0)
-            return 2.0*field.get_val(i,j) - 5.0*field.get_val(i,j+1) + 4.0*field.get_val(i,j+2) - field.get_val(i,j+3);
+            return 2.0*field.at(i,j) - 5.0*field.at(i,j+1) + 4.0*field.at(i,j+2) - field.at(i,j+3);
         else if (j == dimin.y-1)
-            return 2.0*field.get_val(i,j) - 5.0*field.get_val(i,j-1) + 4.0*field.get_val(i,j-2) - field.get_val(i,j-3);
+            return 2.0*field.at(i,j) - 5.0*field.at(i,j-1) + 4.0*field.at(i,j-2) - field.at(i,j-3);
         else
-            return field.get_val(i,j+1) - 2.0*field.get_val(i,j) + field.get_val(i,j-1);
+            return field.at(i,j+1) - 2.0*field.at(i,j) + field.at(i,j-1);
     }
 
     template <typename T>
@@ -71,7 +71,7 @@ namespace gradients {
         if (i == 0 || j == 0 || i == dimin.x-1 || j == dimin.y-1)
             return T{};
 
-        return (field.get_val(i+1,j+1) - field.get_val(i+1,j-1) - field.get_val(i-1,j+1) + field.get_val(i-1,j-1)) / 4.0;
+        return (field.at(i+1,j+1) - field.at(i+1,j-1) - field.at(i-1,j+1) + field.at(i-1,j-1)) / 4.0;
     }
 
     template <typename T>
@@ -86,11 +86,11 @@ namespace gradients {
         // Iterate over interior points
         for (std::size_t i = 1; i < dimin.x-1; ++i) {
             for (std::size_t j = 1; j < dimin.y-1; ++j) {
-                field_avg.set_val(
-                    0.25 * (field.get_val(i+1,j) 
-                            + field.get_val(i-1,j) 
-                            + field.get_val(i,j+1) 
-                            + field.get_val(i,j-1)),
+                field_avg.set(
+                    0.25 * (field.at(i+1,j) 
+                            + field.at(i-1,j) 
+                            + field.at(i,j+1) 
+                            + field.at(i,j-1)),
                     i,j
                 );
             }
@@ -98,61 +98,61 @@ namespace gradients {
 
         // Iterate over edges
         for (std::size_t j = 1; j < dimin.y-1; ++j) {
-            field_avg.set_val(
-                0.25 * (field.get_val(1,j) 
-                        + field.get_val(0,j) 
-                        + field.get_val(0,j+1) 
-                        + field.get_val(0,j-1)),
+            field_avg.set(
+                0.25 * (field.at(1,j) 
+                        + field.at(0,j) 
+                        + field.at(0,j+1) 
+                        + field.at(0,j-1)),
                 0, j
             );
 
-            field_avg.set_val(
-                0.25 * (field.get_val(dimin.x-2, j) 
-                        + field.get_val(dimin.x-1, j) 
-                        + field.get_val(dimin.x-1, j+1) 
-                        + field.get_val(dimin.x-1, j-1)),
+            field_avg.set(
+                0.25 * (field.at(dimin.x-2, j) 
+                        + field.at(dimin.x-1, j) 
+                        + field.at(dimin.x-1, j+1) 
+                        + field.at(dimin.x-1, j-1)),
                 dimin.x-1, j
             );
         }
 
         for (std::size_t i = 1; i < dimin.x-1; ++i) {
-            field_avg.set_val(
-                0.25 * (field.get_val(i,1) 
-                        + field.get_val(i,0) 
-                        + field.get_val(i+1,0) 
-                        + field.get_val(i-1,0)),
+            field_avg.set(
+                0.25 * (field.at(i,1) 
+                        + field.at(i,0) 
+                        + field.at(i+1,0) 
+                        + field.at(i-1,0)),
                 i,0
             );
 
-            field_avg.set_val(
-                0.25 * (field.get_val(i,dimin.y-2) 
-                        + field.get_val(i,dimin.y-1) 
-                        + field.get_val(i+1,dimin.y-1) 
-                        + field.get_val(i-1,dimin.y-1)),
+            field_avg.set(
+                0.25 * (field.at(i,dimin.y-2) 
+                        + field.at(i,dimin.y-1) 
+                        + field.at(i+1,dimin.y-1) 
+                        + field.at(i-1,dimin.y-1)),
                 i, dimin.y-1
             );
         }
 
         // Corner points
-        field_avg.set_val(0.25 * (field.get_val(1,0) 
-                                + field.get_val(0,0) 
-                                + field.get_val(0,1) 
-                                + field.get_val(0,0)),
+        field_avg.set(0.25 * (field.at(1,0) 
+                                + field.at(0,0) 
+                                + field.at(0,1) 
+                                + field.at(0,0)),
                                 0,0);
-        field_avg.set_val(0.25 * (field.get_val(dimin.x-2,0) 
-                                + field.get_val(dimin.x-1,0) 
-                                + field.get_val(dimin.x-1,1) 
-                                + field.get_val(dimin.x-1,0)),
+        field_avg.set(0.25 * (field.at(dimin.x-2,0) 
+                                + field.at(dimin.x-1,0) 
+                                + field.at(dimin.x-1,1) 
+                                + field.at(dimin.x-1,0)),
                                 dimin.x-1,0);
-        field_avg.set_val(0.25 * (field.get_val(0,dimin.y-2) 
-                                + field.get_val(0,dimin.y-1) 
-                                + field.get_val(1,dimin.y-1) 
-                                + field.get_val(0,dimin.y-1)),
+        field_avg.set(0.25 * (field.at(0,dimin.y-2) 
+                                + field.at(0,dimin.y-1) 
+                                + field.at(1,dimin.y-1) 
+                                + field.at(0,dimin.y-1)),
                                 0,dimin.y-1);
-        field_avg.set_val(0.25 * (field.get_val(dimin.x-2,dimin.y-1) 
-                                + field.get_val(dimin.x-1,dimin.y-1) 
-                                + field.get_val(dimin.x-1,dimin.y-2) 
-                                + field.get_val(dimin.x-1, dimin.y-1)),
+        field_avg.set(0.25 * (field.at(dimin.x-2,dimin.y-1) 
+                                + field.at(dimin.x-1,dimin.y-1) 
+                                + field.at(dimin.x-1,dimin.y-2) 
+                                + field.at(dimin.x-1, dimin.y-1)),
                                 dimin.x-1,dimin.y-1);
     }
     
@@ -166,7 +166,7 @@ namespace gradients {
 
         for (std::size_t i = 0; i < dimin.x; i++) {
             for (std::size_t j = 0; j < dimin.y; j++) {
-                dI.set_val(
+                dI.set(
                     vector2d(gradients::partial_x(image, i, j),
                              gradients::partial_y(image, i, j)),
                     i,j
@@ -190,7 +190,7 @@ namespace gradients {
                 dudx = gradients::partial_x<vector2d>(motion, i, j);
                 dudy = gradients::partial_y<vector2d>(motion, i, j);
 
-                image.set_val(
+                image.set(
                     (1.0 + dudx.x) * (1.0 + dudy.y) - dudx.y * dudy.x,
                     i, j
                 );
