@@ -12,43 +12,30 @@
 std::unique_ptr<ImageRegistration> ImageRegistration::_instance = nullptr;
 
 // Constructor
-ImageRegistration::ImageRegistration(
-    const dim dimin, 
-    const ModelOption option,
-    const std::size_t nscales, 
-    const std::size_t* niter,
-    const double alpha,
-    const double beta,
-    const double eps,
-    const std::size_t nrefine,
-    const double resampling_factor) {
+ImageRegistration::ImageRegistration(const RegistrationConfiguration& config) {
     // Registration parameters
-    _nscales = nscales;
-    _nrefine = nrefine;
-    _option = option;
-    _resampling_factor = resampling_factor;
+    _nscales = config.nscales;
+    _nrefine = config.nrefine;
+    _option = config.model_option;
+    _resampling_factor = config.resampling_factor;
 
     // Allocate image and motion 
-    _Iref = new opticalflow::Image*[nscales + 1];
-    _Imov = new opticalflow::Image*[nscales + 1];
-    _motion = new opticalflow::Motion*[nscales + 1];
-    _c = new opticalflow::Image*[nscales + 1];
-    _solver = new IterativeSolver*[nscales + 1];
-    for (int s = static_cast<int>(nscales); s >= 0; s--) {
-        double scale = pow(_resampling_factor, s);
-        const dim dim_s = dim(
-            static_cast<std::size_t> (dimin.x*scale),
-            static_cast<std::size_t> (dimin.y*scale)
-        );
+    _Iref = new opticalflow::Image*[config.nscales + 1];
+    _Imov = new opticalflow::Image*[config.nscales + 1];
+    _motion = new opticalflow::Motion*[config.nscales + 1];
+    _c = new opticalflow::Image*[config.nscales + 1];
+    _solver = new IterativeSolver*[config.nscales + 1];
 
-        _Iref[s] = new opticalflow::Image(dim_s);
-        _Imov[s] = new opticalflow::Image(dim_s);
-        _motion[s] = new opticalflow::Motion(dim_s);
-        _c[s] = new opticalflow::Image(dim_s);
-        _solver[s] = new IterativeSolver(dim_s, s, alpha, beta, niter[s], eps);
+    for (int s = static_cast<int>(config.nscales); s >= 0; s--) {
+        const SolverParameters& solver_params = config.solver_parameters[s];
+
+        _Iref[s] = new opticalflow::Image(solver_params.dimin);
+        _Imov[s] = new opticalflow::Image(solver_params.dimin);
+        _motion[s] = new opticalflow::Motion(solver_params.dimin);
+        _c[s] = new opticalflow::Image(solver_params.dimin);
+        _solver[s] = new IterativeSolver(solver_params);
     }
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Private methods
@@ -73,35 +60,14 @@ ImageRegistration::~ImageRegistration() {
 }
 
 // Instance management
-void ImageRegistration::createInstance(
-    const dim dimin,
-    const ModelOption option,
-    const std::size_t nscales,
-    const std::size_t* niter,
-    const double alpha,
-    const double beta,
-    const double eps,
-    const std::size_t nrefine,
-    const double resampling_factor) {
+void ImageRegistration::createInstance(const RegistrationConfiguration& config) {
     // Check if an instance already exists
     if (_instance)
         throw std::logic_error("Error: ImageRegistration is already initialized.");
 
     // Create a new instance of ImageRegistration. Note: we cannot use std::make_unique 
     // here because the constructor is private.
-    _instance.reset(
-        new ImageRegistration(
-            dimin,
-            option,
-            nscales,
-            niter,
-            alpha,
-            beta,
-            eps,
-            nrefine,
-            resampling_factor
-        )
-    );
+    _instance.reset(new ImageRegistration(config));
 }
 
 ImageRegistration& ImageRegistration::getInstance() {

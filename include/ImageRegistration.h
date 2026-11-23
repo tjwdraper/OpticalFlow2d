@@ -3,8 +3,7 @@
 
 #include "coord2d.hpp"
 #include "Field.hpp"
-#include "ConfigurationOptions.hpp"
-
+#include "RegistrationConfiguration.hpp"
 #include "IterativeSolver.h"
 
 #include <memory>
@@ -15,17 +14,7 @@ class ImageRegistration {
 
         // Remove default constructor, create constructor for registration parameters
         ImageRegistration() = delete;
-        ImageRegistration(
-            const dim dimin,
-            const ModelOption option,
-            const std::size_t nscales,
-            const std::size_t* niter,
-            const double alpha,
-            const double beta,
-            const double eps,
-            const std::size_t nrefine,
-            const double resampling_factor
-        );
+        ImageRegistration(const RegistrationConfiguration& config);
 
         // Private members
         std::size_t _nscales;
@@ -43,15 +32,7 @@ class ImageRegistration {
 
     public:
         // Instance management
-        static void createInstance(const dim dimin,
-                                   const ModelOption option,
-                                   const std::size_t nscales,
-                                   const std::size_t* niter,
-                                   const double alpha,
-                                   const double beta,
-                                   const double eps,
-                                   const std::size_t nrefine,
-                                   const double resampling_factor); 
+        static void createInstance(const RegistrationConfiguration& config);
         static ImageRegistration& getInstance(); 
         static void shutdownInstance();
 
