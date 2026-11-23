@@ -3,11 +3,11 @@
 #include "conv2d.hpp"
 
 // Constructors and deconstructors
-IterativeSolver::IterativeSolver(const dim dimin, const std::size_t resolution_level, const double alpha, const double beta, const std::size_t niter, const double eps) {
+IterativeSolver::IterativeSolver(const SolverParameters& params) {
     // Get the dimensions and size of the images
-    _dimin  = dimin;
-    _step   = dim(1, dimin.x);
-    _sizein = dimin.x * dimin.y;
+    _dimin  = params.dimin;
+    _step   = dim(1, _dimin.x);
+    _sizein = _dimin.x * _dimin.y;
 
     // Allocate memory for image gradients
     _spatial_gradient_image = new opticalflow::Motion(_dimin);
@@ -16,12 +16,31 @@ IterativeSolver::IterativeSolver(const dim dimin, const std::size_t resolution_l
     _c_average = new opticalflow::Image(_dimin);
 
     // Model parameters
-    _alpha = alpha;
-    _beta = beta;
-    _eps = eps;
-    _niter = niter;
-    _resolution_level = resolution_level;
+    _alpha = params.alpha;
+    _beta = params.beta;
+    _eps = params.eps;
+    _niter = params.niter;
 }
+
+// IterativeSolver::IterativeSolver(const dim dimin, const std::size_t resolution_level, const double alpha, const double beta, const std::size_t niter, const double eps) {
+//     // Get the dimensions and size of the images
+//     _dimin  = dimin;
+//     _step   = dim(1, dimin.x);
+//     _sizein = dimin.x * dimin.y;
+
+//     // Allocate memory for image gradients
+//     _spatial_gradient_image = new opticalflow::Motion(_dimin);
+//     _temporal_derivative_image = new opticalflow::Image(_dimin);
+//     _horn_schunck_average = new opticalflow::Motion(_dimin);
+//     _c_average = new opticalflow::Image(_dimin);
+
+//     // Model parameters
+//     _alpha = alpha;
+//     _beta = beta;
+//     _eps = eps;
+//     _niter = niter;
+//     _resolution_level = resolution_level;
+// }
 
 IterativeSolver::~IterativeSolver() {
     delete _horn_schunck_average;

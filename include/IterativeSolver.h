@@ -3,16 +3,18 @@
 
 #include "coord2d.hpp"
 #include "Field.hpp"
+#include "RegistrationConfiguration.hpp"
 
 class IterativeSolver {
     public:
         // Constructors and deconstructors
-        IterativeSolver(const dim dimin, 
-                        const std::size_t resolution_level, 
-                        const double alpha, 
-                        const double beta, 
-                        const std::size_t niter, 
-                        const double eps);
+        IterativeSolver(const SolverParameters& params);
+        // IterativeSolver(const dim dimin, 
+        //                 const std::size_t resolution_level, 
+        //                 const double alpha, 
+        //                 const double beta, 
+        //                 const std::size_t niter, 
+        //                 const double eps);
         ~IterativeSolver();
 
         // Getters and setters
@@ -44,7 +46,7 @@ class IterativeSolver {
         double _beta;
         double _eps;
         std::size_t _niter;
-        std::size_t _resolution_level;
+        // std::size_t _resolution_level;
 };
 
 #endif

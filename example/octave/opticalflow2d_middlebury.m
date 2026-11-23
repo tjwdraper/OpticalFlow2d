@@ -112,11 +112,11 @@ if (isfield(config_json, "registration"))
     if (isfield(config_json.registration, "nrefine"))
         config.nrefine = config_json.registration.nrefine;
     endif
-    
+
     if (isfield(config_json.registration, "niter"))
         config.niter = int32(config_json.registration.niter);
     endif
-    
+
     if (isfield(config_json.registration, "alpha"))
         config.alpha = config_json.registration.alpha;
     endif
