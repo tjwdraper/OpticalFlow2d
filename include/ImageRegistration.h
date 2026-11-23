@@ -7,6 +7,7 @@
 #include "IterativeSolver.h"
 
 #include <memory>
+#include <vector>
 
 class ImageRegistration {
     private:
@@ -22,13 +23,12 @@ class ImageRegistration {
         ModelOption _option;
         double _resampling_factor;
 
-        IterativeSolver** _solver;
+        std::vector<std::unique_ptr<IterativeSolver>> _solver;
 
-        opticalflow::Image** _Iref;
-        opticalflow::Image** _Imov;
-
-        opticalflow::Motion** _motion;
-        opticalflow::Image** _c;
+        std::vector<std::unique_ptr<opticalflow::Image>> _Iref;
+        std::vector<std::unique_ptr<opticalflow::Image>> _Imov;
+        std::vector<std::unique_ptr<opticalflow::Motion>> _motion;
+        std::vector<std::unique_ptr<opticalflow::Image>> _c;
 
     public:
         // Instance management

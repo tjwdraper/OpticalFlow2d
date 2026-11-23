@@ -22,26 +22,6 @@ IterativeSolver::IterativeSolver(const SolverParameters& params) {
     _niter = params.niter;
 }
 
-// IterativeSolver::IterativeSolver(const dim dimin, const std::size_t resolution_level, const double alpha, const double beta, const std::size_t niter, const double eps) {
-//     // Get the dimensions and size of the images
-//     _dimin  = dimin;
-//     _step   = dim(1, dimin.x);
-//     _sizein = dimin.x * dimin.y;
-
-//     // Allocate memory for image gradients
-//     _spatial_gradient_image = new opticalflow::Motion(_dimin);
-//     _temporal_derivative_image = new opticalflow::Image(_dimin);
-//     _horn_schunck_average = new opticalflow::Motion(_dimin);
-//     _c_average = new opticalflow::Image(_dimin);
-
-//     // Model parameters
-//     _alpha = alpha;
-//     _beta = beta;
-//     _eps = eps;
-//     _niter = niter;
-//     _resolution_level = resolution_level;
-// }
-
 IterativeSolver::~IterativeSolver() {
     delete _horn_schunck_average;
     delete _c_average;
