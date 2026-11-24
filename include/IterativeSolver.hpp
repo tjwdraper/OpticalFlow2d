@@ -56,7 +56,7 @@ class HornSchunckStrategy : public IterativeSolverStrategy {
             opticalflow::Motion motionNext(dimin);
 
             // Create convolution kernels
-            const opticalflow::average_conv2d filter(dim(3,3));
+            const opticalflow::averageConv2d filter(dim(3,3));
 
             // Dereference some variables
             opticalflow::Motion& motionAverage = *_motionAverage;
@@ -135,7 +135,7 @@ class CorneliusKanadeStrategy : public IterativeSolverStrategy {
             opticalflow::Image cNext(dimin);
 
             // Create convolution kernels
-            const opticalflow::average_conv2d filter(dim(3,3));
+            const opticalflow::averageConv2d filter(dim(3,3));
 
             // Dereference some variables
             opticalflow::Motion& motionAverage = *_motionAverage;

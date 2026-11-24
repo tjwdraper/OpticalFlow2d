@@ -12,10 +12,10 @@
 // Separable 2d convolution
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 namespace opticalflow {
-    class separable_conv2d {
+    class separableConv2d {
         public:
             // Constructors and deconstructors
-            separable_conv2d(const dim dimconv) : 
+            separableConv2d(const dim dimconv) : 
                 _dimconv(dimconv),
                 _stepconv(1, dimconv.x),
                 _sizeconv(dimconv.x*dimconv.y),
@@ -24,12 +24,12 @@ namespace opticalflow {
 
                 // Check convolution dimensions
                 if (dimconv.x == 0 || dimconv.y == 0)
-                    throw std::runtime_error("In separable_conv2d(const dim), convolution dimensions must be non-zero.");
+                    throw std::runtime_error("In separableConv2d(const dim), convolution dimensions must be non-zero.");
 
                 if (dimconv.x % 2 == 0 || dimconv.y % 2 == 0)
-                    throw std::runtime_error("In separable_conv2d(const dim), convolution dimensions must be odd.");
+                    throw std::runtime_error("In separableConv2d(const dim), convolution dimensions must be odd.");
             }
-            virtual ~separable_conv2d() = default;
+            virtual ~separableConv2d() = default;
 
             // Apply convolution
             template<typename T>
@@ -104,31 +104,31 @@ namespace opticalflow {
             std::vector<double> _weights_j;
     };
 
-    class average_conv2d : public separable_conv2d {
+    class averageConv2d : public separableConv2d {
         public:
-            average_conv2d(const dim dimconv) : separable_conv2d(dimconv) {
+            averageConv2d(const dim dimconv) : separableConv2d(dimconv) {
                 std::fill(_weights_i.begin(), _weights_i.end(), 1.0);
                 std::fill(_weights_j.begin(), _weights_j.end(), 1.0);
 
                 normalize_weights();
             }
-            ~average_conv2d() = default;
+            ~averageConv2d() = default;
     };
 
-    class gaussian_conv2d : public separable_conv2d {
+    class gaussianConv2d : public separableConv2d {
         public:
             // Constructors and deconstructors
-            gaussian_conv2d(const dim dimconv, const vector2d sigma) : separable_conv2d(dimconv), _sigma(sigma) {
+            gaussianConv2d(const dim dimconv, const vector2d sigma) : separableConv2d(dimconv), _sigma(sigma) {
                 if (sigma.x <= 0.0 || sigma.y <= 0.0)
-                    throw std::runtime_error("In gaussian_conv2d(const dim, const vector2d), sigma must be positive.");
+                    throw std::runtime_error("In gaussianConv2d(const dim, const vector2d), sigma must be positive.");
 
                 _weights_i = gaussian_weights(dimconv.x, sigma.x);
                 _weights_j = gaussian_weights(dimconv.y, sigma.y);
 
                 normalize_weights();
             }
-            gaussian_conv2d(const vector2d sigma) : gaussian_conv2d(dim(2*static_cast<std::size_t>(std::ceil(3.0 * sigma.x)) + 1), sigma) {}
-            virtual ~gaussian_conv2d() = default;
+            gaussianConv2d(const vector2d sigma) : gaussianConv2d(dim(2*static_cast<std::size_t>(std::ceil(3.0 * sigma.x)) + 1), sigma) {}
+            virtual ~gaussianConv2d() = default;
 
             //  Getters and setters
             vector2d get_sigma() const {return _sigma;}
