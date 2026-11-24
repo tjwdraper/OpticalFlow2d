@@ -102,12 +102,12 @@ void ImageRegistration::set_reference_image(const opticalflow::Image& image) {
     *_Iref[0] = image;
 
     // Smooth finest level
-    gaussian_conv2d filter(0.8);
+    const opticalflow::gaussian_conv2d filter(0.8);
     filter.convolute(*_Iref[0]);
 
     // Anti-aliasing filter for downsampling
     const double sigma_aa = 0.6 * std::sqrt(1.0 / (_resampling_factor * _resampling_factor) - 1.0);
-    gaussian_conv2d filter_aa(sigma_aa);
+    const opticalflow::gaussian_conv2d filter_aa(sigma_aa);
 
     // Build Gaussian pyramid
     for (std::size_t s = 1; s <= _nscales; ++s) {
@@ -123,12 +123,12 @@ void ImageRegistration::set_moving_image(const opticalflow::Image& image) {
     *_Imov[0] = image;
 
     // Smooth finest level
-    gaussian_conv2d filter(0.8);
+    const opticalflow::gaussian_conv2d filter(0.8);
     filter.convolute(*_Imov[0]);
 
     // Anti-aliasing filter for downsampling
     const double sigma_aa = 0.6 * std::sqrt(1.0 / (_resampling_factor * _resampling_factor) - 1.0);
-    gaussian_conv2d filter_aa(sigma_aa);
+    const opticalflow::gaussian_conv2d filter_aa(sigma_aa);
 
     // Build Gaussian pyramid
     for (std::size_t s = 1; s <= _nscales; ++s) {
