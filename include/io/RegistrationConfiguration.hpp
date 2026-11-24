@@ -32,6 +32,8 @@ inline const std::map<std::string, ModelOption> mapper_model_option {
 
 struct SolverParameters {
     dim dimin; 
+    dim step;
+    std::size_t size;
 
     double alpha;
     double beta;

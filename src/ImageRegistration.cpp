@@ -1,4 +1,5 @@
 #include "ImageRegistration.h"
+#include "IterativeSolver.hpp"
 #include "conv2d.hpp"
 #include "interp2d.hpp"
 
@@ -23,7 +24,6 @@ ImageRegistration::ImageRegistration(const RegistrationConfiguration& config) {
     _Iref.resize(_nscales + 1);
     _Imov.resize(_nscales + 1);
     _motion.resize(_nscales + 1);
-    _c.resize(_nscales + 1);
     _solver.resize(_nscales + 1);
 
     for (int s = static_cast<int>(config.nscales); s >= 0; s--) {
@@ -37,13 +37,23 @@ ImageRegistration::ImageRegistration(const RegistrationConfiguration& config) {
         _Iref[s] = std::make_unique<opticalflow::Image>(solver_params.dimin);
         _Imov[s] = std::make_unique<opticalflow::Image>(solver_params.dimin);
         _motion[s] = std::make_unique<opticalflow::Motion>(solver_params.dimin);
-        _c[s] = std::make_unique<opticalflow::Image>(solver_params.dimin);
-        _solver[s] = std::make_unique<IterativeSolver>(solver_params);
+
+        if (config.model_option == ModelOption::HORN_SCHUNCK) {    
+            _solver[s] = std::make_unique<IterativeSolver>(
+                std::make_unique<HornSchunckStrategy>(solver_params)
+            );
+        }
+        else if (config.model_option == ModelOption::CORNELIUS_KANADE) {
+            _solver[s] = std::make_unique<IterativeSolver>(
+                std::make_unique<CorneliusKanadeStrategy>(solver_params)
+            );
+
+        }
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// Private methods
+// Public methods
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Deconstructor
@@ -54,7 +64,7 @@ ImageRegistration::~ImageRegistration() {
         _Iref[s].reset();
         _Imov[s].reset();
         _motion[s].reset();
-        _c[s].reset();
+        // _c[s].reset();
         _solver[s].reset();
     }
 }
@@ -133,54 +143,76 @@ const opticalflow::Motion& ImageRegistration::get_estimated_motion() const {
     return *_motion[0];
 }
 
-const opticalflow::Image& ImageRegistration::get_estimated_c() const {
-    return *_c[0];
+opticalflow::Image ImageRegistration::get_residue() const {
+    // Dereference images and motion field
+    const opticalflow::Image& Iref = *_Iref[0];
+    const opticalflow::Image& Imov = *_Imov[0];
+    const opticalflow::Motion& motion = *_motion[0];
+
+    // Get the image dimensions
+    const dim dimin = Iref.get_dimensions();
+
+    // Compute image gradient of moving image
+    opticalflow::Motion image_gradient(dimin);
+    gradients::gradient(image_gradient, Imov);
+
+    // Allocate memory for output
+    opticalflow::Image c(dimin);
+
+    // Compute the residue c
+    for (std::size_t idx = 0; idx < Iref.get_size(); ++idx) {
+        // Select deformation vector
+        const vector2d u = motion.at(idx);
+        const vector2d dI = image_gradient.at(idx);
+
+        // Compute residue at voxel
+        c.set(Iref.at(idx) - Imov.at(idx) - dot(u, dI), idx);
+    }
+
+    return c;
 }
 
 // Estimate motion
 void ImageRegistration::estimate_optical_flow() {    
+
     // Multiresolution pyramid
     for (int s = static_cast<int>(_nscales); s >= 0; s--) {
+
         // Dereference variables at current level
-        opticalflow::Motion& motion_s = *_motion[s];
-        opticalflow::Image& c_s = *_c[s];
-        const opticalflow::Image& Iref_s = *_Iref[s];
-        const opticalflow::Image& Imov_s = *_Imov[s];
-        IterativeSolver& solver_s = *_solver[s];
+        opticalflow::Motion& motion = *_motion[s];
+        const opticalflow::Image& Iref = *_Iref[s];
+        const opticalflow::Image& Imov = *_Imov[s];
+        IterativeSolver& solver = *_solver[s];
+
+        // Get current image dimensions
+        const dim dimin = solver.parameters().dimin;
 
         // Upsample from previous resolution
-        if (s < _nscales) {
-            interp2d::resize(motion_s, *_motion[s+1]); // Resample estimated DVF from previous resolution level
-            if (_option == ModelOption::CORNELIUS_KANADE)
-                interp2d::resize(c_s, *_c[s+1]);
-        }
-        else if (_option == ModelOption::CORNELIUS_KANADE)
-            c_s.fill(0.0);
+        if (s < _nscales)
+            interp2d::resize(motion, *_motion[s+1]); // Resample estimated DVF from previous resolution level
 
         // Estimate motion at current resolution level
-        if (_option == ModelOption::HORN_SCHUNCK)
-            solver_s.estimate_optical_flow(motion_s, Iref_s, Imov_s);
-        else if (_option == ModelOption::CORNELIUS_KANADE)
-            solver_s.estimate_optical_flow(motion_s, c_s, Iref_s, Imov_s);
+        solver.estimate_optical_flow(motion, Iref, Imov);
+
+        // If no refine (i.e. _nrefine == 0), continue to next iteration
+        if (_nrefine == 0) 
+            continue;
 
         // Refinement
+        opticalflow::Image ImovPropagated(dimin);
+        opticalflow::Motion motionPropagated(dimin);
         for (std::size_t r = 0; r < _nrefine; ++r) {
             // Initialize auxiliary variables
-            opticalflow::Image Imov_aux_s(Imov_s.get_dimensions());
-            opticalflow::Motion motion_aux_s(Imov_s.get_dimensions());
-            motion_aux_s.fill(vector2d(0.0));
+            motionPropagated.fill(0.0);
 
             // Warp the moving image with the so-far estimated motion field (which warps Imov -> Imov_aux \approx Iref)...
-            interp2d::warp2d(Imov_aux_s, Imov_s, motion_s);
+            interp2d::warp2d(ImovPropagated, Imov, motion);
 
             // ...use deformed image to estimate an deformation field from Imov_aux -> Iref...
-            if (_option == ModelOption::HORN_SCHUNCK)
-                solver_s.estimate_optical_flow(motion_aux_s, Iref_s, Imov_aux_s);
-            else if (_option == ModelOption::CORNELIUS_KANADE)
-                solver_s.estimate_optical_flow(motion_aux_s, c_s, Iref_s, Imov_aux_s);
+            solver.estimate_optical_flow(motionPropagated, Iref, ImovPropagated);
 
             // ...accumulate (= motion field composition) to get the estimated deformation field from Imov to Iref
-            interp2d::accumulate(motion_s, motion_aux_s);
+            interp2d::accumulate(motion, motionPropagated);
         }
     }
 

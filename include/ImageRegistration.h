@@ -4,7 +4,7 @@
 #include "coord2d.hpp"
 #include "Field.hpp"
 #include "RegistrationConfiguration.hpp"
-#include "IterativeSolver.h"
+#include "IterativeSolver.hpp"
 
 #include <memory>
 #include <vector>
@@ -28,7 +28,6 @@ class ImageRegistration {
         std::vector<std::unique_ptr<opticalflow::Image>> _Iref;
         std::vector<std::unique_ptr<opticalflow::Image>> _Imov;
         std::vector<std::unique_ptr<opticalflow::Motion>> _motion;
-        std::vector<std::unique_ptr<opticalflow::Image>> _c;
 
     public:
         // Instance management
@@ -46,7 +45,7 @@ class ImageRegistration {
         void set_reference_image(const opticalflow::Image& im);
         void set_moving_image(const opticalflow::Image& im);
         const opticalflow::Motion& get_estimated_motion() const;
-        const opticalflow::Image& get_estimated_c() const;
+        opticalflow::Image get_residue() const;
 
         // Estimate motion
         void estimate_optical_flow();

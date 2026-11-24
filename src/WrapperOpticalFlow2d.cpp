@@ -70,7 +70,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         ImageRegistration& myImageRegistration = ImageRegistration::getInstance();
 
         const opticalflow::Motion& motion = myImageRegistration.get_estimated_motion();
-        const opticalflow::Image& c = myImageRegistration.get_estimated_c();
+        const opticalflow::Image& c = myImageRegistration.get_residue();
 
         // Create output array and pointer to data
         plhs[0] = mxCreateNumericArray(3, dim_motion_mw.data(), mxDOUBLE_CLASS, mxREAL);

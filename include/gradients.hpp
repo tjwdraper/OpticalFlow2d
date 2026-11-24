@@ -75,7 +75,7 @@ namespace gradients {
     }
 
     template <typename T>
-    void horn_schunck_average(opticalflow::Field<T>& field_avg, const opticalflow::Field<T>& field) {
+    inline void horn_schunck_average(opticalflow::Field<T>& field_avg, const opticalflow::Field<T>& field) {
         // Check that input dimensions are OK
         if (field_avg.get_dimensions() != field.get_dimensions())
             throw std::runtime_error("Error in gradients::horn_schunck_average(opticalflow::Field<T>&, const opticalflow::Field<T>&): input dimensions have to be the same as target");
@@ -156,7 +156,7 @@ namespace gradients {
                                 dimin.x-1,dimin.y-1);
     }
     
-    void gradient(opticalflow::Motion& dI, const opticalflow::Image& image) {
+    inline void gradient(opticalflow::Motion& dI, const opticalflow::Image& image) {
         // Check that input dimensions are OK
         if (image.get_dimensions() != dI.get_dimensions())
             throw std::runtime_error("Error in gradients::gradient(opticalflow::Motion&, const opticalflow::Image&, const opticalflow::Image&): input dimensions have to be the same as target");
@@ -175,7 +175,7 @@ namespace gradients {
         }
     }
 
-    void jacobian(opticalflow::Image& image, const opticalflow::Motion& motion) {
+    inline void jacobian(opticalflow::Image& image, const opticalflow::Motion& motion) {
         // Check that input dimensions are OK
         if (image.get_dimensions() != motion.get_dimensions())
             throw std::runtime_error("Error in gradients::jacobian(Image&, const opticalflow::Motion&): input dimensions have to be the same as target");

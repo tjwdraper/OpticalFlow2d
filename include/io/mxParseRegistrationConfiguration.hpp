@@ -62,7 +62,11 @@ inline RegistrationConfiguration mxParseRegistrationConfiguration(const mxArray*
 
         // Create SolverParameters object
         SolverParameters solver_params;
+
         solver_params.dimin = dim_s;
+        solver_params.step = dim(1, dim_s.x);
+        solver_params.size = dim_s.x * dim_s.y;
+        
         solver_params.alpha = alpha;
         solver_params.beta = beta;
         solver_params.eps = eps;
