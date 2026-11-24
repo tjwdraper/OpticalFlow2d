@@ -114,7 +114,7 @@ void ImageRegistration::set_reference_image(const opticalflow::Image& image) {
         opticalflow::Image I_aa(*_Iref[s - 1]);
 
         filter_aa.convolute(I_aa);
-        interp2d::resize(*_Iref[s], I_aa);
+        opticalflow::interp2d::resize(*_Iref[s], I_aa);
     }
 }
 
@@ -135,7 +135,7 @@ void ImageRegistration::set_moving_image(const opticalflow::Image& image) {
         opticalflow::Image I_aa(*_Imov[s - 1]);
 
         filter_aa.convolute(I_aa);
-        interp2d::resize(*_Imov[s], I_aa);
+        opticalflow::interp2d::resize(*_Imov[s], I_aa);
     }
 }
 
@@ -154,7 +154,7 @@ opticalflow::Image ImageRegistration::get_residue() const {
 
     // Compute image gradient of moving image
     opticalflow::Motion image_gradient(dimin);
-    gradients::gradient(image_gradient, Imov);
+    opticalflow::gradients::gradient(image_gradient, Imov);
 
     // Allocate memory for output
     opticalflow::Image c(dimin);
@@ -189,7 +189,7 @@ void ImageRegistration::estimate_optical_flow() {
 
         // Upsample from previous resolution
         if (s < _nscales)
-            interp2d::resize(motion, *_motion[s+1]); // Resample estimated DVF from previous resolution level
+            opticalflow::interp2d::resize(motion, *_motion[s+1]); // Resample estimated DVF from previous resolution level
 
         // Estimate motion at current resolution level
         solver.estimate_optical_flow(motion, Iref, Imov);
@@ -206,13 +206,13 @@ void ImageRegistration::estimate_optical_flow() {
             motionPropagated.fill(0.0);
 
             // Warp the moving image with the so-far estimated motion field (which warps Imov -> Imov_aux \approx Iref)...
-            interp2d::warp2d(ImovPropagated, Imov, motion);
+            opticalflow::interp2d::warp2d(ImovPropagated, Imov, motion);
 
             // ...use deformed image to estimate an deformation field from Imov_aux -> Iref...
             solver.estimate_optical_flow(motionPropagated, Iref, ImovPropagated);
 
             // ...accumulate (= motion field composition) to get the estimated deformation field from Imov to Iref
-            interp2d::accumulate(motion, motionPropagated);
+            opticalflow::interp2d::accumulate(motion, motionPropagated);
         }
     }
 

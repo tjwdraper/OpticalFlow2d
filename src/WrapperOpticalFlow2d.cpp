@@ -96,7 +96,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         opticalflow::image::load_image(tmp, Imov);
 
         // Warp the image with the motion field
-        interp2d::warp2d(Ireg, Imov, motion);
+        opticalflow::interp2d::warp2d(Ireg, Imov, motion);
 
         // Create output array and poiter to data
         plhs[0] = mxCreateNumericArray(2, dim_image_mw.data(), mxDOUBLE_CLASS, mxREAL);

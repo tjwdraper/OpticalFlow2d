@@ -64,7 +64,7 @@ class HornSchunckStrategy : public IterativeSolverStrategy {
             opticalflow::Image& imageDifference = *_imageDifference;
 
             // Calculate spatial and temporal derivative
-            gradients::gradient(imageGradient, 0.5*(Iref + Imov)); // Symmetric gradient
+            opticalflow::gradients::gradient(imageGradient, 0.5*(Iref + Imov)); // Symmetric gradient
 
             imageDifference = Imov - Iref;
             filter.convolute(imageDifference);
@@ -73,7 +73,7 @@ class HornSchunckStrategy : public IterativeSolverStrategy {
             double falpha = 4.0 * parameters.alpha;
 
             for (std::size_t iter = 0; iter < _parameters.niter; ++iter) {
-                gradients::horn_schunck_average(motionAverage, motion);
+                opticalflow::gradients::horn_schunck_average(motionAverage, motion);
 
                 for (std::size_t idx = 0; idx < _parameters.size; ++idx) {
                     // Get values
@@ -144,7 +144,7 @@ class CorneliusKanadeStrategy : public IterativeSolverStrategy {
             opticalflow::Image& imageDifference = *_imageDifference;
 
             // Calculate spatial and temporal derivative
-            gradients::gradient(imageGradient, 0.5*(Iref + Imov)); // Symmetric gradient
+            opticalflow::gradients::gradient(imageGradient, 0.5*(Iref + Imov)); // Symmetric gradient
 
             imageDifference = Imov - Iref;
             filter.convolute(imageDifference);
@@ -154,8 +154,8 @@ class CorneliusKanadeStrategy : public IterativeSolverStrategy {
             double fbeta = 4.0 * parameters.beta;
 
             for (std::size_t iter = 0; iter < parameters.niter; ++iter) {
-                gradients::horn_schunck_average(motionAverage, motion);
-                gradients::horn_schunck_average(cAverage, c);
+                opticalflow::gradients::horn_schunck_average(motionAverage, motion);
+                opticalflow::gradients::horn_schunck_average(cAverage, c);
 
                 for (std::size_t idx = 0; idx < parameters.size; ++idx) {
                     // Get values
